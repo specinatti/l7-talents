@@ -3,60 +3,18 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-const { Pool } = require('pg');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure uploads directory exists
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads', { recursive: true });
-}
-
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL, 
-  ssl: { rejectUnauthorized: false } 
-});
-
-pool.query('SELECT NOW()', (err) => { 
-  if (err) console.log('❌ DB Error:', err); 
-  else console.log('✅ DB Connected'); 
-});
-
-const storage = multer.diskStorage({ 
-  destination: (req, file, cb) => cb(null, 'uploads/'), 
-  filename: (req, file, cb) => { 
-    const name = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname); 
-    cb(null, name); 
-  } 
-});
-
-const upload = multer({ 
-  storage, 
-  limits: { fileSize: 5 * 1024 * 1024 }, 
-  fileFilter: (req, file, cb) => { 
-    if (/pdf|doc|docx/.test(path.extname(file.originalname).toLowerCase())) 
-      cb(null, true); 
-    else 
-      cb(new Error('Apenas PDF, DOC, DOCX')); 
-  } 
-});
-
-// Middleware - CORS MUST BE FIRST
+// Middleware
 app.use(cors({ 
-  origin: ['https://l7talents.online', 'https://www.l7talents.online', 'http://localhost:3000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true 
 }));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
 
 // Nodemailer Configuration
 const transporter = nodemailer.createTransport({
@@ -83,73 +41,6 @@ transporter.verify((error, success) => {
 });
 
 // ============ API ROUTES ============
-
-// Error handling middleware for multer
-app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    return res.status(400).json({ error: `Erro no upload: ${err.message}` });
-  } else if (err) {
-    return res.status(400).json({ error: err.message });
-  }
-  next();
-});
-
-app.post('/api/curriculum', upload.single('curriculo'), async (req, res) => { 
-  try {
-    const { nome, email, telefone, cargo_desejado, area_atuacao, habilidades, linkedin, nivel_experiencia, resumo_profissional } = req.body; 
-    
-    if (!nome || !email) {
-      return res.status(400).json({ error: 'Nome e email são obrigatórios' }); 
-    }
-    
-    const arquivo = req.file ? req.file.filename : null; 
-    const habs = habilidades ? habilidades.split(',').map(h => h.trim()) : []; 
-    
-    const result = await pool.query(
-      'INSERT INTO curriculos (nome, email, telefone, cargo_desejado, area_atuacao, habilidades, arquivo_curriculo, linkedin, nivel_experiencia, resumo_profissional) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', 
-      [nome, email, telefone, cargo_desejado, area_atuacao, habs, arquivo, linkedin, nivel_experiencia, resumo_profissional]
-    ); 
-    
-    // Send email notification
-    try {
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,
-        to: process.env.ADMIN_EMAIL,
-        subject: `Novo Currículo: ${nome} - ${cargo_desejado}`,
-        html: `
-          <h2>Novo Currículo Recebido</h2>
-          <p><strong>Nome:</strong> ${nome}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Telefone:</strong> ${telefone}</p>
-          <p><strong>Cargo Desejado:</strong> ${cargo_desejado}</p>
-          <p><strong>Área:</strong> ${area_atuacao}</p>
-          <p><strong>Nível:</strong> ${nivel_experiencia}</p>
-          <p><strong>LinkedIn:</strong> ${linkedin || 'Não informado'}</p>
-          <p><strong>Habilidades:</strong> ${habilidades || 'Não informado'}</p>
-          <p><strong>Resumo:</strong> ${resumo_profissional || 'Não informado'}</p>
-          <p><strong>Arquivo:</strong> ${arquivo || 'Não anexado'}</p>
-        `
-      });
-    } catch (emailError) {
-      console.error('❌ Erro ao enviar email:', emailError);
-    }
-    
-    res.json({ success: true, id: result.rows[0].id, message: 'Currículo enviado com sucesso!' }); 
-  } catch (error) { 
-    console.error('❌ Erro ao salvar currículo:', error); 
-    res.status(500).json({ error: 'Erro ao processar currículo. Tente novamente.' }); 
-  } 
-});
-
-app.get('/api/curriculums', async (req, res) => { 
-  try { 
-    const result = await pool.query('SELECT * FROM curriculos ORDER BY created_at DESC'); 
-    res.json(result.rows); 
-  } catch (error) { 
-    console.error('❌ Erro ao buscar currículos:', error);
-    res.status(500).json({ error: 'Erro ao buscar currículos' }); 
-  } 
-});
 
 // Contact Form
 app.post('/api/contact', async (req, res) => {
