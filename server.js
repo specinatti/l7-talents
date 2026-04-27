@@ -3,9 +3,16 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+const { Pool } = require('pg');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+pool.query('SELECT NOW()', (err) => { if (err) console.log('❌ DB Error:', err); else console.log('✅ DB Connected'); });
+const storage = multer.diskStorage({ destination: (req, file, cb) => cb(null, 'uploads/'), filename: (req, file, cb) => { const name = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname); cb(null, name); } });
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => { if (/pdf|doc|docx/.test(path.extname(file.originalname).toLowerCase())) cb(null, true); else cb(new Error('Apenas PDF, DOC, DOCX')); } });
 
 // Middleware
 app.use(cors({ 
@@ -15,6 +22,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
 // Nodemailer Configuration
 const transporter = nodemailer.createTransport({
@@ -41,6 +49,8 @@ transporter.verify((error, success) => {
 });
 
 // ============ API ROUTES ============
+app.post('/api/curriculum', upload.single('curriculo'), async (req, res) => { const { nome, email, telefone, cargo_desejado, area_atuacao, habilidades } = req.body; if (!nome || !email) return res.status(400).json({ error: 'Obrigatórios' }); try { const arquivo = req.file ? req.file.filename : null; const habs = habilidades ? habilidades.split(',').map(h => h.trim()) : []; const result = await pool.query('INSERT INTO curriculos (nome, email, telefone, cargo_desejado, area_atuacao, habilidades, arquivo_curriculo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [nome, email, telefone, cargo_desejado, area_atuacao, habs, arquivo]); res.json({ success: true, id: result.rows[0].id }); } catch (error) { console.error(error); res.status(500).json({ error: 'Erro' }); } });
+app.get('/api/curriculums', async (req, res) => { try { const result = await pool.query('SELECT * FROM curriculos ORDER BY created_at DESC'); res.json(result.rows); } catch (error) { res.status(500).json({ error: 'Erro' }); } });
 
 // Contact Form
 app.post('/api/contact', async (req, res) => {

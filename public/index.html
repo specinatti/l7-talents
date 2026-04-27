@@ -335,6 +335,30 @@
             min-height: 140px;
         }
 
+        .form-group select,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input[type="file"] {
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .form-group select:focus,
+        .form-group input[type="file"]:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(169, 75, 109, 0.1);
+        }
+
         .btn {
             width: 100%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -506,6 +530,7 @@
                 <li><a href="#sobre">Sobre</a></li>
                 <li><a href="#partnership">Parceria</a></li>
                 <li><a href="#services">Serviços</a></li>
+                <li><a href="#vagas">Trabalhe Conosco</a></li>
                 <li><a href="#contact">Contato</a></li>
             </ul>
         </div>
@@ -572,6 +597,77 @@
             <h2>Nossa Atuação</h2>
             <p class="section-subtitle">Combinamos agilidade, governança e visão de negócio para entregar resultados estratégicos</p>
             <img src="/images/nossa_atuacao.jpeg" alt="Nossa Atuação" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- TRABALHE CONOSCO -->
+    <section id="vagas">
+        <div class="container">
+            <h2>Trabalhe Conosco</h2>
+            <p class="section-subtitle">Faça parte do nosso time! Envie seu currículo e entraremos em contato.</p>
+            <form class="contact-form" id="curriculumForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="curr_nome">Nome Completo *</label>
+                    <input type="text" id="curr_nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="curr_email">Email *</label>
+                    <input type="email" id="curr_email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="curr_telefone">Telefone *</label>
+                    <input type="tel" id="curr_telefone" name="telefone" required>
+                </div>
+                <div class="form-group">
+                    <label for="curr_linkedin">LinkedIn</label>
+                    <input type="url" id="curr_linkedin" name="linkedin" placeholder="https://linkedin.com/in/seu-perfil">
+                </div>
+                <div class="form-group">
+                    <label for="curr_cargo">Cargo Desejado *</label>
+                    <input type="text" id="curr_cargo" name="cargo_desejado" required>
+                </div>
+                <div class="form-group">
+                    <label for="curr_area">Área de Atuação *</label>
+                    <select id="curr_area" name="area_atuacao" required>
+                        <option value="">Selecione...</option>
+                        <option value="Recrutamento e Seleção">Recrutamento e Seleção</option>
+                        <option value="Treinamento e Desenvolvimento">Treinamento e Desenvolvimento</option>
+                        <option value="Departamento Pessoal">Departamento Pessoal</option>
+                        <option value="Benefícios">Benefícios</option>
+                        <option value="Gestão de Pessoas">Gestão de Pessoas</option>
+                        <option value="Business Partner">Business Partner</option>
+                        <option value="Outra">Outra</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="curr_nivel">Nível de Experiência</label>
+                    <select id="curr_nivel" name="nivel_experiencia">
+                        <option value="">Selecione...</option>
+                        <option value="Estagiário">Estagiário</option>
+                        <option value="Júnior">Júnior</option>
+                        <option value="Pleno">Pleno</option>
+                        <option value="Sênior">Sênior</option>
+                        <option value="Especialista">Especialista</option>
+                        <option value="Coordenador">Coordenador</option>
+                        <option value="Gerente">Gerente</option>
+                        <option value="Diretor">Diretor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="curr_habilidades">Principais Habilidades (separadas por vírgula)</label>
+                    <input type="text" id="curr_habilidades" name="habilidades" placeholder="Ex: Recrutamento, Excel, Inglês">
+                </div>
+                <div class="form-group">
+                    <label for="curr_resumo">Resumo Profissional</label>
+                    <textarea id="curr_resumo" name="resumo_profissional" rows="4" placeholder="Conte um pouco sobre sua experiência profissional..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="curr_arquivo">Anexar Currículo (PDF, DOC, DOCX - Máx 5MB)</label>
+                    <input type="file" id="curr_arquivo" name="curriculo" accept=".pdf,.doc,.docx">
+                </div>
+                <button type="submit" class="btn">Enviar Currículo</button>
+                <div class="form-message" id="curriculumMessage"></div>
+            </form>
         </div>
     </section>
 
@@ -656,6 +752,38 @@
                 formMessage.className = 'form-message error';
             }
         });
+        // Curriculum Form
+        document.getElementById('curriculumForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const curriculumMessage = document.getElementById('curriculumMessage');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+            try {
+                const response = await fetch('/api/curriculum', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    curriculumMessage.textContent = '✅ Currículo enviado com sucesso! Entraremos em contato em breve.';
+                    curriculumMessage.className = 'form-message success';
+                    e.target.reset();
+                    setTimeout(() => { curriculumMessage.style.display = 'none'; }, 5000);
+                } else {
+                    curriculumMessage.textContent = '❌ Erro: ' + data.error;
+                    curriculumMessage.className = 'form-message error';
+                }
+            } catch (error) {
+                curriculumMessage.textContent = '❌ Erro de conexão: ' + error.message;
+                curriculumMessage.className = 'form-message error';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Currículo';
+            }
+        });
+
     </script>
 </body>
 </html>
