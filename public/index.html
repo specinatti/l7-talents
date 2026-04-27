@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7 Talents - Estratégia em Gestão de Pessoas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a3a52;
+            --secondary: #a94b6d;
+            --accent: #f39c12;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --light-text: #7f8c8d;
+            --white: #ffffff;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* ===== NAVEGAÇÃO ===== */
+        nav {
+            background: linear-gradient(135deg, var(--primary) 0%, rgba(26, 58, 82, 0.95) 100%);
+            color: var(--white);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 3rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 58, 82, 0.85) 0%, rgba(169, 75, 109, 0.85) 100%), url('/images/nosso_compromisso.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--white);
+            padding: 150px 40px;
+            text-align: center;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(243, 156, 18, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-content h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .hero-content .subtitle {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .hero-content .highlight {
+            font-size: 1.8em;
+            font-style: italic;
+            margin-top: 25px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(169, 75, 109, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(169, 75, 109, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== SEÇÕES ===== */
+        section {
+            padding: 100px 40px;
+        }
+
+        section.light {
+            background: linear-gradient(135deg, var(--light-bg) 0%, rgba(248, 249, 250, 0.5) 100%);
+        }
+
+        h2 {
+            font-size: 3em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2em;
+            color: var(--light-text);
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+
+        /* ===== IMAGENS DE SEÇÃO ===== */
+        .section-image {
+            width: 100%;
+            max-width: 1000px;
+            margin: 50px auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .section-image:hover {
+            transform: scale(1.02);
+        }
+
+        .full-width-image {
+            width: 100%;
+            max-width: 100%;
+            margin: 40px 0;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        /* ===== CARDS GRID ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin: 20px 0 15px 0;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--light-text);
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            color: var(--secondary);
+        }
+
+        /* ===== FORMULÁRIO ===== */
+        .contact-form {
+            max-width: 700px;
+            margin: 50px auto;
+            background: var(--white);
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(169, 75, 109, 0.1);
+            background: rgba(169, 75, 109, 0.02);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 16px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(26, 58, 82, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(26, 58, 82, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .form-message {
+            margin-top: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .form-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .form-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, rgba(26, 58, 82, 0.95) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 50px 40px;
+            margin-top: 80px;
+        }
+
+        footer p {
+            margin-bottom: 12px;
+            opacity: 0.95;
+        }
+
+        footer .company-name {
+            font-size: 1.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        footer .footer-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            margin: 20px auto;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 768px) {
+            nav .container {
+                padding: 0 20px;
+            }
+
+            nav ul {
+                gap: 1.5rem;
+                font-size: 0.9em;
+            }
+
+            .hero {
+                padding: 80px 20px;
+                min-height: 400px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.2em;
+            }
+
+            .hero-content .subtitle {
+                font-size: 1.1em;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            section {
+                padding: 60px 20px;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-form {
+                padding: 30px 20px;
+            }
+
+            footer {
+                padding: 40px 20px;
+            }
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <!-- NAVEGAÇÃO -->
+    <nav>
+        <div class="container">
+            <div class="logo">L7 TALENTS</div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#partnership">Parceria</a></li>
+                <li><a href="#services">Serviços</a></li>
+                <li><a href="#contact">Contato</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Nosso Compromisso</h1>
+            <p class="subtitle">Mais do que recrutar, estruturamos decisões estratégicas</p>
+            <p class="highlight">Transformamos talentos em vantagem competitiva</p>
+            <a href="#contact" class="cta-button">Fale Conosco</a>
+        </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section class="light" id="sobre">
+        <div class="container">
+            <h2>Estratégia em Gestão de Pessoas</h2>
+            <p class="section-subtitle">Posicionando capital humano como diferencial competitivo através de soluções estratégicas em Talent Acquisition, Estruturação de RH e Gestão de Talentos.</p>
+            <img src="/images/l7talents_.jpeg" alt="L7 Talents" class="section-image">
+        </div>
+    </section>
+
+    <!-- QUEM SOMOS -->
+    <section id="quem-somos">
+        <div class="container">
+            <h2>Quem Somos</h2>
+            <img src="/images/quem_somos.jpeg" alt="Quem Somos" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- MODELO DE PARCERIA -->
+    <section class="light" id="partnership">
+        <div class="container">
+            <h2>Modelo de Parceria</h2>
+            <p class="section-subtitle">A L7 Talents atua como parceira estratégica, oferecendo soluções sob medida conforme a necessidade da empresa.</p>
+            <img src="/images/modelo_parceria.jpeg" alt="Modelo de Parceria" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- VERTENTES DE ATUAÇÃO -->
+    <section id="services">
+        <div class="container">
+            <h2>Vertentes de Atuação</h2>
+            <p class="section-subtitle">Nossas principais áreas de especialização e atuação</p>
+            <img src="/images/vertentes atuação.jpeg" alt="Vertentes de Atuação" class="full-width-image">
+            <img src="/images/vertentes_atuacao_2.jpeg" alt="Vertentes de Atuação - Continuação" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- DIFERENCIAIS ESTRATÉGICOS -->
+    <section class="light">
+        <div class="container">
+            <h2>Diferenciais Estratégicos</h2>
+            <p class="section-subtitle">O que nos diferencia no mercado de gestão de pessoas</p>
+            <img src="/images/diferenciais.jpeg" alt="Diferenciais Estratégicos" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- NOSSA ATUAÇÃO -->
+    <section>
+        <div class="container">
+            <h2>Nossa Atuação</h2>
+            <p class="section-subtitle">Combinamos agilidade, governança e visão de negócio para entregar resultados estratégicos</p>
+            <img src="/images/nossa_atuacao.jpeg" alt="Nossa Atuação" class="full-width-image">
+        </div>
+    </section>
+
+    <!-- CONTATO -->
+    <section class="light" id="contact">
+        <div class="container">
+            <h2>Entre em Contato</h2>
+            <p class="section-subtitle">Vamos conversar sobre como podemos ajudar sua empresa a crescer</p>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Nome Completo *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefone</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="company">Empresa</label>
+                    <input type="text" id="company" name="company">
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensagem *</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit" class="btn">Enviar Mensagem</button>
+                <div class="form-message" id="formMessage"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="company-name">L7 TALENTS</div>
+            <div class="footer-divider"></div>
+            <p>Estratégia em Gestão de Pessoas</p>
+            <p>Email: <a href="mailto:rh@l7talents.online">rh@l7talents.online</a></p>
+            <p>&copy; 2026 L7 Talents. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const company = document.getElementById('company').value;
+            const message = document.getElementById('message').value;
+            const formMessage = document.getElementById('formMessage');
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, phone, company, message })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    formMessage.textContent = '✅ Mensagem enviada com sucesso! Entraremos em contato em breve.';
+                    formMessage.className = 'form-message success';
+                    document.getElementById('contactForm').reset();
+                    setTimeout(() => {
+                        formMessage.style.display = 'none';
+                    }, 5000);
+                } else {
+                    formMessage.textContent = '❌ Erro ao enviar: ' + data.error;
+                    formMessage.className = 'form-message error';
+                }
+            } catch (error) {
+                formMessage.textContent = '❌ Erro de conexão: ' + error.message;
+                formMessage.className = 'form-message error';
+            }
+        });
+    </script>
+</body>
+</html>
