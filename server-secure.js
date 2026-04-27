@@ -89,9 +89,27 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static files
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+// Static files with proper cache control
+app.use(express.static('public', {
+  maxAge: 0, // No cache for HTML
+  etag: false,
+  lastModified: false,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else if (path.endsWith('.css') || path.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour for CSS/JS
+    } else if (path.match(/\.(jpg|jpeg|png|gif|ico|svg)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours for images
+    }
+  }
+}));
+app.use('/uploads', express.static('uploads', {
+  maxAge: 0,
+  etag: false
+}));
 
 // Trust proxy (for Railway)
 app.set('trust proxy', 1);
@@ -306,8 +324,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
-// Serve HTML
+// Serve HTML with no-cache headers
 app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.sendFile(__dirname + '/public/index.html');
 });
 

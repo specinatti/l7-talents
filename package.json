@@ -4,8 +4,8 @@
   "description": "Landing page L7 Talents",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server-secure.js",
+    "dev": "node server-secure.js"
   },
   "keywords": [
     "l7",

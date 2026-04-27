@@ -15,6 +15,7 @@ const securityHeaders = (app) => {
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
+        upgradeInsecureRequests: [],
       },
     },
     hsts: {
@@ -39,6 +40,14 @@ const securityHeaders = (app) => {
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    // Prevent caching of HTML pages
+    if (req.path === '/' || req.path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    
     res.removeHeader('X-Powered-By');
     next();
   });
