@@ -263,30 +263,32 @@ app.post('/api/contact', formLimiter, async (req, res) => {
       userAgent: req.get('user-agent')
     });
 
-    // Send to Admin only
+    // Send to Commercial team (empresas interessadas)
     try {
       await transporter.sendMail({
         from: process.env.SMTP_USER,
-        to: process.env.ADMIN_EMAIL,
-        replyTo: email, // User can reply directly
-        subject: `Novo Contato: ${name}`,
+        to: process.env.CONTACT_EMAIL, // comercial@l7talents.online
+        replyTo: email,
+        subject: `Novo Contato Empresarial: ${name}${company ? ' - ' + company : ''}`,
         html: `
-          <h2>Novo Contato Recebido</h2>
+          <h2>Nova Solicitação de Contato</h2>
           <p><strong>Nome:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>
           <p><strong>Empresa:</strong> ${company || 'Não informado'}</p>
           <p><strong>Mensagem:</strong></p>
           <p>${message}</p>
+          <hr>
+          <p><small>Este contato foi enviado pelo formulário do site l7talents.online</small></p>
         `
       });
     } catch (emailError) {
-      console.error('❌ Erro ao enviar email para admin:', emailError);
+      console.error('❌ Erro ao enviar email para comercial:', emailError);
       // Continue anyway - data is logged
     }
 
     // Always return success (email sent or not)
-    res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
+    res.json({ success: true, message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.' });
   } catch (error) {
     console.error('❌ Erro ao processar contato:', error);
     auditLogger.logSecurityEvent('contact_form_failed', { error: error.message }, req.ip, req.get('user-agent'));
