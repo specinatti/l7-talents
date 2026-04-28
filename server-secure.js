@@ -14,6 +14,7 @@ const { apiLimiter, formLimiter, uploadLimiter } = require('./rateLimiter');
 const inputValidator = require('./inputValidator');
 const encryption = require('./encryption');
 const auditLogger = require('./auditLogger');
+const cacheBusting = require('./cacheBusting');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -75,6 +76,9 @@ const upload = multer({
 
 // Apply security headers
 securityHeaders(app);
+
+// Apply cache busting
+app.use(cacheBusting);
 
 // CORS Configuration
 app.use(cors({ 
@@ -275,17 +279,23 @@ app.post('/api/contact', formLimiter, async (req, res) => {
       `
     });
 
-    // Send confirmation to user
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: 'Recebemos sua mensagem - L7 Talents',
-      html: `
-        <h2>Obrigado por entrar em contato!</h2>
-        <p>Recebemos sua mensagem e responderemos em breve.</p>
-        <p>Atenciosamente,<br>Equipe L7 Talents</p>
-      `
-    });
+    // Send confirmation to user (only if not our own domain)
+    if (!email.endsWith('@l7talents.online')) {
+      try {
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: email,
+          subject: 'Recebemos sua mensagem - L7 Talents',
+          html: `
+            <h2>Obrigado por entrar em contato!</h2>
+            <p>Recebemos sua mensagem e responderemos em breve.</p>
+            <p>Atenciosamente,<br>Equipe L7 Talents</p>
+          `
+        });
+      } catch (confirmError) {
+        console.log('⚠️ Não foi possível enviar confirmação para:', email);
+      }
+    }
 
     res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
   } catch (error) {
