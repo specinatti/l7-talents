@@ -263,43 +263,32 @@ app.post('/api/contact', formLimiter, async (req, res) => {
       userAgent: req.get('user-agent')
     });
 
-    // Send to Admin
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: process.env.ADMIN_EMAIL,
-      subject: `Novo Contato: ${name}`,
-      html: `
-        <h2>Novo Contato Recebido</h2>
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>
-        <p><strong>Empresa:</strong> ${company || 'Não informado'}</p>
-        <p><strong>Mensagem:</strong></p>
-        <p>${message}</p>
-      `
-    });
-
-    // Send confirmation to user (only if not our own domain)
-    if (!email.endsWith('@l7talents.online')) {
-      try {
-        await transporter.sendMail({
-          from: process.env.SMTP_USER,
-          to: email,
-          subject: 'Recebemos sua mensagem - L7 Talents',
-          html: `
-            <h2>Obrigado por entrar em contato!</h2>
-            <p>Recebemos sua mensagem e responderemos em breve.</p>
-            <p>Atenciosamente,<br>Equipe L7 Talents</p>
-          `
-        });
-      } catch (confirmError) {
-        console.log('⚠️ Não foi possível enviar confirmação para:', email);
-      }
+    // Send to Admin only
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_USER,
+        to: process.env.ADMIN_EMAIL,
+        replyTo: email, // User can reply directly
+        subject: `Novo Contato: ${name}`,
+        html: `
+          <h2>Novo Contato Recebido</h2>
+          <p><strong>Nome:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>
+          <p><strong>Empresa:</strong> ${company || 'Não informado'}</p>
+          <p><strong>Mensagem:</strong></p>
+          <p>${message}</p>
+        `
+      });
+    } catch (emailError) {
+      console.error('❌ Erro ao enviar email para admin:', emailError);
+      // Continue anyway - data is logged
     }
 
+    // Always return success (email sent or not)
     res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
   } catch (error) {
-    console.error('❌ Erro ao enviar contato:', error);
+    console.error('❌ Erro ao processar contato:', error);
     auditLogger.logSecurityEvent('contact_form_failed', { error: error.message }, req.ip, req.get('user-agent'));
     res.status(400).json({ error: error.message || 'Erro ao enviar mensagem' });
   }
