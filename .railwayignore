@@ -1,0 +1,30 @@
+# Ignore documentation
+*.md
+!README.md
+
+# Ignore backups
+*_backup.*
+*_old.*
+server_backup.js
+server_old.js
+server.js.backup
+index_backup.html
+
+# Ignore logs
+logs/
+
+# Ignore uploads (will be created on container)
+uploads/*
+
+# Ignore local env
+.env.local
+
+# Ignore IDE
+.vscode/
+.idea/
+
+# Ignore git
+.git/
+
+# Ignore scripts
+install-security.sh
