@@ -90,8 +90,8 @@ async function login(req, res) {
 
     res.json({ token: generateToken(user), user: { id: user.id, email: user.email, role: user.role } });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao fazer login' });
+    console.error('[LOGIN ERROR]', err.message, err.stack);
+    res.status(500).json({ error: 'Erro ao fazer login', detail: process.env.NODE_ENV !== 'production' ? err.message : undefined });
   }
 }
 
