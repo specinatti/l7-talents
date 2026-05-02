@@ -1,8 +1,8 @@
 :root {
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #eff6ff;
-  --secondary: #7c3aed;
+  --primary: #1B2A4A;
+  --primary-dark: #243558;
+  --primary-light: #F2EDE8;
+  --secondary: #B85C6E;
   --success: #16a34a;
   --warning: #d97706;
   --danger: #dc2626;
@@ -41,7 +41,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--primary); text-decoration: none; }
+a { color: var(--rose); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* Botões */
@@ -91,7 +91,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   display: inline-flex; align-items: center; padding: 3px 10px;
   border-radius: 20px; font-size: 12px; font-weight: 500;
 }
-.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-blue { background: var(--cream2); color: var(--navy); }
 .badge-green { background: #dcfce7; color: #166534; }
 .badge-yellow { background: #fef9c3; color: #854d0e; }
 .badge-red { background: #fee2e2; color: #991b1b; }
@@ -135,7 +135,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px;
 }
 .stat-icon { width: 48px; height: 48px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; }
-.stat-icon.blue { background: #dbeafe; color: var(--primary); }
+.stat-icon.blue { background: var(--cream2); color: var(--navy); }
 .stat-icon.green { background: #dcfce7; color: var(--success); }
 .stat-icon.purple { background: #ede9fe; color: var(--secondary); }
 .stat-icon.yellow { background: #fef9c3; color: var(--warning); }
@@ -149,7 +149,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   transition: box-shadow .2s, transform .2s; cursor: pointer;
 }
 .vaga-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-.vaga-card.destaque { border-left: 3px solid var(--primary); }
+.vaga-card.destaque { border-left: 3px solid var(--rose); }
 .vaga-empresa { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .vaga-logo { width: 40px; height: 40px; border-radius: var(--radius); object-fit: cover; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 16px; }
 .vaga-titulo { font-size: 16px; font-weight: 600; color: var(--gray-900); margin-bottom: 6px; }
@@ -209,7 +209,7 @@ tr:hover td { background: var(--cream); }
 .w-full { width: 100%; }
 .spinner {
   width: 20px; height: 20px; border: 2px solid var(--gray-200);
-  border-top-color: var(--primary); border-radius: 50%; animation: spin .6s linear infinite;
+  border-top-color: var(--rose); border-radius: 50%; animation: spin .6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
