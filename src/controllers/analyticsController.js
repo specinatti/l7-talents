@@ -51,59 +51,48 @@ function formatUptime(ms) {
 }
 
 async function getAnalytics(req, res) {
+  // Cache simples em memória: 2 minutos
+  const now = Date.now();
+  if (getAnalytics._cache && now - getAnalytics._cacheTs < 120000) {
+    return res.json(getAnalytics._cache);
+  }
+
   try {
-    const [
-      usuarios, vagas, candidaturas, empresas,
-      crescimentoUsuarios, crescimentoCandidaturas,
-      vagasPorArea, candidaturasPorStatus,
-      topEmpresas, ultimasCandidaturas,
-      usuariosPorDia
-    ] = await Promise.all([
-      // Totais gerais
-      pool.query(`SELECT COUNT(*) total, COUNT(*) FILTER (WHERE role='candidato') candidatos, COUNT(*) FILTER (WHERE role='empregador') empregadores FROM users WHERE ativo=true`),
-      pool.query(`SELECT COUNT(*) total, COUNT(*) FILTER (WHERE status='ativa') ativas, COUNT(*) FILTER (WHERE status='encerrada') encerradas FROM vagas`),
-      pool.query(`SELECT COUNT(*) total FROM candidaturas`),
-      pool.query(`SELECT COUNT(*) total FROM empregadores`),
-
-      // Crescimento: novos usuários por mês (últimos 6 meses)
-      pool.query(`SELECT TO_CHAR(created_at,'YYYY-MM') mes, COUNT(*) total FROM users WHERE created_at >= NOW() - INTERVAL '6 months' GROUP BY mes ORDER BY mes`),
-
-      // Candidaturas por mês (últimos 6 meses)
-      pool.query(`SELECT TO_CHAR(created_at,'YYYY-MM') mes, COUNT(*) total FROM candidaturas WHERE created_at >= NOW() - INTERVAL '6 months' GROUP BY mes ORDER BY mes`),
-
-      // Vagas por área
+    // Queries paralelas otimizadas — totais em uma só query cada
+    const [totais, crescUsers, crescCand, areas, status, empresas, ultimas, porDia] = await Promise.all([
+      pool.query(`
+        SELECT
+          (SELECT COUNT(*) FROM users WHERE ativo=true) usuarios,
+          (SELECT COUNT(*) FROM users WHERE ativo=true AND role='candidato') candidatos,
+          (SELECT COUNT(*) FROM users WHERE ativo=true AND role='empregador') empregadores,
+          (SELECT COUNT(*) FROM vagas) vagas,
+          (SELECT COUNT(*) FROM vagas WHERE status='ativa') vagas_ativas,
+          (SELECT COUNT(*) FROM candidaturas) candidaturas
+      `),
+      pool.query(`SELECT TO_CHAR(DATE_TRUNC('month',created_at),'YYYY-MM') mes, COUNT(*) total FROM users WHERE created_at >= NOW()-INTERVAL '6 months' GROUP BY 1 ORDER BY 1`),
+      pool.query(`SELECT TO_CHAR(DATE_TRUNC('month',created_at),'YYYY-MM') mes, COUNT(*) total FROM candidaturas WHERE created_at >= NOW()-INTERVAL '6 months' GROUP BY 1 ORDER BY 1`),
       pool.query(`SELECT area, COUNT(*) total FROM vagas WHERE area IS NOT NULL GROUP BY area ORDER BY total DESC LIMIT 8`),
-
-      // Candidaturas por status
       pool.query(`SELECT status, COUNT(*) total FROM candidaturas GROUP BY status ORDER BY total DESC`),
-
-      // Top empresas por vagas
-      pool.query(`SELECT e.razao_social empresa, COUNT(v.id) vagas, SUM(v.visualizacoes) visualizacoes FROM empregadores e LEFT JOIN vagas v ON v.empregador_id=e.id GROUP BY e.id, e.razao_social ORDER BY vagas DESC LIMIT 5`),
-
-      // Últimas candidaturas
+      pool.query(`SELECT e.razao_social empresa, COUNT(v.id) vagas, COALESCE(SUM(v.visualizacoes),0) visualizacoes FROM empregadores e LEFT JOIN vagas v ON v.empregador_id=e.id GROUP BY e.id,e.razao_social ORDER BY vagas DESC LIMIT 5`),
       pool.query(`SELECT c.nome candidato, v.titulo vaga, e.razao_social empresa, ca.status, ca.created_at FROM candidaturas ca JOIN candidatos c ON c.id=ca.candidato_id JOIN vagas v ON v.id=ca.vaga_id JOIN empregadores e ON e.id=v.empregador_id ORDER BY ca.created_at DESC LIMIT 10`),
-
-      // Usuários por dia (últimos 30 dias)
-      pool.query(`SELECT TO_CHAR(created_at,'DD/MM') dia, COUNT(*) total FROM users WHERE created_at >= NOW() - INTERVAL '30 days' GROUP BY dia, DATE(created_at) ORDER BY DATE(created_at)`),
+      pool.query(`SELECT TO_CHAR(DATE_TRUNC('day',created_at),'DD/MM') dia, COUNT(*) total FROM users WHERE created_at >= NOW()-INTERVAL '30 days' GROUP BY 1,DATE_TRUNC('day',created_at) ORDER BY DATE_TRUNC('day',created_at)`),
     ]);
 
-    res.json({
-      totais: {
-        usuarios: parseInt(usuarios.rows[0].total),
-        candidatos: parseInt(usuarios.rows[0].candidatos),
-        empregadores: parseInt(usuarios.rows[0].empregadores),
-        vagas: parseInt(vagas.rows[0].total),
-        vagasAtivas: parseInt(vagas.rows[0].ativas),
-        candidaturas: parseInt(candidaturas.rows[0].total),
-      },
-      crescimentoUsuarios: crescimentoUsuarios.rows,
-      crescimentoCandidaturas: crescimentoCandidaturas.rows,
-      vagasPorArea: vagasPorArea.rows,
-      candidaturasPorStatus: candidaturasPorStatus.rows,
-      topEmpresas: topEmpresas.rows,
-      ultimasCandidaturas: ultimasCandidaturas.rows,
-      usuariosPorDia: usuariosPorDia.rows,
-    });
+    const t = totais.rows[0];
+    const result = {
+      totais: { usuarios: +t.usuarios, candidatos: +t.candidatos, empregadores: +t.empregadores, vagas: +t.vagas, vagasAtivas: +t.vagas_ativas, candidaturas: +t.candidaturas },
+      crescimentoUsuarios: crescUsers.rows,
+      crescimentoCandidaturas: crescCand.rows,
+      vagasPorArea: areas.rows,
+      candidaturasPorStatus: status.rows,
+      topEmpresas: empresas.rows,
+      ultimasCandidaturas: ultimas.rows,
+      usuariosPorDia: porDia.rows,
+    };
+
+    getAnalytics._cache = result;
+    getAnalytics._cacheTs = now;
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao buscar analytics' });
