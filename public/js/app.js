@@ -110,8 +110,7 @@ function initNavbar(role) {
 
   nav.innerHTML = `
     <a href="/" class="navbar-brand">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2563eb"/><text x="14" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="700">L7</text></svg>
-      L7 Talents
+      <img src="/images/l7-logo.jpg" alt="L7 Talents" style="height:40px;object-fit:contain;">
     </a>
     <nav class="navbar-nav">
       ${links}
