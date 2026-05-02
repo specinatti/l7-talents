@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .auth-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 40px; width: 100%; max-width: 480px; }
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo a { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .role-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+    .role-tab { padding: 12px; border: 2px solid var(--gray-200); border-radius: var(--radius); text-align: center; cursor: pointer; font-weight: 500; font-size: 14px; transition: all .15s; }
+    .role-tab.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .role-tab:hover:not(.active) { border-color: var(--gray-300); background: var(--gray-50); }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="/">
+        <svg width="32" height="32" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2563eb"/><text x="14" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="700">L7</text></svg>
+        L7 Talents
+      </a>
+    </div>
+
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">Criar conta</h1>
+    <p style="color:var(--gray-500);font-size:14px;margin-bottom:20px;">Escolha seu tipo de conta</p>
+
+    <div class="role-tabs">
+      <div class="role-tab" id="tab-candidato" onclick="setRole('candidato')">👤 Candidato</div>
+      <div class="role-tab" id="tab-empregador" onclick="setRole('empregador')">🏢 Empresa</div>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <form id="cadastro-form">
+      <input type="hidden" id="role" value="candidato">
+
+      <div class="form-group">
+        <label class="form-label" id="nome-label">Seu nome completo</label>
+        <input type="text" id="nome" class="form-control" placeholder="João Silva" required>
+      </div>
+
+      <div class="form-group" id="razao-group" style="display:none;">
+        <label class="form-label">Razão social da empresa</label>
+        <input type="text" id="razao_social" class="form-control" placeholder="Empresa LTDA">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" id="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <input type="password" id="confirm" class="form-control" placeholder="Repita a senha" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Criar conta</button>
+    </form>
+
+    <p class="text-center text-sm mt-16" style="color:var(--gray-600);">
+      Já tem conta? <a href="/pages/login.html">Entrar</a>
+    </p>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (auth.isLogged()) {
+      const user = auth.getUser();
+      window.location.href = `/pages/${user.role}/dashboard.html`;
+    }
+
+    // Pré-selecionar role pela URL
+    const params = new URLSearchParams(location.search);
+    const roleParam = params.get('role');
+    setRole(roleParam === 'empregador' ? 'empregador' : 'candidato');
+
+    function setRole(role) {
+      document.getElementById('role').value = role;
+      document.getElementById('tab-candidato').classList.toggle('active', role === 'candidato');
+      document.getElementById('tab-empregador').classList.toggle('active', role === 'empregador');
+      document.getElementById('nome-label').textContent = role === 'candidato' ? 'Seu nome completo' : 'Nome do responsável';
+      document.getElementById('razao-group').style.display = role === 'empregador' ? 'block' : 'none';
+    }
+
+    document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+      if (password !== confirm) {
+        showAlert('As senhas não coincidem', 'error', document.getElementById('alert-container'));
+        return;
+      }
+      const btn = document.getElementById('submit-btn');
+      setLoading(btn, true);
+      try {
+        const role = document.getElementById('role').value;
+        const data = await post('/auth/register', {
+          email: document.getElementById('email').value,
+          password,
+          role,
+          nome: document.getElementById('nome').value,
+          razao_social: document.getElementById('razao_social').value || undefined,
+        });
+        auth.setSession(data.token, data.user);
+        window.location.href = `/pages/${data.user.role}/dashboard.html`;
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-container'));
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

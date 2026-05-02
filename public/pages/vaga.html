@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vaga - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2563eb"/><text x="14" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="700">L7</text></svg>
+      L7 Talents
+    </a>
+    <div class="navbar-nav" id="nav-actions">
+      <a href="/pages/vagas.html" class="btn btn-secondary btn-sm">← Voltar</a>
+    </div>
+  </nav>
+
+  <div style="max-width:900px;margin:0 auto;padding:32px 24px;" id="content">
+    <div style="text-align:center;padding:60px;color:var(--gray-400);">Carregando...</div>
+  </div>
+
+  <!-- Modal candidatura -->
+  <div id="modal-cand" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Candidatar-se</h3>
+        <button class="modal-close" onclick="document.getElementById('modal-cand').classList.add('hidden')">×</button>
+      </div>
+      <p class="text-muted text-sm mb-16">Adicione uma carta de apresentação opcional para se destacar.</p>
+      <form id="cand-form">
+        <div class="form-group">
+          <label class="form-label">Carta de apresentação (opcional)</label>
+          <textarea id="carta" class="form-control" rows="5" placeholder="Apresente-se e explique por que você é o candidato ideal para esta vaga..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Enviar Candidatura</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const vagaId = new URLSearchParams(location.search).get('id');
+    const user = auth.getUser();
+
+    if (user) {
+      document.getElementById('nav-actions').innerHTML = `
+        <a href="/pages/vagas.html" class="btn btn-secondary btn-sm">← Vagas</a>
+        <a href="/pages/${user.role}/dashboard.html" class="btn btn-primary btn-sm">Dashboard</a>
+      `;
+    }
+
+    async function load() {
+      if (!vagaId) { document.getElementById('content').innerHTML = '<p class="text-center text-muted">Vaga não encontrada.</p>'; return; }
+      try {
+        const v = await get(`/vagas/${vagaId}`);
+        document.title = `${v.titulo} - L7 Talents`;
+
+        document.getElementById('content').innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
+            <div>
+              <div class="card mb-24">
+                <div style="display:flex;align-items:start;gap:16px;margin-bottom:20px;">
+                  <div class="vaga-logo" style="width:56px;height:56px;font-size:20px;flex-shrink:0;">${v.empresa?.charAt(0) || 'E'}</div>
+                  <div>
+                    <h1 style="font-size:24px;font-weight:700;">${v.titulo}</h1>
+                    <div style="color:var(--gray-600);margin-top:4px;">${v.empresa || ''} · ${v.cidade || ''} ${v.estado || ''}</div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                  ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
+                  ${v.tipo_contrato ? `<span class="badge badge-gray">${v.tipo_contrato.toUpperCase()}</span>` : ''}
+                  ${v.nivel ? `<span class="badge badge-gray">${v.nivel}</span>` : ''}
+                  ${v.area ? `<span class="badge badge-purple">${v.area}</span>` : ''}
+                </div>
+                <div style="font-size:22px;font-weight:700;color:var(--success);margin-bottom:20px;">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
+
+                <h3 style="font-size:16px;font-weight:600;margin-bottom:12px;">Descrição</h3>
+                <div style="color:var(--gray-700);line-height:1.7;white-space:pre-wrap;">${v.descricao}</div>
+
+                ${v.requisitos ? `<h3 style="font-size:16px;font-weight:600;margin:20px 0 12px;">Requisitos</h3><div style="color:var(--gray-700);line-height:1.7;white-space:pre-wrap;">${v.requisitos}</div>` : ''}
+                ${v.beneficios ? `<h3 style="font-size:16px;font-weight:600;margin:20px 0 12px;">Benefícios</h3><div style="color:var(--gray-700);line-height:1.7;white-space:pre-wrap;">${v.beneficios}</div>` : ''}
+
+                ${v.habilidades?.length ? `
+                  <h3 style="font-size:16px;font-weight:600;margin:20px 0 12px;">Habilidades</h3>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;">${v.habilidades.map(h => `<span class="badge badge-blue">${h}</span>`).join('')}</div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div>
+              <div class="card" style="position:sticky;top:80px;">
+                <div id="action-area">
+                  ${!user ? `
+                    <p class="text-muted text-sm mb-16">Faça login para se candidatar a esta vaga.</p>
+                    <a href="/pages/login.html" class="btn btn-primary btn-block">Entrar para candidatar</a>
+                    <a href="/pages/cadastro.html" class="btn btn-secondary btn-block mt-8">Criar conta grátis</a>
+                  ` : user.role === 'candidato' ? `
+                    <button class="btn btn-primary btn-block btn-lg" id="btn-candidatar" onclick="document.getElementById('modal-cand').classList.remove('hidden')">
+                      Candidatar-se
+                    </button>
+                    <button class="btn btn-secondary btn-block mt-8" onclick="salvarVaga()">🔖 Salvar vaga</button>
+                  ` : `<p class="text-muted text-sm">Você está logado como empresa.</p>`}
+                </div>
+                <hr style="margin:16px 0;border-color:var(--gray-200);">
+                <div style="font-size:13px;color:var(--gray-500);">
+                  <div style="margin-bottom:6px;">📅 Publicada em ${formatDate(v.created_at)}</div>
+                  <div style="margin-bottom:6px;">👁 ${v.visualizacoes} visualizações</div>
+                  <div>👥 ${v.total_candidatos} candidatos</div>
+                </div>
+              </div>
+
+              ${v.empresa_descricao ? `
+                <div class="card mt-16">
+                  <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">Sobre a empresa</h3>
+                  <p style="font-size:13px;color:var(--gray-600);line-height:1.6;">${v.empresa_descricao}</p>
+                  ${v.site ? `<a href="${v.site}" target="_blank" class="btn btn-secondary btn-sm mt-8">Visitar site</a>` : ''}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      } catch {
+        document.getElementById('content').innerHTML = '<p class="text-center text-muted">Vaga não encontrada.</p>';
+      }
+    }
+
+    document.getElementById('cand-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      setLoading(btn, true);
+      try {
+        await post(`/vagas/${vagaId}/candidatar`, { carta_apresentacao: document.getElementById('carta').value });
+        document.getElementById('modal-cand').classList.add('hidden');
+        document.getElementById('action-area').innerHTML = `
+          <div class="alert alert-success">✅ Candidatura enviada com sucesso!</div>
+          <a href="/pages/candidato/candidaturas.html" class="btn btn-secondary btn-block">Ver minhas candidaturas</a>
+        `;
+      } catch (err) {
+        if (err.message.includes('já se candidatou')) {
+          document.getElementById('modal-cand').classList.add('hidden');
+          document.getElementById('action-area').innerHTML = '<div class="alert alert-info">Você já se candidatou a esta vaga.</div>';
+        } else {
+          alert(err.message);
+          setLoading(btn, false);
+        }
+      }
+    });
+
+    async function salvarVaga() {
+      try {
+        await post(`/candidatos/vagas-salvas/${vagaId}`);
+        alert('Vaga salva!');
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

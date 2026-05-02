@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil da Empresa - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/empregador/dashboard.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/pages/empregador/vagas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0 1 12 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2m4 6h.01M5 20h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
+        Minhas Vagas
+      </a>
+      <a href="/pages/empregador/candidatos.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Candidatos
+      </a>
+      <a href="/pages/empregador/perfil.html" class="sidebar-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Empresa
+      </a>
+    </aside>
+
+    <main class="main-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <h1 style="font-size:24px;font-weight:700;">Perfil da Empresa</h1>
+        <button class="btn btn-primary" onclick="savePerfil()">Salvar</button>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <form id="perfil-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nome do responsável</label><input type="text" id="nome_contato" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Razão social</label><input type="text" id="razao_social" class="form-control"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nome fantasia</label><input type="text" id="nome_fantasia" class="form-control"></div>
+            <div class="form-group"><label class="form-label">CNPJ</label><input type="text" id="cnpj" class="form-control" placeholder="00.000.000/0001-00"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Setor</label>
+              <select id="setor" class="form-control">
+                <option value="">Selecione</option>
+                <option>Tecnologia</option><option>Saúde</option><option>Educação</option><option>Financeiro</option>
+                <option>Varejo</option><option>Indústria</option><option>Serviços</option><option>Agronegócio</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Porte</label>
+              <select id="porte" class="form-control">
+                <option value="">Selecione</option>
+                <option>Startup</option><option>Pequena</option><option>Média</option><option>Grande</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="telefone" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Site</label><input type="url" id="site" class="form-control" placeholder="https://..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="cidade" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Estado</label>
+              <select id="estado" class="form-control">
+                <option value="">Selecione</option>
+                ${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(e => `<option value="${e}">${e}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">LinkedIn</label><input type="url" id="linkedin" class="form-control" placeholder="https://linkedin.com/company/..."></div>
+          <div class="form-group"><label class="form-label">Sobre a empresa</label><textarea id="descricao" class="form-control" rows="5" placeholder="Descreva a empresa, cultura, missão e valores..."></textarea></div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('empregador')) {}
+    initNavbar('empregador');
+
+    async function loadPerfil() {
+      try {
+        const p = await get('/empregadores/perfil');
+        ['nome_contato','razao_social','nome_fantasia','cnpj','setor','porte','telefone',
+         'site','cidade','linkedin','descricao'].forEach(f => {
+          const el = document.getElementById(f);
+          if (el) el.value = p[f] || '';
+        });
+        if (p.estado) document.getElementById('estado').value = p.estado;
+      } catch {}
+    }
+
+    async function savePerfil() {
+      const body = {};
+      ['nome_contato','razao_social','nome_fantasia','cnpj','setor','porte','telefone',
+       'site','cidade','estado','linkedin','descricao'].forEach(f => {
+        const v = document.getElementById(f)?.value;
+        if (v !== undefined) body[f] = v || null;
+      });
+      try {
+        await put('/empregadores/perfil', body);
+        showAlert('Perfil salvo com sucesso!', 'success', document.getElementById('alert-container'));
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-container'));
+      }
+    }
+
+    loadPerfil();
+  </script>
+</body>
+</html>

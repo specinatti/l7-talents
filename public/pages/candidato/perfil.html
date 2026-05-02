@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/candidato/dashboard.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/pages/vagas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Buscar Vagas
+      </a>
+      <a href="/pages/candidato/candidaturas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+        Candidaturas
+      </a>
+      <a href="/pages/candidato/perfil.html" class="sidebar-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Meu Perfil
+      </a>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <h1 style="font-size:24px;font-weight:700;">Meu Perfil</h1>
+          <p class="text-muted">Mantenha seu perfil atualizado para se destacar.</p>
+        </div>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <!-- Dados pessoais -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <h2 class="card-title">Dados Pessoais</h2>
+          <button class="btn btn-primary btn-sm" onclick="savePerfil()">Salvar</button>
+        </div>
+        <form id="perfil-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nome completo</label><input type="text" id="nome" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="telefone" class="form-control" placeholder="(11) 99999-9999"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="cidade" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Estado</label>
+              <select id="estado" class="form-control">
+                <option value="">Selecione</option>
+                ${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(e => `<option value="${e}">${e}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">LinkedIn</label><input type="url" id="linkedin" class="form-control" placeholder="https://linkedin.com/in/..."></div>
+            <div class="form-group"><label class="form-label">GitHub</label><input type="url" id="github" class="form-control" placeholder="https://github.com/..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Cargo desejado</label><input type="text" id="cargo_desejado" class="form-control" placeholder="Ex: Desenvolvedor Full Stack"></div>
+            <div class="form-group"><label class="form-label">Área de atuação</label>
+              <select id="area_atuacao" class="form-control">
+                <option value="">Selecione</option>
+                <option>Tecnologia</option><option>Marketing</option><option>Vendas</option>
+                <option>Financeiro</option><option>RH</option><option>Operações</option>
+                <option>Design</option><option>Jurídico</option><option>Saúde</option><option>Educação</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nível de experiência</label>
+              <select id="nivel_experiencia" class="form-control">
+                <option value="">Selecione</option>
+                <option>Estagiário</option><option>Júnior</option><option>Pleno</option><option>Sênior</option><option>Especialista</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Pretensão salarial (R$)</label><input type="number" id="pretensao_salarial" class="form-control" placeholder="5000"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Disponibilidade</label>
+              <select id="disponibilidade" class="form-control">
+                <option value="">Selecione</option>
+                <option>Imediata</option><option>15 dias</option><option>30 dias</option><option>A combinar</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Modalidade preferida</label>
+              <select id="modalidade" class="form-control">
+                <option value="">Selecione</option>
+                <option value="presencial">Presencial</option><option value="remoto">Remoto</option><option value="hibrido">Híbrido</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resumo profissional</label>
+            <textarea id="resumo_profissional" class="form-control" rows="4" placeholder="Descreva sua trajetória, principais conquistas e objetivos..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Habilidades (separadas por vírgula)</label>
+            <input type="text" id="habilidades" class="form-control" placeholder="JavaScript, React, Node.js, SQL...">
+          </div>
+        </form>
+      </div>
+
+      <!-- Experiências -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <h2 class="card-title">Experiências Profissionais</h2>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-exp')">+ Adicionar</button>
+        </div>
+        <div id="exp-list"><p class="text-muted text-sm">Nenhuma experiência cadastrada.</p></div>
+      </div>
+
+      <!-- Formações -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Formação Acadêmica</h2>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-form')">+ Adicionar</button>
+        </div>
+        <div id="form-list"><p class="text-muted text-sm">Nenhuma formação cadastrada.</p></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Experiência -->
+  <div id="modal-exp" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Adicionar Experiência</h3>
+        <button class="modal-close" onclick="closeModal('modal-exp')">×</button>
+      </div>
+      <form id="exp-form">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Empresa</label><input type="text" id="exp-empresa" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Cargo</label><input type="text" id="exp-cargo" class="form-control" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Data início</label><input type="month" id="exp-inicio" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Data fim</label><input type="month" id="exp-fim" class="form-control"></div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="exp-atual"> <span class="form-label" style="margin:0;">Trabalho aqui atualmente</span>
+          </label>
+        </div>
+        <div class="form-group"><label class="form-label">Descrição</label><textarea id="exp-desc" class="form-control" rows="3"></textarea></div>
+        <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Formação -->
+  <div id="modal-form" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Adicionar Formação</h3>
+        <button class="modal-close" onclick="closeModal('modal-form')">×</button>
+      </div>
+      <form id="form-form">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Instituição</label><input type="text" id="form-inst" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Curso</label><input type="text" id="form-curso" class="form-control" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nível</label>
+            <select id="form-nivel" class="form-control" required>
+              <option value="">Selecione</option>
+              <option>Ensino Médio</option><option>Técnico</option><option>Graduação</option>
+              <option>Pós-graduação</option><option>MBA</option><option>Mestrado</option><option>Doutorado</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Data início</label><input type="month" id="form-inicio" class="form-control" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Data fim</label><input type="month" id="form-fim" class="form-control"></div>
+          <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="form-andamento"> <span class="form-label" style="margin:0;">Em andamento</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('candidato')) {}
+    initNavbar('candidato');
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    async function loadPerfil() {
+      try {
+        const p = await get('/candidatos/perfil');
+        ['nome','telefone','cidade','linkedin','github','cargo_desejado','area_atuacao',
+         'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
+          const el = document.getElementById(f);
+          if (el) el.value = p[f] || '';
+        });
+        if (p.estado) document.getElementById('estado').value = p.estado;
+        if (p.habilidades) document.getElementById('habilidades').value = p.habilidades.join(', ');
+
+        renderExps(p.experiencias || []);
+        renderForms(p.formacoes || []);
+      } catch (err) {
+        showAlert('Erro ao carregar perfil', 'error', document.getElementById('alert-container'));
+      }
+    }
+
+    function renderExps(exps) {
+      const el = document.getElementById('exp-list');
+      if (!exps.length) { el.innerHTML = '<p class="text-muted text-sm">Nenhuma experiência cadastrada.</p>'; return; }
+      el.innerHTML = exps.map(e => `
+        <div style="padding:16px 0;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div class="fw-600">${e.cargo}</div>
+            <div style="color:var(--gray-600);font-size:14px;">${e.empresa}</div>
+            <div class="text-muted text-sm">${formatDate(e.data_inicio)} – ${e.atual ? 'Atual' : formatDate(e.data_fim)}</div>
+            ${e.descricao ? `<p style="font-size:13px;color:var(--gray-600);margin-top:4px;">${e.descricao}</p>` : ''}
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="deleteExp('${e.id}')">Remover</button>
+        </div>
+      `).join('');
+    }
+
+    function renderForms(forms) {
+      const el = document.getElementById('form-list');
+      if (!forms.length) { el.innerHTML = '<p class="text-muted text-sm">Nenhuma formação cadastrada.</p>'; return; }
+      el.innerHTML = forms.map(f => `
+        <div style="padding:16px 0;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div class="fw-600">${f.curso} <span class="badge badge-blue" style="font-size:11px;">${f.nivel}</span></div>
+            <div style="color:var(--gray-600);font-size:14px;">${f.instituicao}</div>
+            <div class="text-muted text-sm">${formatDate(f.data_inicio)} – ${f.em_andamento ? 'Em andamento' : formatDate(f.data_fim)}</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="deleteForm('${f.id}')">Remover</button>
+        </div>
+      `).join('');
+    }
+
+    async function savePerfil() {
+      const habilidades = document.getElementById('habilidades').value
+        .split(',').map(h => h.trim()).filter(Boolean);
+      const body = {};
+      ['nome','telefone','cidade','estado','linkedin','github','cargo_desejado','area_atuacao',
+       'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
+        const v = document.getElementById(f)?.value;
+        if (v !== undefined) body[f] = v || null;
+      });
+      body.habilidades = habilidades;
+      try {
+        await put('/candidatos/perfil', body);
+        showAlert('Perfil salvo com sucesso!', 'success', document.getElementById('alert-container'));
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-container'));
+      }
+    }
+
+    document.getElementById('exp-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await post('/candidatos/experiencias', {
+          empresa: document.getElementById('exp-empresa').value,
+          cargo: document.getElementById('exp-cargo').value,
+          data_inicio: document.getElementById('exp-inicio').value + '-01',
+          data_fim: document.getElementById('exp-fim').value ? document.getElementById('exp-fim').value + '-01' : null,
+          atual: document.getElementById('exp-atual').checked,
+          descricao: document.getElementById('exp-desc').value,
+        });
+        closeModal('modal-exp');
+        loadPerfil();
+      } catch (err) {
+        showAlert(err.message, 'error');
+      }
+    });
+
+    document.getElementById('form-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await post('/candidatos/formacoes', {
+          instituicao: document.getElementById('form-inst').value,
+          curso: document.getElementById('form-curso').value,
+          nivel: document.getElementById('form-nivel').value,
+          data_inicio: document.getElementById('form-inicio').value + '-01',
+          data_fim: document.getElementById('form-fim').value ? document.getElementById('form-fim').value + '-01' : null,
+          em_andamento: document.getElementById('form-andamento').checked,
+        });
+        closeModal('modal-form');
+        loadPerfil();
+      } catch (err) {
+        showAlert(err.message, 'error');
+      }
+    });
+
+    async function deleteExp(id) {
+      if (!confirm('Remover experiência?')) return;
+      await del(`/candidatos/experiencias/${id}`);
+      loadPerfil();
+    }
+
+    async function deleteForm(id) {
+      if (!confirm('Remover formação?')) return;
+      await del(`/candidatos/formacoes/${id}`);
+      loadPerfil();
+    }
+
+    loadPerfil();
+  </script>
+</body>
+</html>

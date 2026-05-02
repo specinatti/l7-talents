@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Vagas - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/empregador/dashboard.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/pages/empregador/vagas.html" class="sidebar-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0 1 12 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2m4 6h.01M5 20h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
+        Minhas Vagas
+      </a>
+      <a href="/pages/empregador/candidatos.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Candidatos
+      </a>
+      <a href="/pages/empregador/perfil.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Empresa
+      </a>
+    </aside>
+
+    <main class="main-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <h1 style="font-size:24px;font-weight:700;">Minhas Vagas</h1>
+        <button class="btn btn-primary" onclick="openModal()">+ Nova Vaga</button>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div id="vagas-list">
+          <div style="text-align:center;padding:40px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal criar/editar vaga -->
+  <div id="modal-vaga" class="modal-overlay hidden">
+    <div class="modal" style="max-width:680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Nova Vaga</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <form id="vaga-form">
+        <input type="hidden" id="vaga-id">
+        <div class="form-group"><label class="form-label">Título da vaga *</label><input type="text" id="v-titulo" class="form-control" required placeholder="Ex: Desenvolvedor Full Stack Sênior"></div>
+        <div class="form-group"><label class="form-label">Descrição *</label><textarea id="v-descricao" class="form-control" rows="4" required placeholder="Descreva as responsabilidades e o dia a dia da vaga..."></textarea></div>
+        <div class="form-group"><label class="form-label">Requisitos</label><textarea id="v-requisitos" class="form-control" rows="3" placeholder="Experiência mínima, tecnologias, certificações..."></textarea></div>
+        <div class="form-group"><label class="form-label">Benefícios</label><textarea id="v-beneficios" class="form-control" rows="2" placeholder="VR, VT, plano de saúde, home office..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Área</label>
+            <select id="v-area" class="form-control">
+              <option value="">Selecione</option>
+              <option>Tecnologia</option><option>Marketing</option><option>Vendas</option>
+              <option>Financeiro</option><option>RH</option><option>Operações</option>
+              <option>Design</option><option>Jurídico</option><option>Saúde</option><option>Educação</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Nível</label>
+            <select id="v-nivel" class="form-control">
+              <option value="">Selecione</option>
+              <option>Estagiário</option><option>Júnior</option><option>Pleno</option><option>Sênior</option><option>Especialista</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Modalidade</label>
+            <select id="v-modalidade" class="form-control">
+              <option value="">Selecione</option>
+              <option value="presencial">Presencial</option><option value="remoto">Remoto</option><option value="hibrido">Híbrido</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Tipo de contrato</label>
+            <select id="v-contrato" class="form-control">
+              <option value="">Selecione</option>
+              <option value="clt">CLT</option><option value="pj">PJ</option>
+              <option value="estagio">Estágio</option><option value="temporario">Temporário</option><option value="freelance">Freelance</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Salário mínimo (R$)</label><input type="number" id="v-sal-min" class="form-control" placeholder="5000"></div>
+          <div class="form-group"><label class="form-label">Salário máximo (R$)</label><input type="number" id="v-sal-max" class="form-control" placeholder="8000"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="v-cidade" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Estado</label>
+            <select id="v-estado" class="form-control">
+              <option value="">Selecione</option>
+              ${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(e => `<option value="${e}">${e}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Habilidades (separadas por vírgula)</label>
+          <input type="text" id="v-habilidades" class="form-control" placeholder="JavaScript, React, Node.js...">
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="v-oculto"> <span class="form-label" style="margin:0;">Ocultar salário</span>
+          </label>
+        </div>
+        <div id="v-status-group" class="form-group hidden">
+          <label class="form-label">Status</label>
+          <select id="v-status" class="form-control">
+            <option value="ativa">Ativa</option><option value="pausada">Pausada</option><option value="encerrada">Encerrada</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Publicar Vaga</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('empregador')) {}
+    initNavbar('empregador');
+
+    async function loadVagas() {
+      try {
+        const vagas = await get('/empregadores/vagas');
+        const el = document.getElementById('vagas-list');
+        if (!vagas.length) {
+          el.innerHTML = '<p style="text-align:center;padding:40px;color:var(--gray-400);">Nenhuma vaga publicada ainda. Clique em "+ Nova Vaga" para começar.</p>';
+          return;
+        }
+        el.innerHTML = `<div class="table-wrapper"><table>
+          <thead><tr><th>Título</th><th>Área</th><th>Modalidade</th><th>Candidatos</th><th>Visualizações</th><th>Status</th><th></th></tr></thead>
+          <tbody>${vagas.map(v => `
+            <tr>
+              <td class="fw-600">${v.titulo}</td>
+              <td>${v.area || '-'}</td>
+              <td>${v.modalidade ? modalidadeBadge(v.modalidade) : '-'}</td>
+              <td><span class="badge badge-blue">${v.total_candidatos}</span></td>
+              <td class="text-muted">${v.visualizacoes}</td>
+              <td>${statusBadge(v.status)}</td>
+              <td style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-sm" onclick='editVaga(${JSON.stringify(v)})'>Editar</button>
+                <a href="/pages/empregador/candidatos.html?vaga=${v.id}" class="btn btn-secondary btn-sm">Candidatos</a>
+              </td>
+            </tr>
+          `).join('')}</tbody>
+        </table></div>`;
+      } catch (err) {
+        showAlert('Erro ao carregar vagas', 'error', document.getElementById('alert-container'));
+      }
+    }
+
+    function openModal() {
+      document.getElementById('vaga-id').value = '';
+      document.getElementById('vaga-form').reset();
+      document.getElementById('modal-title').textContent = 'Nova Vaga';
+      document.getElementById('submit-btn').textContent = 'Publicar Vaga';
+      document.getElementById('v-status-group').classList.add('hidden');
+      document.getElementById('modal-vaga').classList.remove('hidden');
+    }
+
+    function editVaga(v) {
+      document.getElementById('vaga-id').value = v.id;
+      document.getElementById('v-titulo').value = v.titulo || '';
+      document.getElementById('v-descricao').value = v.descricao || '';
+      document.getElementById('v-requisitos').value = v.requisitos || '';
+      document.getElementById('v-beneficios').value = v.beneficios || '';
+      document.getElementById('v-area').value = v.area || '';
+      document.getElementById('v-nivel').value = v.nivel || '';
+      document.getElementById('v-modalidade').value = v.modalidade || '';
+      document.getElementById('v-contrato').value = v.tipo_contrato || '';
+      document.getElementById('v-sal-min').value = v.salario_min || '';
+      document.getElementById('v-sal-max').value = v.salario_max || '';
+      document.getElementById('v-cidade').value = v.cidade || '';
+      document.getElementById('v-estado').value = v.estado || '';
+      document.getElementById('v-habilidades').value = (v.habilidades || []).join(', ');
+      document.getElementById('v-oculto').checked = v.salario_oculto || false;
+      document.getElementById('v-status').value = v.status || 'ativa';
+      document.getElementById('v-status-group').classList.remove('hidden');
+      document.getElementById('modal-title').textContent = 'Editar Vaga';
+      document.getElementById('submit-btn').textContent = 'Salvar Alterações';
+      document.getElementById('modal-vaga').classList.remove('hidden');
+    }
+
+    function closeModal() { document.getElementById('modal-vaga').classList.add('hidden'); }
+
+    document.getElementById('vaga-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('vaga-id').value;
+      const body = {
+        titulo: document.getElementById('v-titulo').value,
+        descricao: document.getElementById('v-descricao').value,
+        requisitos: document.getElementById('v-requisitos').value || null,
+        beneficios: document.getElementById('v-beneficios').value || null,
+        area: document.getElementById('v-area').value || null,
+        nivel: document.getElementById('v-nivel').value || null,
+        modalidade: document.getElementById('v-modalidade').value || null,
+        tipo_contrato: document.getElementById('v-contrato').value || null,
+        salario_min: document.getElementById('v-sal-min').value || null,
+        salario_max: document.getElementById('v-sal-max').value || null,
+        cidade: document.getElementById('v-cidade').value || null,
+        estado: document.getElementById('v-estado').value || null,
+        habilidades: document.getElementById('v-habilidades').value.split(',').map(h => h.trim()).filter(Boolean),
+        salario_oculto: document.getElementById('v-oculto').checked,
+        status: document.getElementById('v-status').value || 'ativa',
+      };
+      const btn = document.getElementById('submit-btn');
+      setLoading(btn, true);
+      try {
+        if (id) await put(`/empregadores/vagas/${id}`, body);
+        else await post('/empregadores/vagas', body);
+        closeModal();
+        loadVagas();
+        showAlert(id ? 'Vaga atualizada!' : 'Vaga publicada!', 'success', document.getElementById('alert-container'));
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-container'));
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    loadVagas();
+  </script>
+</body>
+</html>

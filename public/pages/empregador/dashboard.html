@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Empresa - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/empregador/dashboard.html" class="sidebar-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/pages/empregador/vagas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0 1 12 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2m4 6h.01M5 20h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
+        Minhas Vagas
+      </a>
+      <a href="/pages/empregador/candidatos.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Candidatos
+      </a>
+      <a href="/pages/empregador/perfil.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Empresa
+      </a>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom:24px;">
+        <h1 style="font-size:24px;font-weight:700;" id="greeting">Dashboard</h1>
+        <p class="text-muted">Gerencie suas vagas e candidatos.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0 1 12 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2m4 6h.01M5 20h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-vagas">-</div><div class="stat-label">Vagas Ativas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-candidaturas">-</div><div class="stat-label">Candidaturas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-views">-</div><div class="stat-label">Visualizações</div></div>
+        </div>
+      </div>
+
+      <!-- Vagas recentes -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <h2 class="card-title">Vagas Recentes</h2>
+          <a href="/pages/empregador/vagas.html" class="btn btn-primary btn-sm">+ Nova Vaga</a>
+        </div>
+        <div id="vagas-list">
+          <div style="text-align:center;padding:32px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Candidatos recentes -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Candidatos Recentes</h2>
+          <a href="/pages/empregador/candidatos.html" class="btn btn-secondary btn-sm">Ver todos</a>
+        </div>
+        <div id="candidatos-list">
+          <div style="text-align:center;padding:32px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('empregador')) {}
+    initNavbar('empregador');
+
+    async function loadDashboard() {
+      try {
+        const [stats, vagas, candidatos, perfil] = await Promise.all([
+          get('/empregadores/dashboard'),
+          get('/empregadores/vagas'),
+          get('/empregadores/candidatos'),
+          get('/empregadores/perfil'),
+        ]);
+
+        document.getElementById('greeting').textContent = `Olá, ${perfil.nome_contato?.split(' ')[0] || 'Empresa'}! 👋`;
+        document.getElementById('stat-vagas').textContent = stats.vagas_ativas;
+        document.getElementById('stat-candidaturas').textContent = stats.total_candidaturas;
+        document.getElementById('stat-views').textContent = stats.total_visualizacoes;
+
+        // Vagas
+        const vl = document.getElementById('vagas-list');
+        if (!vagas.length) {
+          vl.innerHTML = '<p style="text-align:center;padding:24px;color:var(--gray-400);">Nenhuma vaga publicada. <a href="/pages/empregador/vagas.html">Criar vaga</a></p>';
+        } else {
+          vl.innerHTML = `<div class="table-wrapper"><table>
+            <thead><tr><th>Título</th><th>Modalidade</th><th>Candidatos</th><th>Status</th><th>Data</th></tr></thead>
+            <tbody>${vagas.slice(0,5).map(v => `
+              <tr>
+                <td class="fw-600">${v.titulo}</td>
+                <td>${v.modalidade ? modalidadeBadge(v.modalidade) : '-'}</td>
+                <td><span class="badge badge-blue">${v.total_candidatos}</span></td>
+                <td>${statusBadge(v.status)}</td>
+                <td class="text-muted">${formatDate(v.created_at)}</td>
+              </tr>
+            `).join('')}</tbody>
+          </table></div>`;
+        }
+
+        // Candidatos
+        const cl = document.getElementById('candidatos-list');
+        if (!candidatos.length) {
+          cl.innerHTML = '<p style="text-align:center;padding:24px;color:var(--gray-400);">Nenhum candidato ainda.</p>';
+        } else {
+          cl.innerHTML = `<div class="table-wrapper"><table>
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Cargo desejado</th><th>Status</th><th>Data</th></tr></thead>
+            <tbody>${candidatos.slice(0,5).map(c => `
+              <tr>
+                <td class="fw-600">${c.nome}</td>
+                <td class="text-muted">${c.email}</td>
+                <td>${c.cargo_desejado || '-'}</td>
+                <td>${statusBadge(c.status)}</td>
+                <td class="text-muted">${formatDate(c.created_at)}</td>
+              </tr>
+            `).join('')}</tbody>
+          </table></div>`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

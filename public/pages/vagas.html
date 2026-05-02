@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagas - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .search-bar { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 20px; margin-bottom: 24px; }
+    .search-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .vagas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2563eb"/><text x="14" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="700">L7</text></svg>
+      L7 Talents
+    </a>
+    <div class="navbar-nav" id="nav-actions">
+      <a href="/pages/login.html" class="btn btn-secondary btn-sm">Entrar</a>
+      <a href="/pages/cadastro.html" class="btn btn-primary btn-sm">Cadastrar</a>
+    </div>
+  </nav>
+
+  <div style="max-width:1100px;margin:0 auto;padding:32px 24px;">
+    <h1 style="font-size:28px;font-weight:700;margin-bottom:24px;">Vagas Disponíveis</h1>
+
+    <div class="search-bar">
+      <div class="search-row">
+        <input type="text" id="q" class="form-control search-input" placeholder="🔍 Buscar por título ou palavra-chave...">
+        <button class="btn btn-primary" onclick="search()">Buscar</button>
+      </div>
+      <div class="filters">
+        <select id="area" class="form-control" style="width:auto;" onchange="search()">
+          <option value="">Todas as áreas</option>
+          <option>Tecnologia</option><option>Marketing</option><option>Vendas</option>
+          <option>Financeiro</option><option>RH</option><option>Operações</option>
+          <option>Design</option><option>Jurídico</option><option>Saúde</option><option>Educação</option>
+        </select>
+        <select id="modalidade" class="form-control" style="width:auto;" onchange="search()">
+          <option value="">Qualquer modalidade</option>
+          <option value="presencial">Presencial</option>
+          <option value="remoto">Remoto</option>
+          <option value="hibrido">Híbrido</option>
+        </select>
+        <select id="nivel" class="form-control" style="width:auto;" onchange="search()">
+          <option value="">Qualquer nível</option>
+          <option>Estagiário</option><option>Júnior</option><option>Pleno</option><option>Sênior</option><option>Especialista</option>
+        </select>
+        <select id="tipo_contrato" class="form-control" style="width:auto;" onchange="search()">
+          <option value="">Qualquer contrato</option>
+          <option value="clt">CLT</option><option value="pj">PJ</option>
+          <option value="estagio">Estágio</option><option value="temporario">Temporário</option><option value="freelance">Freelance</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="results-info" class="text-muted text-sm mb-16"></div>
+    <div class="vagas-grid" id="vagas-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);">Carregando...</div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const user = auth.getUser();
+    if (user) {
+      document.getElementById('nav-actions').innerHTML = `
+        <a href="/pages/${user.role}/dashboard.html" class="btn btn-primary btn-sm">Meu Dashboard</a>
+      `;
+    }
+
+    let currentPage = 1;
+
+    async function search(page = 1) {
+      currentPage = page;
+      const params = new URLSearchParams({
+        q: document.getElementById('q').value,
+        area: document.getElementById('area').value,
+        modalidade: document.getElementById('modalidade').value,
+        nivel: document.getElementById('nivel').value,
+        tipo_contrato: document.getElementById('tipo_contrato').value,
+        page,
+        limit: 12,
+      });
+      // Remove params vazios
+      [...params.keys()].forEach(k => { if (!params.get(k)) params.delete(k); });
+
+      const grid = document.getElementById('vagas-grid');
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);">Buscando...</div>';
+
+      try {
+        const data = await get(`/vagas?${params}`);
+        document.getElementById('results-info').textContent = `${data.total} vaga${data.total !== 1 ? 's' : ''} encontrada${data.total !== 1 ? 's' : ''}`;
+
+        if (!data.vagas.length) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);">Nenhuma vaga encontrada com esses filtros.</div>';
+          document.getElementById('pagination').innerHTML = '';
+          return;
+        }
+
+        grid.innerHTML = data.vagas.map(v => `
+          <a href="/pages/vaga.html?id=${v.id}" style="text-decoration:none;">
+            <div class="vaga-card ${v.destaque ? 'destaque' : ''}">
+              <div class="vaga-empresa">
+                <div class="vaga-logo">${v.empresa?.charAt(0) || 'E'}</div>
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--gray-700);">${v.empresa || ''}</div>
+                  <div style="font-size:12px;color:var(--gray-400);">${v.cidade || ''} ${v.estado || ''}</div>
+                </div>
+              </div>
+              <div class="vaga-titulo">${v.titulo}</div>
+              <div class="vaga-info">
+                ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
+                ${v.tipo_contrato ? `<span class="badge badge-gray">${v.tipo_contrato.toUpperCase()}</span>` : ''}
+                ${v.nivel ? `<span class="badge badge-gray">${v.nivel}</span>` : ''}
+                ${v.area ? `<span class="badge badge-purple">${v.area}</span>` : ''}
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                <div class="vaga-salario">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
+                <div class="text-muted text-sm">${formatDate(v.created_at)}</div>
+              </div>
+            </div>
+          </a>
+        `).join('');
+
+        // Paginação
+        const totalPages = Math.ceil(data.total / 12);
+        const pag = document.getElementById('pagination');
+        if (totalPages <= 1) { pag.innerHTML = ''; return; }
+        pag.innerHTML = Array.from({length: totalPages}, (_, i) => i + 1).map(p => `
+          <button class="btn ${p === currentPage ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="search(${p})">${p}</button>
+        `).join('');
+      } catch (err) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);">Erro ao buscar vagas.</div>';
+      }
+    }
+
+    document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+
+    // Pré-preencher filtros da URL
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('q')) document.getElementById('q').value = urlParams.get('q');
+    if (urlParams.get('area')) document.getElementById('area').value = urlParams.get('area');
+
+    search();
+  </script>
+</body>
+</html>

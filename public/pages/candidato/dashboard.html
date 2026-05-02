@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/candidato/dashboard.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/pages/vagas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Buscar Vagas
+      </a>
+      <a href="/pages/candidato/candidaturas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Candidaturas
+      </a>
+      <a href="/pages/candidato/vagas-salvas.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Vagas Salvas
+      </a>
+      <a href="/pages/candidato/perfil.html" class="sidebar-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Meu Perfil
+      </a>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom:24px;">
+        <h1 style="font-size:24px;font-weight:700;" id="greeting">Olá! 👋</h1>
+        <p class="text-muted">Acompanhe suas candidaturas e encontre novas oportunidades.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-total">-</div><div class="stat-label">Candidaturas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-analise">-</div><div class="stat-label">Em análise</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-entrevista">-</div><div class="stat-label">Entrevistas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div><div class="stat-value" id="stat-salvas">-</div><div class="stat-label">Vagas Salvas</div></div>
+        </div>
+      </div>
+
+      <!-- Alerta de perfil incompleto -->
+      <div id="perfil-alerta" class="hidden" style="background:#fef9c3;border:1px solid #fde68a;border-radius:var(--radius);padding:16px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <strong>⚠️ Complete seu perfil</strong>
+          <p style="font-size:13px;color:var(--gray-600);margin-top:2px;">Candidatos com perfil completo têm 3x mais chances de serem chamados.</p>
+        </div>
+        <a href="/pages/candidato/perfil.html" class="btn btn-primary btn-sm">Completar agora</a>
+      </div>
+
+      <!-- Candidaturas recentes -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <h2 class="card-title">Candidaturas Recentes</h2>
+          <a href="/pages/candidato/candidaturas.html" class="btn btn-secondary btn-sm">Ver todas</a>
+        </div>
+        <div id="candidaturas-list">
+          <div style="text-align:center;padding:32px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Vagas recomendadas -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Vagas para Você</h2>
+          <a href="/pages/vagas.html" class="btn btn-secondary btn-sm">Ver todas</a>
+        </div>
+        <div id="vagas-rec" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+          <div style="text-align:center;padding:32px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('candidato')) {}
+
+    const user = auth.getUser();
+
+    async function loadDashboard() {
+      try {
+        const [perfil, candidaturas, salvas, vagas] = await Promise.all([
+          get('/candidatos/perfil'),
+          get('/candidatos/candidaturas'),
+          get('/candidatos/vagas-salvas'),
+          get('/vagas?limit=6'),
+        ]);
+
+        document.getElementById('greeting').textContent = `Olá, ${perfil.nome?.split(' ')[0] || 'Candidato'}! 👋`;
+
+        // Stats
+        document.getElementById('stat-total').textContent = candidaturas.length;
+        document.getElementById('stat-analise').textContent = candidaturas.filter(c => c.status === 'em_analise').length;
+        document.getElementById('stat-entrevista').textContent = candidaturas.filter(c => c.status === 'entrevista').length;
+        document.getElementById('stat-salvas').textContent = salvas.length;
+
+        // Alerta perfil incompleto
+        if (!perfil.resumo_profissional || !perfil.cargo_desejado)
+          document.getElementById('perfil-alerta').classList.remove('hidden');
+
+        // Candidaturas recentes
+        const cl = document.getElementById('candidaturas-list');
+        if (!candidaturas.length) {
+          cl.innerHTML = '<p style="text-align:center;padding:24px;color:var(--gray-400);">Você ainda não se candidatou a nenhuma vaga. <a href="/pages/vagas.html">Buscar vagas</a></p>';
+        } else {
+          cl.innerHTML = `<div class="table-wrapper"><table>
+            <thead><tr><th>Vaga</th><th>Empresa</th><th>Status</th><th>Data</th></tr></thead>
+            <tbody>${candidaturas.slice(0,5).map(c => `
+              <tr>
+                <td><a href="/pages/vaga.html?id=${c.vaga_id}">${c.titulo}</a></td>
+                <td>${c.empresa || ''}</td>
+                <td>${statusBadge(c.status)}</td>
+                <td class="text-muted">${formatDate(c.created_at)}</td>
+              </tr>
+            `).join('')}</tbody>
+          </table></div>`;
+        }
+
+        // Vagas recomendadas
+        const vr = document.getElementById('vagas-rec');
+        if (!vagas.vagas?.length) {
+          vr.innerHTML = '<p style="color:var(--gray-400);">Nenhuma vaga disponível.</p>';
+        } else {
+          vr.innerHTML = vagas.vagas.map(v => `
+            <a href="/pages/vaga.html?id=${v.id}" style="text-decoration:none;">
+              <div class="vaga-card">
+                <div class="vaga-empresa">
+                  <div class="vaga-logo">${v.empresa?.charAt(0) || 'E'}</div>
+                  <div><div style="font-size:13px;color:var(--gray-500);">${v.empresa || ''}</div></div>
+                </div>
+                <div class="vaga-titulo">${v.titulo}</div>
+                <div class="vaga-info">
+                  ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
+                  ${v.tipo_contrato ? `<span class="badge badge-gray">${v.tipo_contrato.toUpperCase()}</span>` : ''}
+                </div>
+                <div class="vaga-salario mt-8">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
+              </div>
+            </a>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    initNavbar('candidato');
+    loadDashboard();
+  </script>
+</body>
+</html>

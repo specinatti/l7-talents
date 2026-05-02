@@ -1,1 +1,1 @@
-web: node server-secure.js
+web: node src/server.js
