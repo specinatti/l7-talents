@@ -6,6 +6,8 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const { initDB } = require('./db');
 
+const cacheBusting = require('../cacheBusting');
+
 const app = express();
 
 // Segurança
@@ -13,6 +15,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true }));
+app.use(cacheBusting);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
