@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120" width="220" height="120">
+  <rect width="220" height="120" fill="#FAF7F4"/>
+  <!-- L -->
+  <text x="68" y="72" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#B85C6E" letter-spacing="-2">L</text>
+  <!-- 7 -->
+  <text x="100" y="72" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#B85C6E">7</text>
+  <!-- TALENTS -->
+  <text x="110" y="98" font-family="Georgia, serif" font-size="18" font-weight="400" fill="#1B2A4A" letter-spacing="6" text-anchor="middle">TALENTS</text>
+</svg>

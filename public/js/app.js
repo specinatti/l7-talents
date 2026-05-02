@@ -120,7 +120,7 @@ function initNavbar(role) {
 
   nav.innerHTML = `
     <a href="/" class="navbar-brand">
-      <img src="/images/l7-logo.jpg" alt="L7 Talents" style="height:40px;object-fit:contain;">
+      <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:40px;object-fit:contain;">
     </a>
     <nav class="navbar-nav">
       ${navLinks}
@@ -137,7 +137,7 @@ function initNavbar(role) {
     <div class="mobile-drawer" id="mobile-drawer">
       <div class="drawer-overlay" onclick="closeDrawer()"></div>
       <div class="drawer-panel">
-        <img src="/images/l7-logo.jpg" alt="L7 Talents" class="drawer-logo">
+        <img src="/images/l7-logo.svg" alt="L7 Talents" class="drawer-logo">
         ${drawerLinks}
         <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--cream2);">
           <span style="font-size:12px;color:var(--gray-500);display:block;margin-bottom:8px;">${user?.email || ''}</span>
