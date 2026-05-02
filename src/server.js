@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { initDB } = require('./db');
 const securityHeaders = require('../securityHeaders');
-const { apiLimiter, speedLimiter } = require('../rateLimiter');
+const { apiLimiter } = require('../rateLimiter');
 const cacheBusting = require('../cacheBusting');
 
 const app = express();
@@ -18,9 +18,8 @@ app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
 // Body parser
 app.use(express.json({ limit: '10mb' }));
 
-// Rate limit + slow down globais
+// Rate limit global
 app.use('/api', apiLimiter);
-app.use('/api', speedLimiter);
 
 // Cache busting para assets
 app.use(cacheBusting);
