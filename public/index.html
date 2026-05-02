@@ -355,9 +355,9 @@
       ).join('');
     }
     function obNav(d) { obIdx=Math.max(0,Math.min(obFlow.length-1,obIdx+d)); obRender(); }
-    function obClose() { document.getElementById('onboarding-overlay').style.display='none'; sessionStorage.setItem('ob_seen','1'); }
+    function obClose() { document.getElementById('onboarding-overlay').style.display='none'; }
 
-    if (!sessionStorage.getItem('ob_seen')) setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
+    setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
   </script>
 </body>
 </html>
