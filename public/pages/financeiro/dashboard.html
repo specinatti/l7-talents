@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--navy); }
+    .page-header p { color: var(--gray-500); font-size: 14px; margin-top: 4px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .kpi { background: var(--cream2); border-radius: var(--radius-lg); padding: 20px; border-left: 4px solid var(--rose); }
+    .kpi-value { font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
+    .kpi-label { font-size: 13px; color: var(--gray-500); margin-top: 6px; }
+    .kpi-sub { font-size: 12px; color: var(--rose); margin-top: 4px; font-weight: 500; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .chart-card { background: var(--cream2); border-radius: var(--radius-lg); padding: 20px; }
+    .chart-title { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 16px; }
+    .table-card { background: var(--cream2); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 12px; color: var(--gray-500); font-weight: 500; border-bottom: 1px solid var(--cream); }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--cream); color: var(--navy); }
+    tr:last-child td { border-bottom: none; }
+    @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="main-content" style="max-width:1200px;margin:0 auto;">
+
+    <div class="page-header">
+      <h1>📊 Analytics do Portal</h1>
+      <p id="last-update">Carregando dados...</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpis">
+      <div class="kpi"><div class="kpi-value">—</div><div class="kpi-label">Usuários totais</div></div>
+      <div class="kpi"><div class="kpi-value">—</div><div class="kpi-label">Candidatos</div></div>
+      <div class="kpi"><div class="kpi-value">—</div><div class="kpi-label">Empresas</div></div>
+      <div class="kpi"><div class="kpi-value">—</div><div class="kpi-label">Vagas ativas</div></div>
+      <div class="kpi"><div class="kpi-value">—</div><div class="kpi-label">Candidaturas</div></div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Novos usuários por mês</div>
+        <canvas id="chart-usuarios" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Candidaturas por mês</div>
+        <canvas id="chart-candidaturas" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Vagas por área</div>
+        <canvas id="chart-areas" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Status das candidaturas</div>
+        <canvas id="chart-status" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Usuários por dia (30 dias) -->
+    <div class="chart-card" style="margin-bottom:20px;">
+      <div class="chart-title">Novos usuários — últimos 30 dias</div>
+      <canvas id="chart-diario" height="100"></canvas>
+    </div>
+
+    <!-- Top empresas -->
+    <div class="table-card">
+      <div class="chart-title">Top empresas por vagas publicadas</div>
+      <table id="table-empresas">
+        <thead><tr><th>Empresa</th><th>Vagas</th><th>Visualizações</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Últimas candidaturas -->
+    <div class="table-card">
+      <div class="chart-title">Últimas candidaturas</div>
+      <table id="table-candidaturas">
+        <thead><tr><th>Candidato</th><th>Vaga</th><th>Empresa</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('financeiro')) {}
+
+    initNavbar('financeiro');
+
+    const COLORS = ['#1B2A4A','#B85C6E','#F2EDE8','#6B7280','#EAE3DC','#243558','#a34e60','#374151'];
+
+    function mkChart(id, type, labels, data, label) {
+      return new Chart(document.getElementById(id), {
+        type,
+        data: {
+          labels,
+          datasets: [{ label, data, backgroundColor: type === 'bar' ? '#1B2A4A' : COLORS, borderColor: type === 'line' ? '#B85C6E' : undefined, borderWidth: type === 'line' ? 2 : 0, fill: type === 'line', tension: .4, pointBackgroundColor: '#B85C6E' }]
+        },
+        options: { responsive: true, plugins: { legend: { display: type !== 'bar' } }, scales: type === 'pie' || type === 'doughnut' ? {} : { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+      });
+    }
+
+    get('/financeiro/analytics').then(d => {
+      // KPIs
+      const vals = [d.totais.usuarios, d.totais.candidatos, d.totais.empregadores, d.totais.vagasAtivas, d.totais.candidaturas];
+      document.querySelectorAll('.kpi').forEach((el, i) => {
+        el.querySelector('.kpi-value').textContent = vals[i].toLocaleString('pt-BR');
+      });
+      document.getElementById('last-update').textContent = 'Atualizado em ' + new Date().toLocaleString('pt-BR');
+
+      // Gráficos de linha
+      mkChart('chart-usuarios','bar', d.crescimentoUsuarios.map(r=>r.mes), d.crescimentoUsuarios.map(r=>+r.total), 'Usuários');
+      mkChart('chart-candidaturas','bar', d.crescimentoCandidaturas.map(r=>r.mes), d.crescimentoCandidaturas.map(r=>+r.total), 'Candidaturas');
+      mkChart('chart-areas','doughnut', d.vagasPorArea.map(r=>r.area), d.vagasPorArea.map(r=>+r.total), 'Vagas');
+      mkChart('chart-status','pie', d.candidaturasPorStatus.map(r=>r.status), d.candidaturasPorStatus.map(r=>+r.total), 'Status');
+      mkChart('chart-diario','line', d.usuariosPorDia.map(r=>r.dia), d.usuariosPorDia.map(r=>+r.total), 'Usuários/dia');
+
+      // Tabela empresas
+      document.querySelector('#table-empresas tbody').innerHTML = d.topEmpresas.map(r =>
+        `<tr><td>${r.empresa}</td><td>${r.vagas}</td><td>${r.visualizacoes||0}</td></tr>`
+      ).join('') || '<tr><td colspan="3" style="color:var(--gray-400)">Sem dados</td></tr>';
+
+      // Tabela candidaturas
+      document.querySelector('#table-candidaturas tbody').innerHTML = d.ultimasCandidaturas.map(r =>
+        `<tr><td>${r.candidato}</td><td>${r.vaga}</td><td>${r.empresa}</td><td>${statusBadge(r.status)}</td><td>${formatDate(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Sem dados</td></tr>';
+
+    }).catch(err => {
+      document.getElementById('last-update').textContent = 'Erro ao carregar: ' + err.message;
+    });
+  </script>
+</body>
+</html>

@@ -29,7 +29,7 @@ async function register(req, res) {
   if (!email || !password || !role || !nome)
     return res.status(400).json({ error: 'Campos obrigatórios: email, password, role, nome' });
 
-  if (!['candidato', 'empregador'].includes(role))
+  if (!['candidato', 'empregador', 'financeiro'].includes(role))
     return res.status(400).json({ error: 'Role inválido' });
 
   if (password.length < 6)
@@ -51,11 +51,8 @@ async function register(req, res) {
     const user = rows[0];
 
     if (role === 'candidato') {
-      await client.query(
-        'INSERT INTO candidatos (user_id, nome) VALUES ($1, $2)',
-        [user.id, nome]
-      );
-    } else {
+      await client.query('INSERT INTO candidatos (user_id, nome) VALUES ($1, $2)', [user.id, nome]);
+    } else if (role === 'empregador') {
       await client.query(
         'INSERT INTO empregadores (user_id, nome_contato, razao_social) VALUES ($1, $2, $3)',
         [user.id, nome, razao_social || nome]

@@ -32,6 +32,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/candidatos', require('./routes/candidatos'));
 app.use('/api/empregadores', require('./routes/empregadores'));
 app.use('/api/vagas', require('./routes/vagas'));
+app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api', require('./routes/comunicacao'));
 
 // Frontend estático

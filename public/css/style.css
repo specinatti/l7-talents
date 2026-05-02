@@ -220,7 +220,48 @@ tr:hover td { background: var(--cream); }
   .form-row, .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .navbar { padding: 0 16px; }
+  .navbar-nav .nav-link { display: none; }
+  .navbar-nav .btn { display: none; }
+  .hamburger { display: flex !important; }
 }
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .btn-lg { padding: 12px 20px; font-size: 14px; }
+}
+
+/* Hamburger menu */
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 8px;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--navy); border-radius: 2px; transition: all .3s;
+}
+
+/* Mobile drawer */
+.mobile-drawer {
+  display: none; position: fixed; inset: 0; z-index: 200;
+}
+.mobile-drawer.open { display: block; }
+.drawer-overlay {
+  position: absolute; inset: 0; background: rgba(27,42,74,.4);
+}
+.drawer-panel {
+  position: absolute; top: 0; left: 0; bottom: 0; width: 260px;
+  background: var(--cream); padding: 24px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  box-shadow: 4px 0 24px rgba(0,0,0,.15);
+  overflow-y: auto;
+}
+.drawer-logo { height: 44px; object-fit: contain; margin-bottom: 20px; }
+.drawer-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  border-radius: var(--radius); font-size: 15px; color: var(--navy);
+  font-weight: 500; text-decoration: none; transition: background .15s;
+}
+.drawer-item:hover { background: var(--cream2); text-decoration: none; }
+.drawer-item.active { background: var(--cream2); color: var(--rose); font-weight: 600; }
 
 /* Garantir tom creme em elementos que usam white */
 .stat-card, .vaga-card, .auth-card, .modal-content,

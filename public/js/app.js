@@ -97,33 +97,60 @@ function initNavbar(role) {
   const nav = document.getElementById('navbar');
   if (!nav) return;
 
-  const links = role === 'candidato' ? `
-    <a href="/pages/candidato/dashboard.html" class="nav-link">Dashboard</a>
-    <a href="/pages/vagas.html" class="nav-link">Vagas</a>
-    <a href="/pages/candidato/perfil.html" class="nav-link">Meu Perfil</a>
-  ` : `
-    <a href="/pages/empregador/dashboard.html" class="nav-link">Dashboard</a>
-    <a href="/pages/empregador/vagas.html" class="nav-link">Minhas Vagas</a>
-    <a href="/pages/empregador/candidatos.html" class="nav-link">Candidatos</a>
-    <a href="/pages/empregador/perfil.html" class="nav-link">Empresa</a>
-  `;
+  const links = role === 'candidato' ? [
+    ['/pages/candidato/dashboard.html','Dashboard'],
+    ['/pages/vagas.html','Vagas'],
+    ['/pages/candidato/perfil.html','Meu Perfil'],
+  ] : role === 'financeiro' ? [
+    ['/pages/financeiro/dashboard.html','Analytics'],
+  ] : [
+    ['/pages/empregador/dashboard.html','Dashboard'],
+    ['/pages/empregador/vagas.html','Minhas Vagas'],
+    ['/pages/empregador/candidatos.html','Candidatos'],
+    ['/pages/empregador/perfil.html','Empresa'],
+  ];
+
+  const navLinks = links.map(([href, label]) =>
+    `<a href="${href}" class="nav-link">${label}</a>`
+  ).join('');
+
+  const drawerLinks = links.map(([href, label]) =>
+    `<a href="${href}" class="drawer-item">${label}</a>`
+  ).join('');
 
   nav.innerHTML = `
     <a href="/" class="navbar-brand">
       <img src="/images/l7-logo.jpg" alt="L7 Talents" style="height:40px;object-fit:contain;">
     </a>
     <nav class="navbar-nav">
-      ${links}
+      ${navLinks}
       <div id="notif-btn" style="position:relative;cursor:pointer;padding:8px;" onclick="toggleNotif()">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span id="notif-count" class="hidden" style="position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span>
+        <span id="notif-count" class="hidden" style="position:absolute;top:4px;right:4px;background:#B85C6E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span>
       </div>
       <span style="font-size:13px;color:#6b7280;">${user?.email || ''}</span>
       <button class="btn btn-secondary btn-sm" onclick="logout()">Sair</button>
+      <button class="hamburger" onclick="openDrawer()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="drawer-overlay" onclick="closeDrawer()"></div>
+      <div class="drawer-panel">
+        <img src="/images/l7-logo.jpg" alt="L7 Talents" class="drawer-logo">
+        ${drawerLinks}
+        <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--cream2);">
+          <span style="font-size:12px;color:var(--gray-500);display:block;margin-bottom:8px;">${user?.email || ''}</span>
+          <button class="btn btn-secondary btn-sm w-full" onclick="logout()">Sair</button>
+        </div>
+      </div>
+    </div>
   `;
   loadNotifCount();
 }
+
+function openDrawer() { document.getElementById('mobile-drawer')?.classList.add('open'); }
+function closeDrawer() { document.getElementById('mobile-drawer')?.classList.remove('open'); }
 
 async function loadNotifCount() {
   try {
