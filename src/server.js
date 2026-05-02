@@ -1,20 +1,28 @@
 require('dotenv').config();
 const express = require('express');
-const helmet = require('helmet');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 const { initDB } = require('./db');
-
+const securityHeaders = require('../securityHeaders');
+const { apiLimiter, speedLimiter } = require('../rateLimiter');
 const cacheBusting = require('../cacheBusting');
 
 const app = express();
 
-// Segurança
-app.use(helmet({ contentSecurityPolicy: false }));
+// Segurança: headers, HSTS, CSP, etc.
+securityHeaders(app);
+
+// CORS
 app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+
+// Body parser
 app.use(express.json({ limit: '10mb' }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true }));
+
+// Rate limit + slow down globais
+app.use('/api', apiLimiter);
+app.use('/api', speedLimiter);
+
+// Cache busting para assets
 app.use(cacheBusting);
 
 // Health check

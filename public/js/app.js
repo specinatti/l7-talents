@@ -140,6 +140,54 @@ function logout() {
   window.location.href = '/pages/login.html';
 }
 
+// ── Sessão segura ──────────────────────────────────────────────────────────
+const SESSION_TIMEOUT = 30 * 60 * 1000;  // 30 min inatividade
+const WARN_BEFORE    =  2 * 60 * 1000;   // aviso 2 min antes
+const REFRESH_INTERVAL = 90 * 60 * 1000; // renovar token a cada 90 min
+
+let _idleTimer, _warnTimer, _warnEl;
+
+function _resetIdle() {
+  clearTimeout(_idleTimer);
+  clearTimeout(_warnTimer);
+  if (_warnEl) { _warnEl.remove(); _warnEl = null; }
+  if (!auth.isLogged()) return;
+
+  _warnTimer = setTimeout(() => {
+    _warnEl = document.createElement('div');
+    _warnEl.innerHTML = `
+      <div style="position:fixed;bottom:24px;right:24px;background:#1e3a8a;color:white;padding:16px 20px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:99999;max-width:320px;font-family:Inter,sans-serif;">
+        <div style="font-weight:600;margin-bottom:6px;">⏱ Sessão expirando</div>
+        <div style="font-size:13px;opacity:.85;margin-bottom:12px;">Você ficará desconectado em 2 minutos por inatividade.</div>
+        <button onclick="(function(){_resetIdle();this.closest('div[style]').remove();})()" style="background:white;color:#1e3a8a;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;">Continuar conectado</button>
+      </div>`;
+    document.body.appendChild(_warnEl);
+  }, SESSION_TIMEOUT - WARN_BEFORE);
+
+  _idleTimer = setTimeout(() => { logout(); }, SESSION_TIMEOUT);
+}
+
+// Renovar token automaticamente enquanto ativo
+async function _refreshToken() {
+  if (!auth.isLogged()) return;
+  try {
+    const data = await post('/auth/refresh', null);
+    if (data?.token) {
+      const user = auth.getUser();
+      auth.setSession(data.token, user);
+    }
+  } catch { logout(); }
+}
+
+if (auth.isLogged()) {
+  ['mousemove','keydown','click','scroll','touchstart'].forEach(e =>
+    document.addEventListener(e, _resetIdle, { passive: true })
+  );
+  _resetIdle();
+  setInterval(_refreshToken, REFRESH_INTERVAL);
+}
+// ──────────────────────────────────────────────────────────────────────────
+
 // Highlight active nav link
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-link, .sidebar-item').forEach(el => {

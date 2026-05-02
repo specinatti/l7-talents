@@ -6,8 +6,21 @@ function generateToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '2h' }
   );
+}
+
+async function refresh(req, res) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Token não fornecido' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { rows } = await pool.query('SELECT id, email, role, ativo FROM users WHERE id = $1', [decoded.id]);
+    if (!rows[0] || !rows[0].ativo) return res.status(401).json({ error: 'Usuário inativo' });
+    res.json({ token: generateToken(rows[0]) });
+  } catch {
+    res.status(401).json({ error: 'Token inválido ou expirado' });
+  }
 }
 
 async function register(req, res) {
@@ -199,4 +212,4 @@ async function confirmReset(req, res) {
   }
 }
 
-module.exports = { register, login, me, changePassword, requestReset, confirmReset };
+module.exports = { register, login, me, refresh, changePassword, requestReset, confirmReset };
