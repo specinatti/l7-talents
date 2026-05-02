@@ -32,8 +32,13 @@
   <div class="main-content" style="max-width:1200px;margin:0 auto;">
 
     <div class="page-header">
-      <h1>📊 Analytics do Portal</h1>
-      <p id="last-update">Carregando dados...</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1>📊 Analytics do Portal</h1>
+          <p id="last-update">Carregando dados...</p>
+        </div>
+        <a href="/pages/financeiro/docs.html" style="background:var(--navy);color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">📄 Documentação</a>
+      </div>
     </div>
 
     <!-- KPIs -->
@@ -80,6 +85,26 @@
       </table>
     </div>
 
+    <!-- MONITORAMENTO DO SISTEMA -->
+    <div class="table-card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="chart-title" style="margin:0;">🖥️ Status do Sistema</div>
+        <button onclick="loadMonitor()" style="background:var(--navy);color:white;border:none;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">↻ Atualizar</button>
+      </div>
+      <div id="monitor-status" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
+        <div style="background:var(--cream);border-radius:8px;padding:14px;text-align:center;"><div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;">STATUS</div><div id="mon-status" style="font-weight:700;color:var(--navy);">—</div></div>
+        <div style="background:var(--cream);border-radius:8px;padding:14px;text-align:center;"><div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;">UPTIME</div><div id="mon-uptime" style="font-weight:700;color:var(--navy);">—</div></div>
+        <div style="background:var(--cream);border-radius:8px;padding:14px;text-align:center;"><div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;">BANCO (ms)</div><div id="mon-db" style="font-weight:700;color:var(--navy);">—</div></div>
+        <div style="background:var(--cream);border-radius:8px;padding:14px;text-align:center;"><div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;">MEMÓRIA</div><div id="mon-mem" style="font-weight:700;color:var(--navy);">—</div></div>
+        <div style="background:var(--cream);border-radius:8px;padding:14px;text-align:center;"><div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;">CANDIDATURAS 24H</div><div id="mon-cand" style="font-weight:700;color:var(--navy);">—</div></div>
+      </div>
+      <div class="chart-title" style="font-size:13px;margin-bottom:8px;">Últimos erros registrados</div>
+      <table id="table-errors" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr><th style="text-align:left;padding:6px 10px;color:var(--gray-500);border-bottom:1px solid var(--cream);">Horário</th><th style="text-align:left;padding:6px 10px;color:var(--gray-500);border-bottom:1px solid var(--cream);">Rota</th><th style="text-align:left;padding:6px 10px;color:var(--gray-500);border-bottom:1px solid var(--cream);">Erro</th></tr></thead>
+        <tbody id="errors-body"><tr><td colspan="3" style="padding:12px 10px;color:var(--gray-400);">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+
     <!-- Últimas candidaturas -->
     <div class="table-card">
       <div class="chart-title">Últimas candidaturas</div>
@@ -109,6 +134,23 @@
         options: { responsive: true, plugins: { legend: { display: type !== 'bar' } }, scales: type === 'pie' || type === 'doughnut' ? {} : { y: { beginAtZero: true, ticks: { precision: 0 } } } }
       });
     }
+
+    function loadMonitor() {
+      get('/financeiro/monitor').then(m => {
+        document.getElementById('mon-status').textContent = m.status === 'ok' ? '✅ Online' : '❌ Erro';
+        document.getElementById('mon-uptime').textContent = m.uptime_human;
+        document.getElementById('mon-db').textContent = m.db_latency_ms + 'ms ' + (m.db_status === 'ok' ? '✅' : '⚠️');
+        document.getElementById('mon-mem').textContent = m.memory_mb + ' MB';
+        document.getElementById('mon-cand').textContent = m.stats.candidaturas_24h;
+        document.getElementById('errors-body').innerHTML = m.recent_errors.length
+          ? m.recent_errors.map(e => `<tr><td style="padding:6px 10px;border-bottom:1px solid var(--cream);">${new Date(e.ts).toLocaleString('pt-BR')}</td><td style="padding:6px 10px;border-bottom:1px solid var(--cream);">${e.method||''} ${e.path||''}</td><td style="padding:6px 10px;border-bottom:1px solid var(--cream);color:var(--rose);">${e.error}</td></tr>`).join('')
+          : '<tr><td colspan="3" style="padding:12px 10px;color:var(--gray-400);">✅ Nenhum erro registrado</td></tr>';
+      }).catch(() => {
+        document.getElementById('mon-status').textContent = '❌ Falha';
+      });
+    }
+    loadMonitor();
+    setInterval(loadMonitor, 60000); // atualiza a cada 1 min
 
     get('/financeiro/analytics').then(d => {
       // KPIs

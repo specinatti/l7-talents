@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentação Técnica - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; }
+    h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin: 40px 0 12px; border-bottom: 2px solid var(--rose); padding-bottom: 8px; }
+    h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin: 20px 0 8px; }
+    p, li { font-size: 14px; color: #374151; line-height: 1.7; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    .badge-ok { background: #dcfce7; color: #166534; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-warn { background: #fef9c3; color: #854d0e; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+    th { background: var(--cream2); padding: 10px 14px; text-align: left; color: var(--navy); font-weight: 600; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--cream2); color: #374151; }
+    code { background: var(--cream2); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: monospace; color: var(--rose); }
+    .section-box { background: var(--cream2); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; border-left: 4px solid var(--rose); }
+    .print-btn { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    @media print { .print-btn { display: none; } body { padding: 20px; } }
+  </style>
+</head>
+<body>
+
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:32px;">
+    <img src="/images/l7-logo.jpg" alt="L7 Talents" style="height:60px;object-fit:contain;">
+    <div>
+      <h1 style="margin:0;">Documentação Técnica</h1>
+      <p style="margin:4px 0 0;color:var(--gray-500);">Portal L7 Talents — Versão 2.0 — <span id="doc-date"></span></p>
+    </div>
+  </div>
+
+  <h2>1. Visão Geral do Sistema</h2>
+  <div class="section-box">
+    <p>O <strong>L7 Talents</strong> é um portal de recrutamento e gestão de pessoas desenvolvido para conectar candidatos a oportunidades de emprego e empresas a talentos qualificados. A plataforma opera em modelo SaaS com acesso via browser, sem necessidade de instalação.</p>
+  </div>
+  <table>
+    <tr><th>Item</th><th>Detalhe</th></tr>
+    <tr><td>URL de produção</td><td><code>https://l7-talents-production.up.railway.app</code></td></tr>
+    <tr><td>Repositório</td><td><code>github.com/specinatti/l7-talents</code></td></tr>
+    <tr><td>Infraestrutura</td><td>Railway.app (Node.js + PostgreSQL)</td></tr>
+    <tr><td>Versão Node.js</td><td>18.x LTS</td></tr>
+    <tr><td>Banco de dados</td><td>PostgreSQL 15 (Railway managed)</td></tr>
+    <tr><td>Deploy</td><td>Automático a cada push no branch <code>main</code></td></tr>
+  </table>
+
+  <h2>2. Arquitetura</h2>
+  <h3>Stack tecnológica</h3>
+  <table>
+    <tr><th>Camada</th><th>Tecnologia</th><th>Versão</th></tr>
+    <tr><td>Backend</td><td>Node.js + Express</td><td>4.18</td></tr>
+    <tr><td>Banco de dados</td><td>PostgreSQL</td><td>15</td></tr>
+    <tr><td>Autenticação</td><td>JWT (jsonwebtoken)</td><td>9.x</td></tr>
+    <tr><td>Hash de senhas</td><td>bcryptjs</td><td>2.4</td></tr>
+    <tr><td>Frontend</td><td>HTML5 + CSS3 + JavaScript vanilla</td><td>—</td></tr>
+    <tr><td>Email</td><td>Nodemailer (SMTP)</td><td>6.9</td></tr>
+  </table>
+
+  <h3>Estrutura de diretórios</h3>
+  <div class="section-box">
+    <code>src/server.js</code> — Servidor principal<br>
+    <code>src/controllers/</code> — Lógica de negócio<br>
+    <code>src/routes/</code> — Definição de rotas da API<br>
+    <code>src/middleware/auth.js</code> — Validação JWT<br>
+    <code>src/db/index.js</code> — Conexão PostgreSQL<br>
+    <code>database/schema.sql</code> — Schema completo do banco<br>
+    <code>public/</code> — Frontend estático<br>
+    <code>public/pages/financeiro/</code> — Área exclusiva da gestão
+  </div>
+
+  <h2>3. Perfis de Acesso (Roles)</h2>
+  <table>
+    <tr><th>Role</th><th>Acesso</th><th>Dashboard</th></tr>
+    <tr><td><code>candidato</code></td><td>Buscar vagas, candidatar-se, perfil, mensagens</td><td>/pages/candidato/dashboard.html</td></tr>
+    <tr><td><code>empregador</code></td><td>Publicar vagas, gerenciar candidatos, perfil empresa</td><td>/pages/empregador/dashboard.html</td></tr>
+    <tr><td><code>financeiro</code></td><td>Analytics, monitoramento, métricas do portal</td><td>/pages/financeiro/dashboard.html</td></tr>
+    <tr><td><code>admin</code></td><td>Acesso total (todos os endpoints)</td><td>—</td></tr>
+  </table>
+
+  <h3>Conta de gestão (financeiro)</h3>
+  <div class="section-box">
+    <p><strong>Email:</strong> <code>comercial@l7talents.online</code><br>
+    <strong>Acesso:</strong> Analytics de audiência, monitoramento do sistema, logs de erros em tempo real<br>
+    <strong>Renovação de senha:</strong> Via página <code>/pages/esqueci-senha.html</code></p>
+  </div>
+
+  <h2>4. Variáveis de Ambiente (Railway)</h2>
+  <table>
+    <tr><th>Variável</th><th>Descrição</th><th>Status</th></tr>
+    <tr><td><code>DATABASE_URL</code></td><td>URL de conexão PostgreSQL (Railway)</td><td><span class="badge-ok">Configurada</span></td></tr>
+    <tr><td><code>JWT_SECRET</code></td><td>Chave secreta para assinar tokens JWT</td><td><span class="badge-ok">Configurada</span></td></tr>
+    <tr><td><code>NODE_ENV</code></td><td>Ambiente (<code>production</code>)</td><td><span class="badge-ok">Configurada</span></td></tr>
+    <tr><td><code>APP_URL</code></td><td>URL base para links de email (reset de senha)</td><td><span class="badge-warn">Opcional</span></td></tr>
+    <tr><td><code>SMTP_HOST</code></td><td>Servidor SMTP para envio de emails</td><td><span class="badge-warn">Opcional</span></td></tr>
+    <tr><td><code>SMTP_PORT</code></td><td>Porta SMTP (padrão: 587)</td><td><span class="badge-warn">Opcional</span></td></tr>
+    <tr><td><code>SMTP_USER</code></td><td>Usuário SMTP</td><td><span class="badge-warn">Opcional</span></td></tr>
+    <tr><td><code>SMTP_PASS</code></td><td>Senha SMTP</td><td><span class="badge-warn">Opcional</span></td></tr>
+    <tr><td><code>ADMIN_EMAIL</code></td><td>Email do administrador</td><td><span class="badge-ok">Configurada</span></td></tr>
+    <tr><td><code>CONTACT_EMAIL</code></td><td>Email de contato comercial</td><td><span class="badge-ok">Configurada</span></td></tr>
+  </table>
+  <p><strong>⚠️ Importante:</strong> O <code>JWT_SECRET</code> nunca deve ser alterado sem invalidar todas as sessões ativas. Guarde-o em local seguro (gerenciador de senhas).</p>
+
+  <h2>5. Segurança</h2>
+
+  <h3>5.1 Autenticação e Sessão</h3>
+  <ul>
+    <li>Autenticação via <strong>JWT (JSON Web Token)</strong> com expiração de <strong>2 horas</strong></li>
+    <li>Renovação automática de token a cada 90 minutos de uso ativo</li>
+    <li>Timeout de sessão por inatividade: <strong>30 minutos</strong> com aviso 2 minutos antes</li>
+    <li>Senhas armazenadas com <strong>bcrypt (salt rounds: 10)</strong> — irreversível</li>
+    <li>Nenhuma senha é armazenada em texto puro em nenhum momento</li>
+  </ul>
+
+  <h3>5.2 Proteção de Rotas</h3>
+  <ul>
+    <li>Todas as rotas da API exigem token JWT válido (exceto login, cadastro e vagas públicas)</li>
+    <li>Controle de acesso por role: candidato, empregador, financeiro, admin</li>
+    <li>Tentativa de acesso a role diferente retorna HTTP 403</li>
+  </ul>
+
+  <h3>5.3 Rate Limiting</h3>
+  <ul>
+    <li><strong>API geral:</strong> máximo 100 requisições por IP a cada 15 minutos</li>
+    <li><strong>Login/Cadastro/Recuperação de senha:</strong> máximo 20 tentativas por hora por IP</li>
+    <li>Excesso retorna HTTP 429 com tempo de espera</li>
+  </ul>
+
+  <h3>5.4 Headers de Segurança</h3>
+  <ul>
+    <li><code>X-Content-Type-Options: nosniff</code> — previne MIME sniffing</li>
+    <li><code>X-Frame-Options: DENY</code> — previne clickjacking</li>
+    <li><code>X-XSS-Protection: 1; mode=block</code> — proteção XSS no browser</li>
+    <li><code>Referrer-Policy: strict-origin-when-cross-origin</code></li>
+    <li><code>Permissions-Policy</code> — desabilita geolocalização, microfone e câmera</li>
+    <li>Header <code>X-Powered-By</code> removido (não expõe tecnologia)</li>
+  </ul>
+
+  <h3>5.5 Recuperação de Senha</h3>
+  <ul>
+    <li>Token de reset gerado com <code>crypto.randomBytes(32)</code> — 256 bits de entropia</li>
+    <li>Token expira em <strong>1 hora</strong> e é invalidado após uso</li>
+    <li>Endpoint não revela se email existe (proteção contra enumeração)</li>
+  </ul>
+
+  <h3>5.6 Cache Busting</h3>
+  <ul>
+    <li>Assets CSS/JS recebem <code>?v=timestamp</code> a cada deploy</li>
+    <li>Páginas HTML têm <code>Cache-Control: no-cache</code></li>
+    <li>Garante que usuários sempre recebem a versão mais recente</li>
+  </ul>
+
+  <h2>6. LGPD — Lei Geral de Proteção de Dados</h2>
+
+  <h3>6.1 Dados coletados</h3>
+  <table>
+    <tr><th>Dado</th><th>Finalidade</th><th>Base legal (LGPD)</th></tr>
+    <tr><td>Nome completo</td><td>Identificação no portal</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>Email</td><td>Login, comunicações, recuperação de senha</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>Senha (hash)</td><td>Autenticação segura</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>CPF (opcional)</td><td>Identificação do candidato</td><td>Consentimento (Art. 7º, I)</td></tr>
+    <tr><td>Telefone (opcional)</td><td>Contato pelo empregador</td><td>Consentimento (Art. 7º, I)</td></tr>
+    <tr><td>Currículo/Experiências</td><td>Candidatura a vagas</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>CNPJ (opcional)</td><td>Identificação da empresa</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+  </table>
+
+  <h3>6.2 Direitos dos titulares</h3>
+  <ul>
+    <li><strong>Acesso:</strong> O usuário pode visualizar todos os seus dados no perfil</li>
+    <li><strong>Correção:</strong> O usuário pode editar seus dados a qualquer momento</li>
+    <li><strong>Exclusão:</strong> Conta pode ser desativada (campo <code>ativo = false</code>)</li>
+    <li><strong>Portabilidade:</strong> Dados exportáveis mediante solicitação</li>
+    <li><strong>Revogação:</strong> Usuário pode solicitar exclusão total via email</li>
+  </ul>
+
+  <h3>6.3 Armazenamento e retenção</h3>
+  <ul>
+    <li>Dados armazenados em servidor PostgreSQL gerenciado pelo Railway (infraestrutura AWS)</li>
+    <li>Backups automáticos diários (plano pago Railway)</li>
+    <li>Dados de candidaturas retidos enquanto a conta estiver ativa</li>
+    <li>Senhas nunca armazenadas — apenas hash irreversível</li>
+  </ul>
+
+  <h3>6.4 Compartilhamento de dados</h3>
+  <ul>
+    <li>Dados de candidatos são compartilhados <strong>apenas</strong> com empregadores para os quais o candidato se candidatou</li>
+    <li>Nenhum dado é vendido ou compartilhado com terceiros para fins comerciais</li>
+    <li>Infraestrutura: Railway.app (EUA) — coberto por cláusulas contratuais padrão</li>
+  </ul>
+
+  <h2>7. Funcionalidades do Portal</h2>
+
+  <h3>Área do Candidato</h3>
+  <ul>
+    <li>Cadastro e login com email/senha</li>
+    <li>Perfil completo: experiências, formações, habilidades, foto, currículo</li>
+    <li>Busca de vagas com filtros (área, modalidade, nível, contrato, salário)</li>
+    <li>Candidatura com carta de apresentação personalizada</li>
+    <li>Acompanhamento de status das candidaturas em tempo real</li>
+    <li>Chat com recrutadores via mensagens internas</li>
+    <li>Salvar vagas favoritas</li>
+    <li>Notificações de atualizações</li>
+    <li>Recuperação e troca de senha</li>
+  </ul>
+
+  <h3>Área do Empregador</h3>
+  <ul>
+    <li>Cadastro de empresa com perfil completo</li>
+    <li>CRUD completo de vagas (criar, editar, pausar, encerrar)</li>
+    <li>Gestão de candidatos por vaga com atualização de status</li>
+    <li>Visualização de perfis completos dos candidatos</li>
+    <li>Chat com candidatos</li>
+    <li>Dashboard com métricas de vagas e candidaturas</li>
+    <li>Feedback para candidatos</li>
+  </ul>
+
+  <h3>Área Financeiro/Gestão (comercial@l7talents.online)</h3>
+  <ul>
+    <li>KPIs: usuários totais, candidatos, empresas, vagas ativas, candidaturas</li>
+    <li>Gráficos de crescimento mensal (usuários e candidaturas)</li>
+    <li>Distribuição de vagas por área e status de candidaturas</li>
+    <li>Evolução diária de novos usuários (30 dias)</li>
+    <li>Ranking de empresas por vagas publicadas</li>
+    <li>Monitoramento em tempo real: uptime, latência do banco, memória</li>
+    <li>Log dos últimos erros do sistema</li>
+  </ul>
+
+  <h2>8. Banco de Dados — Tabelas Principais</h2>
+  <table>
+    <tr><th>Tabela</th><th>Descrição</th></tr>
+    <tr><td><code>users</code></td><td>Usuários do sistema (todos os roles)</td></tr>
+    <tr><td><code>candidatos</code></td><td>Perfil completo dos candidatos</td></tr>
+    <tr><td><code>empregadores</code></td><td>Perfil das empresas</td></tr>
+    <tr><td><code>vagas</code></td><td>Vagas publicadas pelas empresas</td></tr>
+    <tr><td><code>candidaturas</code></td><td>Candidaturas dos candidatos às vagas</td></tr>
+    <tr><td><code>mensagens</code></td><td>Chat entre candidato e empregador</td></tr>
+    <tr><td><code>notificacoes</code></td><td>Notificações do sistema</td></tr>
+    <tr><td><code>vagas_salvas</code></td><td>Vagas favoritas dos candidatos</td></tr>
+    <tr><td><code>password_resets</code></td><td>Tokens de recuperação de senha (expiram em 1h)</td></tr>
+    <tr><td><code>experiencias</code></td><td>Histórico profissional dos candidatos</td></tr>
+    <tr><td><code>formacoes</code></td><td>Formação acadêmica dos candidatos</td></tr>
+  </table>
+
+  <h2>9. Procedimentos de Emergência</h2>
+
+  <h3>Site fora do ar</h3>
+  <ol>
+    <li>Acesse <a href="https://railway.app" target="_blank">railway.app</a> → projeto l7-talents</li>
+    <li>Verifique a aba <strong>Deployments</strong> — se o último deploy falhou, clique em <strong>Redeploy</strong></li>
+    <li>Verifique as <strong>Variables</strong> — confirme que <code>DATABASE_URL</code> e <code>JWT_SECRET</code> estão presentes</li>
+  </ol>
+
+  <h3>Usuário não consegue logar</h3>
+  <ol>
+    <li>Verifique se o email está correto</li>
+    <li>Use a função "Esqueci a senha" em <code>/pages/esqueci-senha.html</code></li>
+    <li>Se SMTP não estiver configurado, o link de reset aparece apenas nos logs do Railway</li>
+  </ol>
+
+  <h3>Redefinir senha de qualquer usuário (emergência)</h3>
+  <p>Execute localmente com o <code>.env</code> configurado:</p>
+  <div class="section-box">
+    <code>node -e "const b=require('bcryptjs'),{Pool}=require('pg');require('dotenv').config();const p=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}});b.hash('NOVA_SENHA',10).then(h=>p.query('UPDATE users SET password_hash=$1 WHERE email=$2',[h,'EMAIL']).then(()=>{console.log('ok');p.end()}))"</code>
+  </div>
+
+  <h2>10. Contatos e Responsáveis</h2>
+  <table>
+    <tr><th>Função</th><th>Contato</th></tr>
+    <tr><td>Gestão do portal / Analytics</td><td>comercial@l7talents.online</td></tr>
+    <tr><td>Repositório GitHub</td><td>github.com/specinatti/l7-talents</td></tr>
+    <tr><td>Infraestrutura</td><td>railway.app (projeto l7-talents)</td></tr>
+  </table>
+
+  <p style="margin-top:40px;font-size:12px;color:var(--gray-400);text-align:center;">
+    Documento gerado em <span id="doc-date2"></span> — L7 Talents Portal v2.0 — Confidencial
+  </p>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('financeiro')) {}
+    const d = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('doc-date').textContent = d;
+    document.getElementById('doc-date2').textContent = d;
+  </script>
+</body>
+</html>
