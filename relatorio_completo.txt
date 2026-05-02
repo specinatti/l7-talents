@@ -1,0 +1,1 @@
+bash: analise_completa.sh: No such file or directory
