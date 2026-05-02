@@ -126,6 +126,129 @@
     <p>© 2025 L7 Talents. Todos os direitos reservados.</p>
   </footer>
 
+  <!-- Onboarding Modal -->
+  <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+    <div id="onboarding-box" style="background:white;border-radius:16px;width:min(480px,92vw);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+      <!-- Steps -->
+      <div id="ob-steps">
+
+        <!-- Step 0: Escolha -->
+        <div class="ob-step" data-step="0">
+          <div style="background:linear-gradient(135deg,#1e3a8a,#7c3aed);padding:36px 32px 28px;text-align:center;color:white;">
+            <div style="font-size:48px;margin-bottom:12px;">👋</div>
+            <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;">Bem-vindo ao L7 Talents!</h2>
+            <p style="opacity:.85;font-size:14px;">Como você quer usar a plataforma?</p>
+          </div>
+          <div style="padding:28px 32px;display:flex;flex-direction:column;gap:12px;">
+            <button onclick="obChoose('candidato')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e5e7eb'">
+              <span style="font-size:32px;">🎯</span>
+              <div><div style="font-weight:600;font-size:15px;">Sou Candidato</div><div style="font-size:13px;color:#6b7280;">Busco oportunidades de emprego</div></div>
+            </button>
+            <button onclick="obChoose('empregador')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e5e7eb'">
+              <span style="font-size:32px;">🏢</span>
+              <div><div style="font-weight:600;font-size:15px;">Sou Empresa</div><div style="font-size:13px;color:#6b7280;">Quero contratar profissionais</div></div>
+            </button>
+            <button onclick="obClose()" style="margin-top:4px;background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;">Pular introdução</button>
+          </div>
+        </div>
+
+        <!-- Step 1: Candidato tour -->
+        <div class="ob-step" data-step="1" style="display:none;">
+          <div id="ob-progress" style="height:4px;background:#e5e7eb;"><div id="ob-bar" style="height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);transition:width .4s;width:33%"></div></div>
+          <div style="padding:32px;text-align:center;">
+            <div id="ob-icon" style="font-size:52px;margin-bottom:16px;animation:obBounce .6s ease">🔍</div>
+            <h3 id="ob-title" style="font-size:20px;font-weight:700;margin-bottom:10px;"></h3>
+            <p id="ob-desc" style="color:#6b7280;font-size:14px;line-height:1.6;margin-bottom:24px;"></p>
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;" id="ob-dots"></div>
+            <div style="display:flex;gap:10px;justify-content:center;">
+              <button id="ob-back" onclick="obNav(-1)" style="padding:10px 20px;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:14px;">← Voltar</button>
+              <button id="ob-next" onclick="obNav(1)" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;cursor:pointer;font-size:14px;font-weight:600;">Próximo →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes obBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes obFadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    #onboarding-box { animation: obFadeIn .35s ease; }
+  </style>
+
+  <script>
+    const OB_FLOWS = {
+      candidato: [
+        { icon:'🔍', title:'Explore as Vagas', desc:'Navegue por centenas de vagas com filtros por área, cidade, modalidade e salário. Encontre a oportunidade certa para você.', action:null },
+        { icon:'📝', title:'Crie seu Perfil', desc:'Cadastre-se e monte seu currículo online com experiências, formações e habilidades. Seu perfil fica visível para recrutadores.', action:null },
+        { icon:'🚀', title:'Candidate-se', desc:'Com um clique você se candidata e envia uma carta de apresentação personalizada. Acompanhe o status em tempo real.', action:'/pages/cadastro.html?role=candidato', actionLabel:'Criar conta grátis' },
+      ],
+      empregador: [
+        { icon:'📋', title:'Publique Vagas', desc:'Crie vagas detalhadas com requisitos, benefícios e faixa salarial. Suas vagas aparecem para milhares de candidatos qualificados.', action:null },
+        { icon:'👥', title:'Gerencie Candidatos', desc:'Visualize todos os candidatos por vaga, analise perfis completos e atualize o status de cada candidatura facilmente.', action:null },
+        { icon:'💬', title:'Comunique-se', desc:'Troque mensagens diretamente com os candidatos pela plataforma e agilize o processo seletivo.', action:'/pages/cadastro.html?role=empregador', actionLabel:'Cadastrar empresa' },
+      ]
+    };
+
+    let obFlow = [], obIdx = 0;
+
+    function obChoose(tipo) {
+      obFlow = OB_FLOWS[tipo];
+      obIdx = 0;
+      document.querySelector('[data-step="0"]').style.display = 'none';
+      document.querySelector('[data-step="1"]').style.display = 'block';
+      obRender();
+    }
+
+    function obRender() {
+      const s = obFlow[obIdx];
+      document.getElementById('ob-icon').textContent = s.icon;
+      document.getElementById('ob-icon').style.animation = 'none';
+      setTimeout(() => document.getElementById('ob-icon').style.animation = 'obBounce .6s ease', 10);
+      document.getElementById('ob-title').textContent = s.title;
+      document.getElementById('ob-desc').textContent = s.desc;
+      document.getElementById('ob-bar').style.width = ((obIdx + 1) / obFlow.length * 100) + '%';
+      document.getElementById('ob-back').style.visibility = obIdx === 0 ? 'hidden' : 'visible';
+
+      const isLast = obIdx === obFlow.length - 1;
+      const btn = document.getElementById('ob-next');
+      if (isLast && s.action) {
+        btn.textContent = s.actionLabel;
+        btn.onclick = () => { obClose(); location.href = s.action; };
+      } else if (isLast) {
+        btn.textContent = 'Começar ✓';
+        btn.onclick = obClose;
+      } else {
+        btn.textContent = 'Próximo →';
+        btn.onclick = () => obNav(1);
+      }
+
+      const dots = document.getElementById('ob-dots');
+      dots.innerHTML = obFlow.map((_, i) =>
+        `<div style="width:8px;height:8px;border-radius:50%;background:${i===obIdx?'#2563eb':'#e5e7eb'};transition:background .3s;"></div>`
+      ).join('');
+    }
+
+    function obNav(dir) {
+      obIdx = Math.max(0, Math.min(obFlow.length - 1, obIdx + dir));
+      obRender();
+    }
+
+    function obClose() {
+      document.getElementById('onboarding-overlay').style.display = 'none';
+      localStorage.setItem('ob_seen', '1');
+    }
+
+    function obOpen() {
+      document.getElementById('onboarding-overlay').style.display = 'flex';
+    }
+
+    if (!localStorage.getItem('ob_seen')) {
+      setTimeout(obOpen, 800);
+    }
+  </script>
+
   <script src="/js/app.js"></script>
   <script>
     // Redirecionar se já logado
