@@ -120,20 +120,25 @@
   <script src="/js/app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script>
-    if (!auth.redirectIfNotLogged('financeiro')) {}
+    // Verificação de acesso
+    const _user = auth.getUser();
+    if (!_user) { location.href = '/pages/login.html'; }
+    else if (_user.role !== 'financeiro' && _user.role !== 'admin') { location.href = '/pages/login.html'; }
+    else {
+      initNavbar('financeiro');
+      init();
+    }
 
-    initNavbar('financeiro');
-
-    const COLORS = ['#1B2A4A','#B85C6E','#F2EDE8','#6B7280','#EAE3DC','#243558','#a34e60','#374151'];
+    const COLORS = ['#1B2A4A','#B85C6E','#EAE3DC','#6B7280','#F2EDE8','#243558','#a34e60','#374151'];
 
     function mkChart(id, type, labels, data, label) {
-      return new Chart(document.getElementById(id), {
+      if (typeof Chart === 'undefined') return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      new Chart(el, {
         type,
-        data: {
-          labels,
-          datasets: [{ label, data, backgroundColor: type === 'bar' ? '#1B2A4A' : COLORS, borderColor: type === 'line' ? '#B85C6E' : undefined, borderWidth: type === 'line' ? 2 : 0, fill: type === 'line', tension: .4, pointBackgroundColor: '#B85C6E' }]
-        },
-        options: { responsive: true, plugins: { legend: { display: type !== 'bar' } }, scales: type === 'pie' || type === 'doughnut' ? {} : { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        data: { labels, datasets: [{ label, data, backgroundColor: type === 'bar' ? '#1B2A4A' : COLORS, borderColor: type === 'line' ? '#B85C6E' : undefined, borderWidth: type === 'line' ? 2 : 0, fill: false, tension: .4 }] },
+        options: { responsive: true, plugins: { legend: { display: type !== 'bar' } }, scales: (type === 'pie' || type === 'doughnut') ? {} : { y: { beginAtZero: true, ticks: { precision: 0 } } } }
       });
     }
 
@@ -147,45 +152,44 @@
         document.getElementById('errors-body').innerHTML = m.recent_errors.length
           ? m.recent_errors.map(e => `<tr><td style="padding:6px 10px;border-bottom:1px solid var(--cream);">${new Date(e.ts).toLocaleString('pt-BR')}</td><td style="padding:6px 10px;border-bottom:1px solid var(--cream);">${e.method||''} ${e.path||''}</td><td style="padding:6px 10px;border-bottom:1px solid var(--cream);color:var(--rose);">${e.error}</td></tr>`).join('')
           : '<tr><td colspan="3" style="padding:12px 10px;color:var(--gray-400);">✅ Nenhum erro registrado</td></tr>';
-      }).catch(() => {
-        document.getElementById('mon-status').textContent = '❌ Falha';
-      });
+      }).catch(() => {});
     }
-    loadMonitor();
-    setInterval(loadMonitor, 60000); // atualiza a cada 1 min
 
-    get('/financeiro/analytics').then(d => {      // KPIs
-      const vals = [d.totais.usuarios, d.totais.candidatos, d.totais.empregadores, d.totais.vagasAtivas, d.totais.candidaturas];
-      document.querySelectorAll('.kpi').forEach((el, i) => {
-        const v = el.querySelector('.kpi-value');
-        v.classList.remove('skeleton');
-        v.textContent = vals[i].toLocaleString('pt-BR');
-      });
-      document.getElementById('last-update').textContent = 'Atualizado em ' + new Date().toLocaleString('pt-BR');
+    function init() {
+      loadMonitor();
+      setInterval(loadMonitor, 60000);
 
-      // Gráficos (só se Chart.js carregou)
-      if (typeof Chart !== 'undefined') {
+      get('/financeiro/analytics').then(d => {
+        // KPIs
+        const vals = [d.totais.usuarios, d.totais.candidatos, d.totais.empregadores, d.totais.vagasAtivas, d.totais.candidaturas];
+        document.querySelectorAll('.kpi').forEach((el, i) => {
+          const v = el.querySelector('.kpi-value');
+          v.classList.remove('skeleton');
+          v.textContent = vals[i].toLocaleString('pt-BR');
+        });
+        document.getElementById('last-update').textContent = 'Atualizado em ' + new Date().toLocaleString('pt-BR');
+
+        // Gráficos
         mkChart('chart-usuarios','bar', d.crescimentoUsuarios.map(r=>r.mes), d.crescimentoUsuarios.map(r=>+r.total), 'Usuários');
         mkChart('chart-candidaturas','bar', d.crescimentoCandidaturas.map(r=>r.mes), d.crescimentoCandidaturas.map(r=>+r.total), 'Candidaturas');
         mkChart('chart-areas','doughnut', d.vagasPorArea.map(r=>r.area), d.vagasPorArea.map(r=>+r.total), 'Vagas');
         mkChart('chart-status','pie', d.candidaturasPorStatus.map(r=>r.status), d.candidaturasPorStatus.map(r=>+r.total), 'Status');
         mkChart('chart-diario','line', d.usuariosPorDia.map(r=>r.dia), d.usuariosPorDia.map(r=>+r.total), 'Usuários/dia');
-      }
 
-      // Tabela empresas
-      document.querySelector('#table-empresas tbody').innerHTML = d.topEmpresas.map(r =>
-        `<tr><td>${r.empresa}</td><td>${r.vagas}</td><td>${r.visualizacoes||0}</td></tr>`
-      ).join('') || '<tr><td colspan="3" style="color:var(--gray-400)">Sem dados</td></tr>';
+        // Tabelas
+        document.querySelector('#table-empresas tbody').innerHTML = d.topEmpresas.map(r =>
+          `<tr><td>${r.empresa}</td><td>${r.vagas}</td><td>${r.visualizacoes||0}</td></tr>`
+        ).join('') || '<tr><td colspan="3" style="color:var(--gray-400)">Sem dados</td></tr>';
 
-      // Tabela candidaturas
-      document.querySelector('#table-candidaturas tbody').innerHTML = d.ultimasCandidaturas.map(r =>
-        `<tr><td>${r.candidato}</td><td>${r.vaga}</td><td>${r.empresa}</td><td>${statusBadge(r.status)}</td><td>${formatDate(r.created_at)}</td></tr>`
-      ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Sem dados</td></tr>';
+        document.querySelector('#table-candidaturas tbody').innerHTML = d.ultimasCandidaturas.map(r =>
+          `<tr><td>${r.candidato}</td><td>${r.vaga}</td><td>${r.empresa}</td><td>${statusBadge(r.status)}</td><td>${formatDate(r.created_at)}</td></tr>`
+        ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Sem dados</td></tr>';
 
-    }).catch(err => {
-      document.getElementById('last-update').textContent = '❌ Erro: ' + err.message;
-      document.querySelectorAll('.kpi-value').forEach(el => { el.classList.remove('skeleton'); el.textContent = '—'; });
-    });
+      }).catch(err => {
+        document.getElementById('last-update').textContent = '❌ Erro ao carregar: ' + err.message;
+        document.querySelectorAll('.kpi-value').forEach(el => { el.classList.remove('skeleton'); el.textContent = '—'; });
+      });
+    }
   </script>
 </body>
 </html>
