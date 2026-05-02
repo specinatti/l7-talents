@@ -3,292 +3,350 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L7 Talents - Portal de RH</title>
+  <title>L7 Talents - Estratégia em Gestão de Pessoas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body { background: var(--white); }
-    .hero {
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #7c3aed 100%);
-      color: white; padding: 80px 24px; text-align: center;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #F2EDE8;
+      --cream2:  #EAE3DC;
+      --rose:    #B85C6E;
+      --navy:    #1B2A4A;
+      --navy2:   #243558;
+      --white:   #FFFFFF;
+      --gray:    #6B7280;
+      --radius:  12px;
     }
-    .hero h1 { font-size: clamp(32px, 5vw, 56px); font-weight: 800; margin-bottom: 16px; }
-    .hero p { font-size: 18px; opacity: .85; max-width: 560px; margin: 0 auto 40px; }
-    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn-white { background: white; color: var(--primary); font-weight: 600; }
-    .btn-white:hover { background: var(--gray-100); }
-    .btn-outline-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,.5); font-weight: 600; }
-    .btn-outline-white:hover { background: rgba(255,255,255,.1); }
-    .section { padding: 64px 24px; max-width: 1100px; margin: 0 auto; }
-    .section-title { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
-    .section-sub { text-align: center; color: var(--gray-500); margin-bottom: 48px; }
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-    .feature-card { padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); }
-    .feature-icon { width: 48px; height: 48px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 24px; }
-    .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .feature-card p { color: var(--gray-500); font-size: 14px; line-height: 1.6; }
-    .cta { background: var(--primary-light); border-radius: var(--radius-lg); padding: 48px; text-align: center; }
-    .cta h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-    .cta p { color: var(--gray-600); margin-bottom: 28px; }
-    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    footer { background: var(--gray-900); color: var(--gray-400); text-align: center; padding: 32px; font-size: 14px; }
-    .nav-home { background: transparent; position: absolute; top: 0; left: 0; right: 0; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
-    .nav-home .brand { color: white; font-weight: 700; font-size: 20px; display: flex; align-items: center; gap: 8px; }
-    .nav-home .nav-links { display: flex; gap: 8px; }
-    .nav-home .btn-nav { padding: 8px 18px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
-    .vagas-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+    body { background: var(--cream); color: var(--navy); font-family: 'Inter', sans-serif; }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(242,237,232,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(184,92,110,.12);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 44px; object-fit: contain; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      padding: 9px 20px; border-radius: 6px; font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-ghost { color: var(--navy); border: 1px solid transparent; }
+    .btn-ghost:hover { border-color: var(--navy); }
+    .btn-rose {
+      background: var(--rose); color: var(--white);
+      border: 1px solid var(--rose);
+    }
+    .btn-rose:hover { background: #a34e60; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background: var(--cream);
+    }
+    .hero-inner { max-width: 760px; }
+    .hero-logo { height: 110px; margin-bottom: 36px; }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-size: 15px; color: var(--rose); letter-spacing: .06em;
+      margin-bottom: 20px;
+    }
+    .hero-tagline {
+      font-size: 16px; color: var(--navy); opacity: .7;
+      margin-bottom: 44px; line-height: 1.6;
+    }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-navy {
+      padding: 14px 32px; border-radius: 6px; font-size: 15px; font-weight: 600;
+      background: var(--navy); color: var(--white); text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-navy:hover { background: var(--navy2); }
+    .btn-outline-navy {
+      padding: 14px 32px; border-radius: 6px; font-size: 15px; font-weight: 600;
+      border: 2px solid var(--navy); color: var(--navy); text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-outline-navy:hover { background: var(--navy); color: var(--white); }
+
+    /* DIVIDER */
+    .divider { width: 60px; height: 3px; background: var(--rose); margin: 0 auto 20px; border-radius: 2px; }
+
+    /* SECTIONS */
+    .section { padding: 88px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-alt { background: var(--cream2); }
+    .section-alt .section { /* inner */ }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      color: var(--navy); text-align: center; margin-bottom: 12px;
+    }
+    .section-sub { text-align: center; color: var(--gray); font-size: 15px; margin-bottom: 52px; line-height: 1.6; }
   </style>
 </head>
 <body>
-  <div style="position:relative;">
-    <nav class="nav-home">
-      <div class="brand">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="white" fill-opacity=".2"/><text x="14" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="700">L7</text></svg>
-        L7 Talents
-      </div>
-      <div class="nav-links" id="nav-actions">
-        <a href="/pages/login.html" class="btn-nav" style="background:rgba(255,255,255,.15);color:white;">Entrar</a>
-        <a href="/pages/cadastro.html" class="btn-nav" style="background:white;color:#2563eb;">Cadastrar</a>
-      </div>
-    </nav>
 
-    <section class="hero" style="padding-top: 120px;">
-      <h1>Conectando talentos<br>às melhores oportunidades</h1>
-      <p>Plataforma completa de recrutamento para candidatos e empresas. Encontre sua próxima vaga ou o profissional ideal.</p>
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <img src="/images/l7talents_.jpeg" alt="L7 Talents">
+    </a>
+    <div class="nav-links" id="nav-actions">
+      <a href="/pages/login.html" class="nav-links btn-ghost">Entrar</a>
+      <a href="/pages/cadastro.html" class="nav-links btn-rose">Cadastrar</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <img src="/images/l7talents_.jpeg" alt="L7 Talents" class="hero-logo">
+      <h1>Estratégia em Gestão<br>de Pessoas</h1>
+      <p class="hero-sub">Talent Acquisition &nbsp;·&nbsp; Estruturação de RH &nbsp;·&nbsp; Gestão de Talentos</p>
+      <p class="hero-tagline">Posicionando capital humano como diferencial competitivo.</p>
       <div class="hero-btns">
-        <a href="/pages/vagas.html" class="btn btn-white btn-lg">Ver Vagas Abertas</a>
-        <a href="/pages/cadastro.html?role=empregador" class="btn btn-outline-white btn-lg">Sou Empresa</a>
+        <a href="/pages/vagas.html" class="btn-navy">Ver Vagas Abertas</a>
+        <a href="/pages/cadastro.html?role=empregador" class="btn-outline-navy">Sou Empresa</a>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <!-- NOSSA ATUAÇÃO -->
+  <div class="section-alt">
+  <div class="section">
+    <div class="divider"></div>
+    <h2 class="section-title">Nossa Atuação</h2>
+    <p class="section-sub">Nosso modelo combina agilidade, governança e visão de negócio.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;">
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;border-left:4px solid var(--rose);">
+        <div style="font-size:28px;margin-bottom:12px;">🎯</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:8px;">Recrutamento Estratégico</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;">Recrutamento estratégico e hunting direcionado para posições-chave.</p>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;border-left:4px solid var(--rose);">
+        <div style="font-size:28px;margin-bottom:12px;">⚙️</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:8px;">Estruturação de RH</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;">Estruturação de processos de RH com governança e fluxo definido.</p>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;border-left:4px solid var(--rose);">
+        <div style="font-size:28px;margin-bottom:12px;">🧠</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:8px;">Avaliação Técnica e Comportamental</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;">Validação técnica, comportamental e aderência cultural.</p>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;border-left:4px solid var(--rose);">
+        <div style="font-size:28px;margin-bottom:12px;">📊</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:8px;">Inteligência de Mercado</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;">Inteligência de mercado e posicionamento salarial competitivo.</p>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;border-left:4px solid var(--rose);">
+        <div style="font-size:28px;margin-bottom:12px;">🤝</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:8px;">Gestão de Profissionais</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;">Gestão e acompanhamento contínuo de profissionais alocados.</p>
+      </div>
+    </div>
+  </div>
   </div>
 
-  <section class="section">
-    <h2 class="section-title">Tudo que você precisa</h2>
-    <p class="section-sub">Uma plataforma completa para candidatos e empregadores</p>
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#dbeafe;">🎯</div>
-        <h3>Vagas Personalizadas</h3>
-        <p>Encontre vagas que combinam com seu perfil, área de atuação e pretensão salarial.</p>
+  <!-- DIFERENCIAIS -->
+  <div class="section">
+    <div class="divider"></div>
+    <h2 class="section-title">Diferenciais Estratégicos</h2>
+    <p class="section-sub">O que nos diferencia no mercado de gestão de pessoas.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">1.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Atuação Consultiva e Não Operacional</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Entendemos a estratégia do negócio, o momento da empresa e o impacto da contratação.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#dcfce7;">📋</div>
-        <h3>Perfil Completo</h3>
-        <p>Monte seu currículo online com experiências, formações, habilidades e portfólio.</p>
+      <div style="background:var(--cream2);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">2.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Inteligência de Mercado Aplicada</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Análise baseada em benchmarking real, faixa salarial e competitividade do setor.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#ede9fe;">💬</div>
-        <h3>Comunicação Direta</h3>
-        <p>Troque mensagens com recrutadores diretamente pela plataforma.</p>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">3.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Processo Estruturado com Governança</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Fluxo definido, validação técnica/comportamental e organização documental para reduzir riscos.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#fef9c3;">🏢</div>
-        <h3>Para Empresas</h3>
-        <p>Publique vagas, gerencie candidaturas e encontre os melhores talentos.</p>
+      <div style="background:var(--cream2);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">4.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Visão Integrada entre RH e Performance</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Foco em gerar resultado, avaliando aderência cultural, maturidade profissional e potencial.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#fee2e2;">🔔</div>
-        <h3>Notificações</h3>
-        <p>Receba alertas sobre novas vagas e atualizações nas suas candidaturas.</p>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">5.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Experiência Humanizada</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Comunicação clara, confidencialidade e respeito, fortalecendo a marca empregadora.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:#f0fdf4;">📊</div>
-        <h3>Dashboard Completo</h3>
-        <p>Acompanhe suas candidaturas e métricas em tempo real.</p>
+      <div style="background:var(--cream2);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">6.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Acompanhamento Pós-Contratação</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Follow-up estruturado para mitigar riscos de turnover nos primeiros meses.</p>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius);padding:28px 24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);margin-bottom:12px;">7.</div>
+        <h3 style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;">Estrutura Enxuta, Ágil e Personalizada</h3>
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Atendimento direto, tomada de decisão rápida e soluções adaptáveis.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="section">
-    <h2 class="section-title">Vagas em Destaque</h2>
-    <p class="section-sub">Oportunidades das melhores empresas</p>
-    <div class="vagas-preview" id="vagas-preview">
-      <div style="text-align:center;padding:40px;color:var(--gray-400);">Carregando vagas...</div>
-    </div>
-    <div style="text-align:center;margin-top:32px;">
-      <a href="/pages/vagas.html" class="btn btn-primary btn-lg">Ver todas as vagas</a>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="cta">
-      <h2>Pronto para começar?</h2>
-      <p>Crie sua conta gratuitamente e acesse todas as funcionalidades da plataforma.</p>
-      <div class="cta-btns">
-        <a href="/pages/cadastro.html?role=candidato" class="btn btn-primary btn-lg">Sou Candidato</a>
-        <a href="/pages/cadastro.html?role=empregador" class="btn btn-secondary btn-lg">Sou Empresa</a>
+  <!-- MODELO DE PARCERIA -->
+  <div class="section-alt">
+  <div class="section">
+    <div class="divider"></div>
+    <h2 class="section-title">Modelo de Parceria</h2>
+    <p class="section-sub">A L7 Talents atua como parceira estratégica, oferecendo soluções sob medida conforme a necessidade da empresa.</p>
+    <div style="display:flex;gap:0;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:36px;">
+      <div style="text-align:center;padding:24px 32px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">📢</div>
+        <div style="font-size:13px;font-weight:600;color:var(--navy);max-width:120px;">Divulgação estratégica de vagas</div>
+      </div>
+      <div style="flex:1;min-width:40px;height:3px;background:linear-gradient(90deg,var(--navy),var(--rose));border-radius:2px;max-width:80px;"></div>
+      <div style="text-align:center;padding:24px 32px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--rose);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">🔍</div>
+        <div style="font-size:13px;font-weight:600;color:var(--navy);max-width:120px;">Processo seletivo completo</div>
+      </div>
+      <div style="flex:1;min-width:40px;height:3px;background:linear-gradient(90deg,var(--rose),var(--navy));border-radius:2px;max-width:80px;"></div>
+      <div style="text-align:center;padding:24px 32px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">⚙️</div>
+        <div style="font-size:13px;font-weight:600;color:var(--navy);max-width:140px;">Gestão administrativa e acompanhamento contínuo</div>
       </div>
     </div>
-  </section>
+    <div style="border:2px solid var(--navy);border-radius:var(--radius);padding:24px;text-align:center;max-width:600px;margin:0 auto;">
+      <p style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);font-weight:700;">Flexibilidade contratual e estrutura adaptável ao porte da organização</p>
+    </div>
+  </div>
+  </div>
 
-  <footer>
+  <!-- CTA FINAL -->
+  <div class="section" style="text-align:center;">
+    <div class="divider"></div>
+    <h2 class="section-title">Pronto para começar?</h2>
+    <p class="section-sub" style="max-width:480px;margin-left:auto;margin-right:auto;">Crie sua conta gratuitamente e acesse todas as funcionalidades da plataforma.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="/pages/cadastro.html?role=candidato" class="btn-navy" style="padding:14px 32px;border-radius:6px;font-size:15px;font-weight:600;background:var(--navy);color:var(--white);text-decoration:none;">Sou Candidato</a>
+      <a href="/pages/cadastro.html?role=empregador" class="btn-outline-navy" style="padding:14px 32px;border-radius:6px;font-size:15px;font-weight:600;border:2px solid var(--navy);color:var(--navy);text-decoration:none;">Sou Empresa</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:32px 24px;font-size:13px;">
     <p>© 2025 L7 Talents. Todos os direitos reservados.</p>
   </footer>
 
-  <!-- Onboarding Modal -->
-  <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
-    <div id="onboarding-box" style="background:white;border-radius:16px;width:min(480px,92vw);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3);">
-      <!-- Steps -->
-      <div id="ob-steps">
-
-        <!-- Step 0: Escolha -->
-        <div class="ob-step" data-step="0">
-          <div style="background:linear-gradient(135deg,#1e3a8a,#7c3aed);padding:36px 32px 28px;text-align:center;color:white;">
-            <div style="font-size:48px;margin-bottom:12px;">👋</div>
-            <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;">Bem-vindo ao L7 Talents!</h2>
-            <p style="opacity:.85;font-size:14px;">Como você quer usar a plataforma?</p>
-          </div>
-          <div style="padding:28px 32px;display:flex;flex-direction:column;gap:12px;">
-            <button onclick="obChoose('candidato')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e5e7eb'">
-              <span style="font-size:32px;">🎯</span>
-              <div><div style="font-weight:600;font-size:15px;">Sou Candidato</div><div style="font-size:13px;color:#6b7280;">Busco oportunidades de emprego</div></div>
-            </button>
-            <button onclick="obChoose('empregador')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e5e7eb'">
-              <span style="font-size:32px;">🏢</span>
-              <div><div style="font-weight:600;font-size:15px;">Sou Empresa</div><div style="font-size:13px;color:#6b7280;">Quero contratar profissionais</div></div>
-            </button>
-            <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-              <button onclick="obClose()" style="background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;">Pular introdução</button>
-              <a href="/pages/login.html" style="font-size:13px;color:#2563eb;font-weight:500;text-decoration:none;">Já tenho cadastro → Entrar</a>
-            </div>
+  <!-- ONBOARDING -->
+  <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(27,42,74,.55);z-index:9999;align-items:center;justify-content:center;">
+    <div id="onboarding-box" style="background:var(--cream);border-radius:16px;width:min(480px,92vw);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.25);">
+      <div class="ob-step" data-step="0">
+        <div style="background:var(--navy);padding:36px 32px 28px;text-align:center;color:white;">
+          <img src="/images/l7talents_.jpeg" alt="L7 Talents" style="height:60px;object-fit:contain;margin-bottom:16px;border-radius:6px;">
+          <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;">Bem-vindo ao L7 Talents!</h2>
+          <p style="opacity:.8;font-size:14px;">Como você quer usar a plataforma?</p>
+        </div>
+        <div style="padding:28px 32px;display:flex;flex-direction:column;gap:12px;">
+          <button onclick="obChoose('candidato')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:10px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#B85C6E'" onmouseout="this.style.borderColor='#e5e7eb'">
+            <span style="font-size:30px;">🎯</span>
+            <div><div style="font-weight:600;font-size:15px;color:var(--navy);">Sou Candidato</div><div style="font-size:13px;color:#6b7280;">Busco oportunidades de emprego</div></div>
+          </button>
+          <button onclick="obChoose('empregador')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid #e5e7eb;border-radius:10px;background:white;cursor:pointer;text-align:left;transition:border-color .2s;" onmouseover="this.style.borderColor='#1B2A4A'" onmouseout="this.style.borderColor='#e5e7eb'">
+            <span style="font-size:30px;">🏢</span>
+            <div><div style="font-weight:600;font-size:15px;color:var(--navy);">Sou Empresa</div><div style="font-size:13px;color:#6b7280;">Quero contratar profissionais</div></div>
+          </button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <button onclick="obClose()" style="background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;">Pular introdução</button>
+            <a href="/pages/login.html" style="font-size:13px;color:var(--rose);font-weight:500;text-decoration:none;">Já tenho cadastro → Entrar</a>
           </div>
         </div>
+      </div>
 
-        <!-- Step 1: Candidato tour -->
-        <div class="ob-step" data-step="1" style="display:none;">
-          <div id="ob-progress" style="height:4px;background:#e5e7eb;"><div id="ob-bar" style="height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);transition:width .4s;width:33%"></div></div>
-          <div style="padding:32px;text-align:center;">
-            <div id="ob-icon" style="font-size:52px;margin-bottom:16px;animation:obBounce .6s ease">🔍</div>
-            <h3 id="ob-title" style="font-size:20px;font-weight:700;margin-bottom:10px;"></h3>
-            <p id="ob-desc" style="color:#6b7280;font-size:14px;line-height:1.6;margin-bottom:24px;"></p>
-            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;" id="ob-dots"></div>
-            <div style="display:flex;gap:10px;justify-content:center;">
-              <button id="ob-back" onclick="obNav(-1)" style="padding:10px 20px;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:14px;">← Voltar</button>
-              <button id="ob-next" onclick="obNav(1)" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;cursor:pointer;font-size:14px;font-weight:600;">Próximo →</button>
-            </div>
+      <div class="ob-step" data-step="1" style="display:none;">
+        <div id="ob-progress" style="height:4px;background:#e5e7eb;"><div id="ob-bar" style="height:100%;background:linear-gradient(90deg,var(--navy),var(--rose));transition:width .4s;width:33%"></div></div>
+        <div style="padding:32px;text-align:center;">
+          <div id="ob-icon" style="font-size:48px;margin-bottom:14px;">🔍</div>
+          <h3 id="ob-title" style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);margin-bottom:10px;"></h3>
+          <p id="ob-desc" style="color:#6b7280;font-size:14px;line-height:1.6;margin-bottom:24px;"></p>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;" id="ob-dots"></div>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button id="ob-back" onclick="obNav(-1)" style="padding:10px 20px;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:14px;">← Voltar</button>
+            <button id="ob-next" onclick="obNav(1)" style="padding:10px 24px;border:none;border-radius:8px;background:var(--navy);color:white;cursor:pointer;font-size:14px;font-weight:600;">Próximo →</button>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
   <style>
-    @keyframes obBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
     @keyframes obFadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
     #onboarding-box { animation: obFadeIn .35s ease; }
+    .nav-links { display:flex;gap:8px;align-items:center; }
   </style>
 
+  <script src="/js/app.js"></script>
   <script>
+    // Nav: se logado
+    const _u = auth.getUser();
+    if (_u) {
+      document.getElementById('nav-actions').innerHTML = `<a href="/pages/${_u.role}/dashboard.html" class="nav-links btn-rose" style="padding:9px 20px;border-radius:6px;font-size:14px;font-weight:500;text-decoration:none;background:var(--rose);color:white;">Meu Dashboard</a>`;
+    }
+
+    // Onboarding
     const OB_FLOWS = {
       candidato: [
-        { icon:'🔍', title:'Explore as Vagas', desc:'Navegue por centenas de vagas com filtros por área, cidade, modalidade e salário. Encontre a oportunidade certa para você.', action:null },
-        { icon:'📝', title:'Crie seu Perfil', desc:'Cadastre-se e monte seu currículo online com experiências, formações e habilidades. Seu perfil fica visível para recrutadores.', action:null },
-        { icon:'🚀', title:'Candidate-se', desc:'Com um clique você se candidata e envia uma carta de apresentação personalizada. Acompanhe o status em tempo real.', action:'/pages/cadastro.html?role=candidato', actionLabel:'Criar conta grátis' },
+        { icon:'🔍', title:'Explore as Vagas', desc:'Navegue por vagas com filtros por área, cidade, modalidade e salário.', action:null },
+        { icon:'📝', title:'Crie seu Perfil', desc:'Monte seu currículo online com experiências, formações e habilidades.', action:null },
+        { icon:'🚀', title:'Candidate-se', desc:'Candidate-se com um clique e acompanhe o status em tempo real.', action:'/pages/cadastro.html?role=candidato', actionLabel:'Criar conta grátis' },
       ],
       empregador: [
-        { icon:'📋', title:'Publique Vagas', desc:'Crie vagas detalhadas com requisitos, benefícios e faixa salarial. Suas vagas aparecem para milhares de candidatos qualificados.', action:null },
-        { icon:'👥', title:'Gerencie Candidatos', desc:'Visualize todos os candidatos por vaga, analise perfis completos e atualize o status de cada candidatura facilmente.', action:null },
-        { icon:'💬', title:'Comunique-se', desc:'Troque mensagens diretamente com os candidatos pela plataforma e agilize o processo seletivo.', action:'/pages/cadastro.html?role=empregador', actionLabel:'Cadastrar empresa' },
+        { icon:'📋', title:'Publique Vagas', desc:'Crie vagas detalhadas que aparecem para candidatos qualificados.', action:null },
+        { icon:'👥', title:'Gerencie Candidatos', desc:'Visualize perfis, analise candidaturas e atualize status facilmente.', action:null },
+        { icon:'💬', title:'Comunique-se', desc:'Troque mensagens diretamente com candidatos pela plataforma.', action:'/pages/cadastro.html?role=empregador', actionLabel:'Cadastrar empresa' },
       ]
     };
-
     let obFlow = [], obIdx = 0;
 
     function obChoose(tipo) {
-      obFlow = OB_FLOWS[tipo];
-      obIdx = 0;
+      obFlow = OB_FLOWS[tipo]; obIdx = 0;
       document.querySelector('[data-step="0"]').style.display = 'none';
       document.querySelector('[data-step="1"]').style.display = 'block';
       obRender();
     }
-
     function obRender() {
       const s = obFlow[obIdx];
       document.getElementById('ob-icon').textContent = s.icon;
-      document.getElementById('ob-icon').style.animation = 'none';
-      setTimeout(() => document.getElementById('ob-icon').style.animation = 'obBounce .6s ease', 10);
       document.getElementById('ob-title').textContent = s.title;
       document.getElementById('ob-desc').textContent = s.desc;
-      document.getElementById('ob-bar').style.width = ((obIdx + 1) / obFlow.length * 100) + '%';
-      document.getElementById('ob-back').style.visibility = obIdx === 0 ? 'hidden' : 'visible';
-
-      const isLast = obIdx === obFlow.length - 1;
+      document.getElementById('ob-bar').style.width = ((obIdx+1)/obFlow.length*100)+'%';
+      document.getElementById('ob-back').style.visibility = obIdx===0?'hidden':'visible';
+      const isLast = obIdx===obFlow.length-1;
       const btn = document.getElementById('ob-next');
-      if (isLast && s.action) {
-        btn.textContent = s.actionLabel;
-        btn.onclick = () => { obClose(); location.href = s.action; };
-      } else if (isLast) {
-        btn.textContent = 'Começar ✓';
-        btn.onclick = obClose;
-      } else {
-        btn.textContent = 'Próximo →';
-        btn.onclick = () => obNav(1);
-      }
-
-      const dots = document.getElementById('ob-dots');
-      dots.innerHTML = obFlow.map((_, i) =>
-        `<div style="width:8px;height:8px;border-radius:50%;background:${i===obIdx?'#2563eb':'#e5e7eb'};transition:background .3s;"></div>`
+      if (isLast && s.action) { btn.textContent=s.actionLabel; btn.onclick=()=>{obClose();location.href=s.action}; }
+      else if (isLast) { btn.textContent='Começar ✓'; btn.onclick=obClose; }
+      else { btn.textContent='Próximo →'; btn.onclick=()=>obNav(1); }
+      document.getElementById('ob-dots').innerHTML = obFlow.map((_,i)=>
+        `<div style="width:8px;height:8px;border-radius:50%;background:${i===obIdx?'#1B2A4A':'#e5e7eb'};transition:background .3s;"></div>`
       ).join('');
     }
+    function obNav(d) { obIdx=Math.max(0,Math.min(obFlow.length-1,obIdx+d)); obRender(); }
+    function obClose() { document.getElementById('onboarding-overlay').style.display='none'; sessionStorage.setItem('ob_seen','1'); }
 
-    function obNav(dir) {
-      obIdx = Math.max(0, Math.min(obFlow.length - 1, obIdx + dir));
-      obRender();
-    }
-
-    function obClose() {
-      document.getElementById('onboarding-overlay').style.display = 'none';
-      sessionStorage.setItem('ob_seen', '1');
-    }
-
-    function obOpen() {
-      document.getElementById('onboarding-overlay').style.display = 'flex';
-    }
-
-    if (!sessionStorage.getItem('ob_seen')) {
-      setTimeout(obOpen, 800);
-    }
-  </script>
-
-  <script src="/js/app.js"></script>
-  <script>
-    // Redirecionar se já logado
-    const user = auth.getUser();
-    if (user) {
-      document.getElementById('nav-actions').innerHTML = `
-        <a href="/pages/${user.role}/dashboard.html" class="btn-nav" style="background:white;color:#2563eb;">Meu Dashboard</a>
-      `;
-    }
-
-    // Carregar vagas em destaque
-    get('/vagas?limit=6').then(data => {
-      const el = document.getElementById('vagas-preview');
-      if (!data.vagas?.length) { el.innerHTML = '<p style="text-align:center;color:var(--gray-400);">Nenhuma vaga disponível no momento.</p>'; return; }
-      el.innerHTML = data.vagas.map(v => `
-        <a href="/pages/vaga.html?id=${v.id}" style="text-decoration:none;">
-          <div class="vaga-card ${v.destaque ? 'destaque' : ''}">
-            <div class="vaga-empresa">
-              <div class="vaga-logo">${v.empresa?.charAt(0) || 'E'}</div>
-              <div>
-                <div style="font-size:13px;color:var(--gray-500);">${v.empresa || ''}</div>
-                <div style="font-size:12px;color:var(--gray-400);">${v.cidade || ''} ${v.estado || ''}</div>
-              </div>
-            </div>
-            <div class="vaga-titulo">${v.titulo}</div>
-            <div class="vaga-info">
-              ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
-              ${v.tipo_contrato ? `<span class="badge badge-gray">${v.tipo_contrato.toUpperCase()}</span>` : ''}
-              ${v.area ? `<span class="badge badge-gray">${v.area}</span>` : ''}
-            </div>
-            <div class="vaga-salario mt-8">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
-          </div>
-        </a>
-      `).join('');
-    }).catch(() => {
-      document.getElementById('vagas-preview').innerHTML = '<p style="text-align:center;color:var(--gray-400);">Erro ao carregar vagas.</p>';
-    });
+    if (!sessionStorage.getItem('ob_seen') && !_u) setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
   </script>
 </body>
 </html>
