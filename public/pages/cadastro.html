@@ -77,7 +77,14 @@
   <script>
     if (auth.isLogged()) {
       const user = auth.getUser();
-      window.location.href = `/pages/${user.role}/dashboard.html`;
+      const roleParam = new URLSearchParams(location.search).get('role');
+      // Se já logado com o mesmo role, vai pro dashboard
+      if (!roleParam || roleParam === user.role) {
+        window.location.href = `/pages/${user.role}/dashboard.html`;
+      } else {
+        // Role diferente: faz logout e deixa cadastrar nova conta
+        auth.clear();
+      }
     }
 
     // Pré-selecionar role pela URL
