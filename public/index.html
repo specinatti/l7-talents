@@ -357,7 +357,7 @@
     function obNav(d) { obIdx=Math.max(0,Math.min(obFlow.length-1,obIdx+d)); obRender(); }
     function obClose() { document.getElementById('onboarding-overlay').style.display='none'; sessionStorage.setItem('ob_seen','1'); }
 
-    if (!sessionStorage.getItem('ob_seen') && !_u) setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
+    if (!sessionStorage.getItem('ob_seen')) setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
   </script>
 </body>
 </html>
