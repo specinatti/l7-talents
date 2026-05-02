@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .card { background: white; border-radius: var(--radius-lg); padding: 40px; width: min(420px, 92vw); box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo a { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    p.sub { color: var(--gray-500); font-size: 14px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo"><a href="/">L7 Talents</a></div>
+
+    <!-- Passo 1: solicitar reset -->
+    <div id="step-request">
+      <h1>Esqueceu a senha?</h1>
+      <p class="sub">Informe seu email e enviaremos as instruções para redefinir sua senha.</p>
+      <div id="alert-request"></div>
+      <form id="form-request">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="email" class="form-input" placeholder="seu@email.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-16" id="btn-request">Enviar instruções</button>
+      </form>
+      <p style="text-align:center;margin-top:20px;font-size:14px;"><a href="/pages/login.html" style="color:var(--primary);">← Voltar ao login</a></p>
+    </div>
+
+    <!-- Passo 2: nova senha (via token na URL) -->
+    <div id="step-reset" style="display:none;">
+      <h1>Nova senha</h1>
+      <p class="sub">Escolha uma nova senha para sua conta.</p>
+      <div id="alert-reset"></div>
+      <form id="form-reset">
+        <div class="form-group">
+          <label class="form-label">Nova senha</label>
+          <input type="password" id="nova-senha" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <input type="password" id="conf-senha" class="form-input" placeholder="Repita a senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-16" id="btn-reset">Redefinir senha</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+    if (token) {
+      document.getElementById('step-request').style.display = 'none';
+      document.getElementById('step-reset').style.display = 'block';
+    }
+
+    document.getElementById('form-request').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-request');
+      setLoading(btn, true);
+      try {
+        await post('/auth/recuperar-senha', { email: document.getElementById('email').value });
+        showAlert('alert-request', 'Se o email existir, você receberá as instruções em breve.', 'success');
+        e.target.reset();
+      } catch (err) {
+        showAlert('alert-request', err.message || 'Erro ao enviar. Tente novamente.', 'error');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById('form-reset').addEventListener('submit', async e => {
+      e.preventDefault();
+      const nova = document.getElementById('nova-senha').value;
+      const conf = document.getElementById('conf-senha').value;
+      if (nova !== conf) return showAlert('alert-reset', 'As senhas não coincidem.', 'error');
+      const btn = document.getElementById('btn-reset');
+      setLoading(btn, true);
+      try {
+        await post('/auth/redefinir-senha', { token, nova_senha: nova });
+        showAlert('alert-reset', 'Senha redefinida! Redirecionando...', 'success');
+        setTimeout(() => location.href = '/pages/login.html', 2000);
+      } catch (err) {
+        showAlert('alert-reset', err.message || 'Token inválido ou expirado.', 'error');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

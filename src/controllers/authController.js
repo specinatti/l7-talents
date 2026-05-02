@@ -108,4 +108,95 @@ async function me(req, res) {
   }
 }
 
-module.exports = { register, login, me };
+async function changePassword(req, res) {
+  const { senha_atual, nova_senha } = req.body;
+  if (!senha_atual || !nova_senha)
+    return res.status(400).json({ error: 'Campos obrigatórios: senha_atual, nova_senha' });
+  if (nova_senha.length < 6)
+    return res.status(400).json({ error: 'Nova senha deve ter no mínimo 6 caracteres' });
+
+  try {
+    const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [req.user.id]);
+    if (!rows[0] || !await bcrypt.compare(senha_atual, rows[0].password_hash))
+      return res.status(401).json({ error: 'Senha atual incorreta' });
+
+    const hash = await bcrypt.hash(nova_senha, 10);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, req.user.id]);
+    res.json({ message: 'Senha alterada com sucesso' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao alterar senha' });
+  }
+}
+
+async function requestReset(req, res) {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email obrigatório' });
+
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+    // Sempre retorna 200 para não revelar se email existe
+    if (!rows[0]) return res.json({ message: 'Se o email existir, você receberá as instruções.' });
+
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+    await pool.query(
+      'INSERT INTO password_resets (user_id, token, expires_at) VALUES ($1, $2, $3)',
+      [rows[0].id, token, expires]
+    );
+
+    const resetUrl = `${process.env.APP_URL || 'http://localhost:3000'}/pages/reset-senha.html?token=${token}`;
+
+    // Enviar email se SMTP configurado
+    if (process.env.SMTP_HOST) {
+      const nodemailer = require('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT || 587,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      });
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'noreply@l7talents.com',
+        to: email,
+        subject: 'Recuperação de senha - L7 Talents',
+        html: `<p>Clique no link para redefinir sua senha (válido por 1 hora):</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+      });
+    } else {
+      console.log(`[RESET] Token para ${email}: ${resetUrl}`);
+    }
+
+    res.json({ message: 'Se o email existir, você receberá as instruções.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao solicitar recuperação' });
+  }
+}
+
+async function confirmReset(req, res) {
+  const { token, nova_senha } = req.body;
+  if (!token || !nova_senha)
+    return res.status(400).json({ error: 'Token e nova senha obrigatórios' });
+  if (nova_senha.length < 6)
+    return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres' });
+
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM password_resets WHERE token = $1 AND used = false AND expires_at > NOW()',
+      [token]
+    );
+    if (!rows[0]) return res.status(400).json({ error: 'Token inválido ou expirado' });
+
+    const hash = await bcrypt.hash(nova_senha, 10);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, rows[0].user_id]);
+    await pool.query('UPDATE password_resets SET used = true WHERE id = $1', [rows[0].id]);
+
+    res.json({ message: 'Senha redefinida com sucesso' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao redefinir senha' });
+  }
+}
+
+module.exports = { register, login, me, changePassword, requestReset, confirmReset };

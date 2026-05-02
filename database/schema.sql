@@ -158,6 +158,17 @@ CREATE TABLE IF NOT EXISTS notificacoes (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Tokens de recuperação de senha
+CREATE TABLE IF NOT EXISTS password_resets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token);
+
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_vagas_status ON vagas(status);
 CREATE INDEX IF NOT EXISTS idx_vagas_area ON vagas(area);
