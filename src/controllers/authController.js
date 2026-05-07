@@ -2,23 +2,39 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../db');
 
-function generateToken(user) {
+function generateToken(user, req) {
+  const ua = req?.headers?.['user-agent']?.substring(0, 100) || '';
+  const ip = req?.ip || '';
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id, email: user.email, role: user.role, _ua: ua, _ip: ip },
     process.env.JWT_SECRET,
     { expiresIn: '2h' }
   );
 }
 
+function setTokenCookie(res, token) {
+  res.cookie('auth_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 2 * 60 * 60 * 1000, // 2h
+    path: '/',
+  });
+}
+
 async function refresh(req, res) {
-  const token = req.headers.authorization?.split(' ')[1];
+  // Aceitar token do cookie httpOnly OU do header (retrocompatibilidade)
+  const token = req.cookies?.auth_token || req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Token não fornecido' });
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { rows } = await pool.query('SELECT id, email, role, ativo FROM users WHERE id = $1', [decoded.id]);
     if (!rows[0] || !rows[0].ativo) return res.status(401).json({ error: 'Usuário inativo' });
-    res.json({ token: generateToken(rows[0]) });
+    const newToken = generateToken(rows[0]);
+    setTokenCookie(res, newToken);
+    res.json({ token: newToken, user: { id: rows[0].id, email: rows[0].email, role: rows[0].role } });
   } catch {
+    res.clearCookie('auth_token');
     res.status(401).json({ error: 'Token inválido ou expirado' });
   }
 }
@@ -88,7 +104,9 @@ async function login(req, res) {
     if (!user.ativo)
       return res.status(403).json({ error: 'Conta desativada' });
 
-    res.json({ token: generateToken(user), user: { id: user.id, email: user.email, role: user.role } });
+    const token = generateToken(user, req);
+    setTokenCookie(res, token);
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (err) {
     console.error('[LOGIN ERROR]', err.message, err.stack);
     res.status(500).json({ error: 'Erro ao fazer login', detail: process.env.NODE_ENV !== 'production' ? err.message : undefined });

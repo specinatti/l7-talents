@@ -7,6 +7,10 @@ router.post('/register', formLimiter, register);
 router.post('/login', formLimiter, login);
 router.get('/me', auth, me);
 router.post('/refresh', auth, refresh);
+router.post('/logout', (req, res) => {
+  res.clearCookie('auth_token', { path: '/' });
+  res.json({ message: 'Logout realizado' });
+});
 router.put('/senha', auth, changePassword);
 router.post('/recuperar-senha', formLimiter, requestReset);
 router.post('/redefinir-senha', formLimiter, confirmReset);

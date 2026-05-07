@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const { initDB } = require('./db');
 const securityHeaders = require('../securityHeaders');
@@ -9,14 +10,10 @@ const cacheBusting = require('../cacheBusting');
 
 const app = express();
 
-// Segurança: headers, HSTS, CSP, etc.
 securityHeaders(app);
-
-// CORS
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
-
-// Body parser
+app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 
 // Rate limit global
 app.use('/api', apiLimiter);

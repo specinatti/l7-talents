@@ -177,8 +177,10 @@ async function loadNotifCount() {
 }
 
 function logout() {
-  auth.clear();
-  window.location.href = '/pages/login.html';
+  fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+    auth.clear();
+    window.location.href = '/pages/login.html';
+  });
 }
 
 // ── Sessão segura ──────────────────────────────────────────────────────────
