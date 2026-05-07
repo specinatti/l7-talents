@@ -44,7 +44,7 @@ async function criarPreferencia(req, res) {
           failure: `${appUrl}/pages/pagamento-falha.html`,
           pending: `${appUrl}/pages/pagamento-sucesso.html`,
         },
-        auto_return: 'approved',
+        ...(process.env.NODE_ENV === 'production' && { auto_return: 'approved' }),
         notification_url: `${appUrl}/api/pagamentos/webhook`,
         statement_descriptor: 'L7 TALENTS',
       }
