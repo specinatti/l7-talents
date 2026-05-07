@@ -65,8 +65,18 @@
       else { f.type = 'password'; b.textContent = '👁'; }
     }
 
-    if (auth.isLogged()) {      const user = auth.getUser();
-      window.location.href = `/pages/${user.role}/dashboard.html`;
+    if (auth.isLogged()) {
+      const user = auth.getUser();
+      // Mostrar banner "já logado" em vez de redirecionar automaticamente
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:var(--cream2);border:1px solid rgba(184,92,110,.3);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:14px;display:flex;justify-content:space-between;align-items:center;';
+      banner.innerHTML = `<span>Você está logado como <strong>${user.email}</strong></span>
+        <div style="display:flex;gap:8px;">
+          <a href="/pages/${user.role}/dashboard.html" style="color:var(--rose);font-weight:600;font-size:13px;">Ir ao dashboard</a>
+          <span style="color:#ccc">|</span>
+          <a href="#" onclick="auth.clear();location.reload();return false;" style="color:var(--gray-500);font-size:13px;">Sair</a>
+        </div>`;
+      document.getElementById('alert-container').appendChild(banner);
     }
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
