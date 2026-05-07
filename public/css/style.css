@@ -223,11 +223,21 @@ tr:hover td { background: var(--cream); }
   .navbar-nav .nav-link { display: none; }
   .navbar-nav .btn { display: none; }
   .hamburger { display: flex !important; }
+  .card { padding: 16px; }
+  .vaga-card { padding: 16px; }
+  table { font-size: 12px; }
+  th, td { padding: 8px 8px; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr; }
   .btn-lg { padding: 12px 20px; font-size: 14px; }
+  h1 { font-size: 24px !important; }
+  .auth-card { padding: 24px 20px; }
 }
+
+/* Classes utilitárias mobile */
+.device-mobile .hide-mobile { display: none !important; }
+.device-desktop .hide-desktop { display: none !important; }
 
 /* Hamburger menu */
 .hamburger {

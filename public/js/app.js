@@ -1,5 +1,20 @@
 const API = '/api';
 
+// Device detection e tracking automático
+(function() {
+  const ua = navigator.userAgent;
+  const device = /Mobi|Android|iPhone|iPad|iPod/i.test(ua)
+    ? (/iPad|Tablet/i.test(ua) ? 'tablet' : 'mobile')
+    : 'desktop';
+  window.deviceType = device;
+  document.documentElement.classList.add('device-' + device);
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page: location.pathname, device })
+  }).catch(() => {});
+})();
+
 // Auth helpers
 const auth = {
   getToken: () => localStorage.getItem('token'),

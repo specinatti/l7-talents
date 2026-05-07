@@ -169,6 +169,17 @@ CREATE TABLE IF NOT EXISTS password_resets (
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token);
 
+-- Rastreamento de acessos por device
+CREATE TABLE IF NOT EXISTS page_views (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  page VARCHAR(255),
+  device VARCHAR(20) CHECK (device IN ('mobile','desktop','tablet')),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_page_views_device ON page_views(device);
+CREATE INDEX IF NOT EXISTS idx_page_views_date ON page_views(created_at);
+
 -- Pedidos / assinaturas de pacotes
 CREATE TABLE IF NOT EXISTS pedidos (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

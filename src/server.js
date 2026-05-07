@@ -27,6 +27,20 @@ app.use(cacheBusting);
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
+// Tracking de acessos (público, sem auth)
+app.post('/api/track', async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const { page, device } = req.body;
+    if (!['mobile','desktop','tablet'].includes(device)) return;
+    const { pool } = require('./db');
+    await pool.query(
+      'INSERT INTO page_views (page, device) VALUES ($1, $2)',
+      [page?.substring(0,255) || '/', device]
+    );
+  } catch {}
+});
+
 // Rotas API
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/candidatos', require('./routes/candidatos'));

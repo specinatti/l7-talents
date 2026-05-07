@@ -69,6 +69,10 @@
         <div class="chart-title">Status das candidaturas</div>
         <canvas id="chart-status" height="200"></canvas>
       </div>
+      <div class="chart-card">
+        <div class="chart-title">Acessos: Mobile vs Desktop (30 dias)</div>
+        <canvas id="chart-devices" height="200"></canvas>
+      </div>
     </div>
 
     <!-- Usuários por dia (30 dias) -->
@@ -202,6 +206,9 @@
         mkChart('chart-areas','doughnut', d.vagasPorArea.map(r=>r.area), d.vagasPorArea.map(r=>+r.total), 'Vagas');
         mkChart('chart-status','pie', d.candidaturasPorStatus.map(r=>r.status), d.candidaturasPorStatus.map(r=>+r.total), 'Status');
         mkChart('chart-diario','line', d.usuariosPorDia.map(r=>r.dia), d.usuariosPorDia.map(r=>+r.total), 'Usuários/dia');
+        if (d.acessosPorDevice?.length) {
+          mkChart('chart-devices','doughnut', d.acessosPorDevice.map(r=>r.device), d.acessosPorDevice.map(r=>+r.total), 'Acessos');
+        }
 
       // Tabelas
         document.querySelector('#table-empresas tbody').innerHTML = d.topEmpresas.map(r =>

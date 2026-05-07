@@ -59,7 +59,7 @@ async function getAnalytics(req, res) {
 
   try {
     // Queries paralelas otimizadas — totais em uma só query cada
-    const [totais, crescUsers, crescCand, areas, status, empresas, ultimas, porDia] = await Promise.all([
+    const [totais, crescUsers, crescCand, areas, status, empresas, ultimas, porDia, devices] = await Promise.all([
       pool.query(`
         SELECT
           (SELECT COUNT(*) FROM users WHERE ativo=true) usuarios,
@@ -76,6 +76,7 @@ async function getAnalytics(req, res) {
       pool.query(`SELECT e.razao_social empresa, COUNT(v.id) vagas, COALESCE(SUM(v.visualizacoes),0) visualizacoes FROM empregadores e LEFT JOIN vagas v ON v.empregador_id=e.id GROUP BY e.id,e.razao_social ORDER BY vagas DESC LIMIT 5`),
       pool.query(`SELECT c.nome candidato, v.titulo vaga, e.razao_social empresa, ca.status, ca.created_at FROM candidaturas ca JOIN candidatos c ON c.id=ca.candidato_id JOIN vagas v ON v.id=ca.vaga_id JOIN empregadores e ON e.id=v.empregador_id ORDER BY ca.created_at DESC LIMIT 10`),
       pool.query(`SELECT TO_CHAR(DATE_TRUNC('day',created_at),'DD/MM') dia, COUNT(*) total FROM users WHERE created_at >= NOW()-INTERVAL '30 days' GROUP BY 1,DATE_TRUNC('day',created_at) ORDER BY DATE_TRUNC('day',created_at)`),
+      pool.query(`SELECT device, COUNT(*) total FROM page_views WHERE created_at >= NOW()-INTERVAL '30 days' GROUP BY device ORDER BY total DESC`),
     ]);
 
     const t = totais.rows[0];
@@ -88,6 +89,7 @@ async function getAnalytics(req, res) {
       topEmpresas: empresas.rows,
       ultimasCandidaturas: ultimas.rows,
       usuariosPorDia: porDia.rows,
+      acessosPorDevice: devices.rows,
     };
 
     getAnalytics._cache = result;
