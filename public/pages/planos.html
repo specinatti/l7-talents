@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planos e Serviços - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--cream); }
+    .hero { background: var(--navy); color: white; text-align: center; padding: 72px 24px 56px; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px,5vw,48px); margin-bottom: 12px; }
+    .hero p { opacity: .8; font-size: 16px; max-width: 520px; margin: 0 auto; }
+    .plans { max-width: 1100px; margin: 0 auto; padding: 56px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .plan-card { background: var(--cream2); border-radius: 14px; padding: 32px 28px; border: 2px solid transparent; transition: border-color .2s, transform .2s; position: relative; }
+    .plan-card:hover { border-color: var(--rose); transform: translateY(-4px); }
+    .plan-card.destaque { border-color: var(--rose); }
+    .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--rose); color: white; font-size: 12px; font-weight: 600; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
+    .plan-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 8px; }
+    .plan-price { font-size: 36px; font-weight: 700; color: var(--navy); margin: 16px 0 4px; }
+    .plan-price span { font-size: 16px; font-weight: 400; color: var(--gray-500); }
+    .plan-desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; margin-bottom: 20px; min-height: 60px; }
+    .plan-features { list-style: none; padding: 0; margin-bottom: 28px; }
+    .plan-features li { font-size: 14px; color: var(--navy); padding: 6px 0; border-bottom: 1px solid var(--cream); display: flex; gap: 8px; }
+    .plan-features li::before { content: '✓'; color: var(--rose); font-weight: 700; flex-shrink: 0; }
+    .btn-contratar { width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--navy); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+    .btn-contratar:hover { background: var(--rose); }
+    .enterprise { max-width: 700px; margin: 0 auto 56px; background: var(--navy); color: white; border-radius: 14px; padding: 36px; text-align: center; }
+    .enterprise h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; }
+    .enterprise p { opacity: .8; margin-bottom: 24px; }
+    .btn-enterprise { background: var(--rose); color: white; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand"><img src="/images/l7-logo.svg" alt="L7 Talents" style="height:40px;object-fit:contain;"></a>
+    <div class="navbar-nav" id="nav-actions">
+      <a href="/pages/login.html" class="btn btn-secondary btn-sm">Entrar</a>
+      <a href="/pages/cadastro.html" class="btn btn-primary btn-sm">Cadastrar</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>Planos e Serviços</h1>
+    <p>Soluções estratégicas em gestão de pessoas para empresas de todos os portes.</p>
+  </div>
+
+  <div class="plans" id="plans-grid">
+    <!-- preenchido via JS -->
+  </div>
+
+  <div style="padding: 0 24px 56px;">
+    <div class="enterprise">
+      <h3>Enterprise — Sob Consulta</h3>
+      <p>Vagas ilimitadas, estruturação completa de RH, gestão contínua de profissionais e relatórios mensais. Solução personalizada para o porte da sua organização.</p>
+      <a href="mailto:comercial@l7talents.online?subject=Interesse%20Plano%20Enterprise" class="btn-enterprise">Falar com consultor</a>
+    </div>
+  </div>
+
+  <footer style="background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:24px;font-size:13px;">
+    © 2025 L7 Talents. Todos os direitos reservados.
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const user = auth.getUser();
+    if (user) {
+      document.getElementById('nav-actions').innerHTML = `<a href="/pages/${user.role}/dashboard.html" class="btn btn-primary btn-sm">Meu Dashboard</a>`;
+    }
+
+    const FEATURES = {
+      starter:   ['1 vaga publicada', 'Processo seletivo básico', 'Triagem de currículos', 'Validade 30 dias'],
+      business:  ['3 vagas publicadas', 'Hunting direcionado', 'Avaliação comportamental', 'Inteligência salarial', 'Validade 60 dias'],
+      premium:   ['5 vagas publicadas', 'Hunting + inteligência de mercado', 'Posicionamento salarial', 'Avaliação técnica e comportamental', 'Acompanhamento pós-contratação', 'Validade 90 dias'],
+      rh_avulso: ['Mapeamento de processos', 'Estruturação de fluxos de RH', 'Documentação e governança', 'Sem recrutamento incluso'],
+      avaliacao: ['Avaliação técnica', 'Avaliação comportamental', 'Relatório por candidato', 'Aderência cultural'],
+    };
+
+    get('/pagamentos/pacotes').then(pacotes => {
+      const order = ['starter','business','premium','rh_avulso','avaliacao'];
+      document.getElementById('plans-grid').innerHTML = order.map(key => {
+        const p = pacotes[key];
+        const isDestaque = key === 'business';
+        return `
+          <div class="plan-card ${isDestaque ? 'destaque' : ''}">
+            ${isDestaque ? '<div class="plan-badge">⭐ Mais popular</div>' : ''}
+            <div class="plan-name">${p.nome}</div>
+            <div class="plan-price">R$ ${Number(p.valor).toLocaleString('pt-BR')}<span>/pacote</span></div>
+            <div class="plan-desc">${p.descricao}</div>
+            <ul class="plan-features">
+              ${(FEATURES[key]||[]).map(f=>`<li>${f}</li>`).join('')}
+            </ul>
+            <button class="btn-contratar" onclick="contratar('${key}','${p.nome}',${p.valor})">Contratar agora</button>
+          </div>`;
+      }).join('');
+    });
+
+    function contratar(pacote, nome, valor) {
+      location.href = `/pages/checkout.html?pacote=${pacote}&nome=${encodeURIComponent(nome)}&valor=${valor}`;
+    }
+  </script>
+</body>
+</html>

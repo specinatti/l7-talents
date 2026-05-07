@@ -169,6 +169,27 @@ CREATE TABLE IF NOT EXISTS password_resets (
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token);
 
+-- Pedidos / assinaturas de pacotes
+CREATE TABLE IF NOT EXISTS pedidos (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  pacote VARCHAR(50) NOT NULL,
+  descricao TEXT,
+  valor DECIMAL(10,2) NOT NULL,
+  status VARCHAR(30) DEFAULT 'pendente' CHECK (status IN ('pendente','aprovado','recusado','cancelado','reembolsado')),
+  mp_preference_id VARCHAR(255),
+  mp_payment_id VARCHAR(255),
+  mp_status VARCHAR(50),
+  email_comprador VARCHAR(255),
+  nome_comprador VARCHAR(255),
+  empresa VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_pedidos_user ON pedidos(user_id);
+CREATE INDEX IF NOT EXISTS idx_pedidos_status ON pedidos(status);
+CREATE OR REPLACE TRIGGER trg_pedidos_updated BEFORE UPDATE ON pedidos FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_vagas_status ON vagas(status);
 CREATE INDEX IF NOT EXISTS idx_vagas_area ON vagas(area);

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--cream); display: flex; flex-direction: column; min-height: 100vh; }
+    .checkout-wrap { max-width: 520px; margin: 40px auto; padding: 0 24px; width: 100%; }
+    .checkout-card { background: var(--cream2); border-radius: 14px; padding: 36px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--navy); margin-bottom: 4px; }
+    .plan-summary { background: var(--cream); border-radius: 8px; padding: 16px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+    .plan-summary .name { font-weight: 600; color: var(--navy); }
+    .plan-summary .price { font-size: 22px; font-weight: 700; color: var(--rose); }
+    .form-input { width: 100%; padding: 11px 14px; border: 1px solid rgba(27,42,74,.2); border-radius: 8px; font-size: 14px; background: var(--cream); color: var(--navy); margin-bottom: 14px; }
+    .form-input:focus { outline: none; border-color: var(--rose); }
+    .btn-pay { width: 100%; padding: 16px; background: var(--rose); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .2s; }
+    .btn-pay:hover { background: #a34e60; }
+    .btn-pay:disabled { opacity: .6; cursor: not-allowed; }
+    .security { text-align: center; font-size: 12px; color: var(--gray-500); margin-top: 16px; }
+    #alert { display: none; background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand"><img src="/images/l7-logo.svg" alt="L7 Talents" style="height:40px;object-fit:contain;"></a>
+    <a href="/pages/planos.html" style="font-size:14px;color:var(--navy);">← Voltar aos planos</a>
+  </nav>
+
+  <div class="checkout-wrap">
+    <div class="checkout-card">
+      <h1>Finalizar contratação</h1>
+      <p style="color:var(--gray-500);font-size:14px;margin-bottom:4px;">Você será redirecionado ao Mercado Pago para pagamento seguro.</p>
+
+      <div class="plan-summary">
+        <div>
+          <div class="name" id="plan-name">—</div>
+          <div style="font-size:13px;color:var(--gray-500);" id="plan-desc">—</div>
+        </div>
+        <div class="price" id="plan-price">—</div>
+      </div>
+
+      <div id="alert"></div>
+
+      <form id="checkout-form">
+        <label style="font-size:13px;font-weight:500;color:var(--navy);display:block;margin-bottom:6px;">Nome completo *</label>
+        <input type="text" id="nome" class="form-input" placeholder="Seu nome" required>
+
+        <label style="font-size:13px;font-weight:500;color:var(--navy);display:block;margin-bottom:6px;">E-mail *</label>
+        <input type="email" id="email" class="form-input" placeholder="seu@email.com" required>
+
+        <label style="font-size:13px;font-weight:500;color:var(--navy);display:block;margin-bottom:6px;">Empresa</label>
+        <input type="text" id="empresa" class="form-input" placeholder="Nome da empresa (opcional)">
+
+        <button type="submit" class="btn-pay" id="btn-pay">
+          🔒 Pagar com Mercado Pago
+        </button>
+      </form>
+
+      <div class="security">
+        🔐 Pagamento 100% seguro via Mercado Pago · Cartão, Pix e Boleto
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const pacote = params.get('pacote');
+    const nomePacote = params.get('nome') || pacote;
+    const valor = parseFloat(params.get('valor') || 0);
+
+    if (!pacote) location.href = '/pages/planos.html';
+
+    document.getElementById('plan-name').textContent = nomePacote;
+    document.getElementById('plan-price').textContent = 'R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+    // Pré-preencher se logado
+    const user = auth.getUser();
+    if (user) document.getElementById('email').value = user.email;
+
+    // Buscar descrição
+    get('/pagamentos/pacotes').then(p => {
+      if (p[pacote]) document.getElementById('plan-desc').textContent = p[pacote].descricao;
+    }).catch(()=>{});
+
+    document.getElementById('checkout-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-pay');
+      const alert = document.getElementById('alert');
+      alert.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Aguarde...';
+
+      try {
+        const data = await post('/pagamentos/preferencia', {
+          pacote,
+          nome: document.getElementById('nome').value,
+          email: document.getElementById('email').value,
+          empresa: document.getElementById('empresa').value,
+        });
+        // Redirecionar para o Mercado Pago
+        location.href = data.init_point;
+      } catch (err) {
+        alert.textContent = err.message || 'Erro ao processar. Tente novamente.';
+        alert.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '🔒 Pagar com Mercado Pago';
+      }
+    });
+  </script>
+</body>
+</html>

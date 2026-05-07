@@ -77,6 +77,18 @@
       <canvas id="chart-diario" height="100"></canvas>
     </div>
 
+    <!-- Pedidos -->
+    <div class="table-card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="chart-title" style="margin:0;">💳 Pedidos e Pagamentos</div>
+        <a href="/pages/planos.html" target="_blank" style="font-size:13px;color:var(--rose);font-weight:500;">Ver página de planos →</a>
+      </div>
+      <table id="table-pedidos">
+        <thead><tr><th>Cliente</th><th>Empresa</th><th>Pacote</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody><tr><td colspan="6" style="color:var(--gray-400);padding:12px;">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+
     <!-- Top empresas -->
     <div class="table-card">
       <div class="chart-title">Top empresas por vagas publicadas</div>
@@ -159,6 +171,21 @@
       loadMonitor();
       setInterval(loadMonitor, 60000);
 
+      // Carregar pedidos
+      get('/pagamentos/pedidos').then(pedidos => {
+        const STATUS_COLOR = { aprovado:'#166534', pendente:'#854d0e', recusado:'#991b1b', cancelado:'#6b7280' };
+        document.querySelector('#table-pedidos tbody').innerHTML = pedidos.length
+          ? pedidos.map(p => `<tr>
+              <td>${p.nome_comprador||'—'}</td>
+              <td>${p.empresa||'—'}</td>
+              <td>${p.pacote}</td>
+              <td>R$ ${Number(p.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+              <td><span style="font-weight:600;color:${STATUS_COLOR[p.status]||'#374151'}">${p.status}</span></td>
+              <td>${formatDate(p.created_at)}</td>
+            </tr>`).join('')
+          : '<tr><td colspan="6" style="color:var(--gray-400);padding:12px;">Nenhum pedido ainda</td></tr>';
+      }).catch(()=>{});
+
       get('/financeiro/analytics').then(d => {
         // KPIs
         const vals = [d.totais.usuarios, d.totais.candidatos, d.totais.empregadores, d.totais.vagasAtivas, d.totais.candidaturas];
@@ -176,7 +203,7 @@
         mkChart('chart-status','pie', d.candidaturasPorStatus.map(r=>r.status), d.candidaturasPorStatus.map(r=>+r.total), 'Status');
         mkChart('chart-diario','line', d.usuariosPorDia.map(r=>r.dia), d.usuariosPorDia.map(r=>+r.total), 'Usuários/dia');
 
-        // Tabelas
+      // Tabelas
         document.querySelector('#table-empresas tbody').innerHTML = d.topEmpresas.map(r =>
           `<tr><td>${r.empresa}</td><td>${r.vagas}</td><td>${r.visualizacoes||0}</td></tr>`
         ).join('') || '<tr><td colspan="3" style="color:var(--gray-400)">Sem dados</td></tr>';
