@@ -4,99 +4,236 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Planos e Serviços - L7 Talents</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     body { background: var(--cream); }
-    .hero { background: var(--navy); color: white; text-align: center; padding: 72px 24px 56px; }
-    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px,5vw,48px); margin-bottom: 12px; }
-    .hero p { opacity: .8; font-size: 16px; max-width: 520px; margin: 0 auto; }
-    .plans { max-width: 1100px; margin: 0 auto; padding: 56px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-    .plan-card { background: var(--cream2); border-radius: 14px; padding: 32px 28px; border: 2px solid transparent; transition: border-color .2s, transform .2s; position: relative; }
-    .plan-card:hover { border-color: var(--rose); transform: translateY(-4px); }
-    .plan-card.destaque { border-color: var(--rose); }
-    .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--rose); color: white; font-size: 12px; font-weight: 600; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
-    .plan-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 8px; }
-    .plan-price { font-size: 36px; font-weight: 700; color: var(--navy); margin: 16px 0 4px; }
-    .plan-price span { font-size: 16px; font-weight: 400; color: var(--gray-500); }
-    .plan-desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; margin-bottom: 20px; min-height: 60px; }
-    .plan-features { list-style: none; padding: 0; margin-bottom: 28px; }
-    .plan-features li { font-size: 14px; color: var(--navy); padding: 6px 0; border-bottom: 1px solid var(--cream); display: flex; gap: 8px; }
-    .plan-features li::before { content: '✓'; color: var(--rose); font-weight: 700; flex-shrink: 0; }
-    .btn-contratar { width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--navy); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
-    .btn-contratar:hover { background: var(--rose); }
-    .enterprise { max-width: 700px; margin: 0 auto 56px; background: var(--navy); color: white; border-radius: 14px; padding: 36px; text-align: center; }
-    .enterprise h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; }
-    .enterprise p { opacity: .8; margin-bottom: 24px; }
-    .btn-enterprise { background: var(--rose); color: white; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; }
+
+    /* NAV */
+    .top-nav { background: rgba(250,247,244,.95); border-bottom: 1px solid rgba(184,92,110,.12); padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+    .top-nav img { height: 44px; }
+    .top-nav-links { display: flex; gap: 10px; align-items: center; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 72px 24px 48px; }
+    .hero-tag { display: inline-block; background: var(--cream2); color: var(--rose); font-size: 13px; font-weight: 600; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; letter-spacing: .04em; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,52px); color: var(--navy); margin-bottom: 16px; line-height: 1.2; }
+    .hero p { color: #6b7280; font-size: 17px; max-width: 540px; margin: 0 auto 40px; line-height: 1.7; }
+    .hero-trust { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b7280; }
+
+    /* PLANS */
+    .plans-section { max-width: 1140px; margin: 0 auto; padding: 0 24px 64px; }
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .plan { background: var(--cream2); border-radius: 16px; padding: 32px; border: 2px solid transparent; transition: all .25s; position: relative; display: flex; flex-direction: column; }
+    .plan:hover { border-color: var(--rose); transform: translateY(-6px); box-shadow: 0 16px 40px rgba(184,92,110,.12); }
+    .plan.popular { border-color: var(--rose); }
+    .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--rose); color: white; font-size: 12px; font-weight: 700; padding: 5px 18px; border-radius: 20px; white-space: nowrap; letter-spacing: .04em; }
+    .plan-icon { font-size: 36px; margin-bottom: 16px; }
+    .plan-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 6px; }
+    .plan-tagline { font-size: 13px; color: var(--rose); font-weight: 500; margin-bottom: 20px; }
+    .plan-price { margin-bottom: 24px; }
+    .plan-price .amount { font-size: 42px; font-weight: 700; color: var(--navy); line-height: 1; }
+    .plan-price .period { font-size: 14px; color: #6b7280; margin-top: 4px; }
+    .plan-features { list-style: none; padding: 0; margin: 0 0 28px; flex: 1; }
+    .plan-features li { font-size: 14px; color: #374151; padding: 8px 0; border-bottom: 1px solid rgba(27,42,74,.06); display: flex; gap: 10px; align-items: flex-start; }
+    .plan-features li:last-child { border-bottom: none; }
+    .check { color: var(--rose); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .btn-plan { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .btn-plan-primary { background: var(--navy); color: white; }
+    .btn-plan-primary:hover { background: var(--rose); }
+    .btn-plan-outline { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+    .btn-plan-outline:hover { background: var(--navy); color: white; }
+
+    /* ENTERPRISE */
+    .enterprise-card { background: var(--navy); border-radius: 16px; padding: 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; margin-bottom: 64px; }
+    .enterprise-card h3 { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 10px; }
+    .enterprise-card p { color: rgba(255,255,255,.75); font-size: 15px; line-height: 1.6; max-width: 480px; }
+    .btn-enterprise { background: var(--rose); color: white; padding: 14px 32px; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .2s; }
+    .btn-enterprise:hover { background: #a34e60; text-decoration: none; }
+
+    /* FAQ */
+    .faq { max-width: 700px; margin: 0 auto 64px; padding: 0 24px; }
+    .faq h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--navy); text-align: center; margin-bottom: 32px; }
+    .faq-item { background: var(--cream2); border-radius: 10px; padding: 20px 24px; margin-bottom: 12px; }
+    .faq-item h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: #6b7280; line-height: 1.6; margin: 0; }
+
+    footer { background: var(--navy); color: rgba(255,255,255,.6); text-align: center; padding: 28px; font-size: 13px; }
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/" class="navbar-brand"><img src="/images/l7-logo.svg" alt="L7 Talents" style="height:40px;object-fit:contain;"></a>
-    <div class="navbar-nav" id="nav-actions">
+
+  <nav class="top-nav">
+    <a href="/"><img src="/images/l7-logo.svg" alt="L7 Talents"></a>
+    <div class="top-nav-links">
+      <a href="/pages/vagas.html" style="font-size:14px;color:var(--navy);text-decoration:none;padding:8px 14px;">Ver Vagas</a>
       <a href="/pages/login.html" class="btn btn-secondary btn-sm">Entrar</a>
-      <a href="/pages/cadastro.html" class="btn btn-primary btn-sm">Cadastrar</a>
+      <a href="/pages/cadastro.html?role=empregador" class="btn btn-primary btn-sm">Cadastrar empresa</a>
     </div>
   </nav>
 
+  <!-- HERO -->
   <div class="hero">
-    <h1>Planos e Serviços</h1>
-    <p>Soluções estratégicas em gestão de pessoas para empresas de todos os portes.</p>
-  </div>
-
-  <div class="plans" id="plans-grid">
-    <!-- preenchido via JS -->
-  </div>
-
-  <div style="padding: 0 24px 56px;">
-    <div class="enterprise">
-      <h3>Enterprise — Sob Consulta</h3>
-      <p>Vagas ilimitadas, estruturação completa de RH, gestão contínua de profissionais e relatórios mensais. Solução personalizada para o porte da sua organização.</p>
-      <a href="mailto:comercial@l7talents.online?subject=Interesse%20Plano%20Enterprise" class="btn-enterprise">Falar com consultor</a>
+    <div class="hero-tag">Estratégia em Gestão de Pessoas</div>
+    <h1>Encontre o talento certo<br>para sua empresa</h1>
+    <p>Soluções completas de recrutamento, estruturação de RH e gestão de talentos. Escolha o plano ideal para o seu momento.</p>
+    <div class="hero-trust">
+      <div class="trust-item">🔒 Pagamento seguro</div>
+      <div class="trust-item">⚡ Início imediato</div>
+      <div class="trust-item">💬 Suporte dedicado</div>
+      <div class="trust-item">✅ Sem fidelidade</div>
     </div>
   </div>
 
-  <footer style="background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:24px;font-size:13px;">
-    © 2025 L7 Talents. Todos os direitos reservados.
-  </footer>
+  <!-- PLANOS -->
+  <div class="plans-section">
+    <div class="plans-grid">
+
+      <!-- Starter -->
+      <div class="plan">
+        <div class="plan-icon">🎯</div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-tagline">Ideal para primeira contratação</div>
+        <div class="plan-price">
+          <div class="amount">R$ 490</div>
+          <div class="period">pagamento único · validade 30 dias</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 1 vaga publicada</li>
+          <li><span class="check">✓</span> Processo seletivo básico</li>
+          <li><span class="check">✓</span> Triagem de currículos</li>
+          <li><span class="check">✓</span> Apresentação dos finalistas</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="ir('starter')">Contratar Starter</button>
+      </div>
+
+      <!-- Business (destaque) -->
+      <div class="plan popular">
+        <div class="popular-badge">⭐ Mais contratado</div>
+        <div class="plan-icon">🚀</div>
+        <div class="plan-name">Business</div>
+        <div class="plan-tagline">Para empresas em crescimento</div>
+        <div class="plan-price">
+          <div class="amount">R$ 1.290</div>
+          <div class="period">pagamento único · validade 60 dias</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 3 vagas publicadas</li>
+          <li><span class="check">✓</span> Hunting direcionado</li>
+          <li><span class="check">✓</span> Avaliação comportamental</li>
+          <li><span class="check">✓</span> Inteligência salarial de mercado</li>
+          <li><span class="check">✓</span> Relatório de candidatos</li>
+        </ul>
+        <button class="btn-plan btn-plan-primary" onclick="ir('business')">Contratar Business</button>
+      </div>
+
+      <!-- Premium -->
+      <div class="plan">
+        <div class="plan-icon">💎</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-tagline">Processo completo e estratégico</div>
+        <div class="plan-price">
+          <div class="amount">R$ 2.490</div>
+          <div class="period">pagamento único · validade 90 dias</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 5 vagas publicadas</li>
+          <li><span class="check">✓</span> Hunting + inteligência de mercado</li>
+          <li><span class="check">✓</span> Avaliação técnica e comportamental</li>
+          <li><span class="check">✓</span> Posicionamento salarial</li>
+          <li><span class="check">✓</span> Acompanhamento pós-contratação</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="ir('premium')">Contratar Premium</button>
+      </div>
+
+    </div>
+
+    <!-- Segunda linha -->
+    <div class="plans-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 680px; margin: 0 auto 40px;">
+
+      <!-- RH Avulso -->
+      <div class="plan">
+        <div class="plan-icon">⚙️</div>
+        <div class="plan-name">RH Avulso</div>
+        <div class="plan-tagline">Estruture seu RH sem recrutar</div>
+        <div class="plan-price">
+          <div class="amount">R$ 890</div>
+          <div class="period">pagamento único</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Mapeamento de processos</li>
+          <li><span class="check">✓</span> Estruturação de fluxos de RH</li>
+          <li><span class="check">✓</span> Documentação e governança</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="ir('rh_avulso')">Contratar RH Avulso</button>
+      </div>
+
+      <!-- Avaliação -->
+      <div class="plan">
+        <div class="plan-icon">🧠</div>
+        <div class="plan-name">Avaliação</div>
+        <div class="plan-tagline">Por candidato externo</div>
+        <div class="plan-price">
+          <div class="amount">R$ 290</div>
+          <div class="period">por candidato avaliado</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Avaliação técnica</li>
+          <li><span class="check">✓</span> Avaliação comportamental</li>
+          <li><span class="check">✓</span> Relatório individual</li>
+          <li><span class="check">✓</span> Aderência cultural</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="ir('avaliacao')">Contratar Avaliação</button>
+      </div>
+
+    </div>
+
+    <!-- Enterprise -->
+    <div class="enterprise-card">
+      <div>
+        <h3>Enterprise — Sob Consulta</h3>
+        <p>Vagas ilimitadas, estruturação completa de RH, gestão contínua de profissionais e relatórios mensais. Flexibilidade contratual adaptada ao porte da sua organização.</p>
+      </div>
+      <a href="mailto:comercial@l7talents.online?subject=Interesse%20Plano%20Enterprise" class="btn-enterprise">Falar com consultor →</a>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq">
+    <h2>Dúvidas frequentes</h2>
+    <div class="faq-item">
+      <h4>Como funciona o pagamento?</h4>
+      <p>Aceitamos cartão de crédito, débito, Pix e boleto via Mercado Pago. O pagamento é processado de forma segura e o serviço inicia em até 24h após a confirmação.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Posso cancelar ou mudar de plano?</h4>
+      <p>Sim. Entre em contato pelo e-mail comercial@l7talents.online e nossa equipe vai orientar sobre upgrade, downgrade ou cancelamento.</p>
+    </div>
+    <div class="faq-item">
+      <h4>O que acontece após o pagamento?</h4>
+      <p>Nossa equipe entra em contato em até 24 horas para alinhar o briefing da vaga e iniciar o processo seletivo.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Preciso criar uma conta para contratar?</h4>
+      <p>Não é obrigatório, mas recomendamos criar uma conta de empregador para acompanhar o andamento do processo diretamente no portal.</p>
+    </div>
+  </div>
+
+  <footer>© 2025 L7 Talents · comercial@l7talents.online</footer>
 
   <script src="/js/app.js"></script>
   <script>
-    const user = auth.getUser();
-    if (user) {
-      document.getElementById('nav-actions').innerHTML = `<a href="/pages/${user.role}/dashboard.html" class="btn btn-primary btn-sm">Meu Dashboard</a>`;
-    }
-
-    const FEATURES = {
-      starter:   ['1 vaga publicada', 'Processo seletivo básico', 'Triagem de currículos', 'Validade 30 dias'],
-      business:  ['3 vagas publicadas', 'Hunting direcionado', 'Avaliação comportamental', 'Inteligência salarial', 'Validade 60 dias'],
-      premium:   ['5 vagas publicadas', 'Hunting + inteligência de mercado', 'Posicionamento salarial', 'Avaliação técnica e comportamental', 'Acompanhamento pós-contratação', 'Validade 90 dias'],
-      rh_avulso: ['Mapeamento de processos', 'Estruturação de fluxos de RH', 'Documentação e governança', 'Sem recrutamento incluso'],
-      avaliacao: ['Avaliação técnica', 'Avaliação comportamental', 'Relatório por candidato', 'Aderência cultural'],
+    const PLANOS = {
+      starter:   { nome: 'Starter',    valor: 490 },
+      business:  { nome: 'Business',   valor: 1290 },
+      premium:   { nome: 'Premium',    valor: 2490 },
+      rh_avulso: { nome: 'RH Avulso',  valor: 890 },
+      avaliacao: { nome: 'Avaliação',  valor: 290 },
     };
-
-    get('/pagamentos/pacotes').then(pacotes => {
-      const order = ['starter','business','premium','rh_avulso','avaliacao'];
-      document.getElementById('plans-grid').innerHTML = order.map(key => {
-        const p = pacotes[key];
-        const isDestaque = key === 'business';
-        return `
-          <div class="plan-card ${isDestaque ? 'destaque' : ''}">
-            ${isDestaque ? '<div class="plan-badge">⭐ Mais popular</div>' : ''}
-            <div class="plan-name">${p.nome}</div>
-            <div class="plan-price">R$ ${Number(p.valor).toLocaleString('pt-BR')}<span>/pacote</span></div>
-            <div class="plan-desc">${p.descricao}</div>
-            <ul class="plan-features">
-              ${(FEATURES[key]||[]).map(f=>`<li>${f}</li>`).join('')}
-            </ul>
-            <button class="btn-contratar" onclick="contratar('${key}','${p.nome}',${p.valor})">Contratar agora</button>
-          </div>`;
-      }).join('');
-    });
-
-    function contratar(pacote, nome, valor) {
-      location.href = `/pages/checkout.html?pacote=${pacote}&nome=${encodeURIComponent(nome)}&valor=${valor}`;
+    function ir(pacote) {
+      const p = PLANOS[pacote];
+      location.href = `/pages/checkout.html?pacote=${pacote}&nome=${encodeURIComponent(p.nome)}&valor=${p.valor}`;
     }
   </script>
 </body>
