@@ -24,8 +24,16 @@ const auth = {
   isLogged: () => !!localStorage.getItem('token'),
   redirectIfNotLogged: (role) => {
     const user = auth.getUser();
-    if (!user) { window.location.href = '/pages/login.html'; return false; }
-    if (role && user.role !== role) { window.location.href = '/pages/login.html'; return false; }
+    if (!user) {
+      document.body.style.visibility = 'hidden';
+      window.location.replace('/pages/login.html');
+      return false;
+    }
+    if (role && user.role !== role) {
+      document.body.style.visibility = 'hidden';
+      window.location.replace('/pages/login.html');
+      return false;
+    }
     return true;
   }
 };

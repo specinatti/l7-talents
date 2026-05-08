@@ -56,6 +56,16 @@ app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api/pagamentos', require('./routes/pagamentos'));
 app.use('/api', require('./routes/comunicacao'));
 
+// Proteção server-side: páginas internas exigem cookie de sessão
+const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/'];
+app.use((req, res, next) => {
+  const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
+  if (isProtected && req.path.endsWith('.html') && !req.cookies?.auth_token) {
+    return res.redirect(302, '/pages/login.html');
+  }
+  next();
+});
+
 // Frontend estático
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('*', (req, res) => {

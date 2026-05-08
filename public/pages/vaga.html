@@ -44,6 +44,11 @@
     const vagaId = new URLSearchParams(location.search).get('id');
     const user = auth.getUser();
 
+    if (!user) {
+      document.body.style.visibility = 'hidden';
+      window.location.replace('/pages/login.html');
+    }
+
     if (user) {
       document.getElementById('nav-actions').innerHTML = `
         <a href="/pages/vagas.html" class="btn btn-secondary btn-sm">← Vagas</a>
