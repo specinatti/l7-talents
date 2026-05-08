@@ -1,4 +1,6 @@
 const { pool } = require('../db');
+const { sendWhatsApp } = require('../utils/whatsapp');
+const APP_URL = process.env.APP_URL || 'https://l7-talents-production.up.railway.app';
 
 // Público: listar vagas com filtros
 async function listarVagas(req, res) {
@@ -64,6 +66,24 @@ async function candidatar(req, res) {
       [req.params.id, cand.rows[0].id, carta_apresentacao || null]
     );
     res.status(201).json(rows[0]);
+
+    // Notificar empregador via WhatsApp (fire-and-forget)
+    pool.query(
+      `SELECT e.whatsapp, u_c.email AS cand_email, c.nome AS cand_nome, v.titulo
+       FROM vagas v
+       JOIN empregadores e ON e.id = v.empregador_id
+       JOIN candidatos c ON c.id = $1
+       JOIN users u_c ON u_c.id = c.user_id
+       WHERE v.id = $2`,
+      [cand.rows[0].id, req.params.id]
+    ).then(r => {
+      const d = r.rows[0];
+      if (d?.whatsapp) {
+        sendWhatsApp(d.whatsapp,
+          `Nova candidatura recebida! 🎯\n\n*${d.cand_nome}* se candidatou para *${d.titulo}*.\n\nVer candidatos: ${APP_URL}/pages/empregador/candidatos.html`
+        );
+      }
+    }).catch(() => {});
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ error: 'Você já se candidatou a esta vaga' });
     res.status(500).json({ error: 'Erro ao candidatar' });

@@ -1,4 +1,6 @@
 const { pool } = require('../db');
+const { sendWhatsApp } = require('../utils/whatsapp');
+const APP_URL = process.env.APP_URL || 'https://l7-talents-production.up.railway.app';
 
 async function getPerfil(req, res) {
   try {
@@ -96,13 +98,10 @@ async function notificarCandidatosMatch(vaga) {
       } catch {}
     }
 
-    // WhatsApp link (apenas registra — envio manual via dashboard RH)
+    // WhatsApp direto via Z-API
     if (c.alerta_whatsapp && c.whatsapp) {
-      const msg = `Olá ${c.nome}! Nova vaga compatível: *${vaga.titulo}*. Acesse: ${process.env.APP_URL||'https://l7-talents-production.up.railway.app'}/pages/vaga.html?id=${vaga.id}`;
-      await pool.query(
-        `INSERT INTO notificacoes (user_id, tipo, titulo, mensagem, link) VALUES ($1,'alerta_whatsapp',$2,$3,$4)`,
-        [c.user_id, `WhatsApp: ${vaga.titulo}`, msg,
-         `https://wa.me/55${c.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`]
+      await sendWhatsApp(c.whatsapp,
+        `Olá ${c.nome}! Nova vaga compatível com seu perfil:\n\n*${vaga.titulo}*\n${vaga.area||''} · ${vaga.modalidade||''} · ${vaga.cidade||''}\n\nVer vaga: ${APP_URL}/pages/vaga.html?id=${vaga.id}`
       );
     }
   }
@@ -180,14 +179,27 @@ async function updateStatusCandidatura(req, res) {
     );
     if (!rows[0]) return res.status(404).json({ error: 'Candidatura não encontrada' });
 
-    // Notificar candidato
-    await pool.query(
+    // Notificar candidato por notificação interna + WhatsApp
+    const notif = await pool.query(
       `INSERT INTO notificacoes (user_id, tipo, titulo, mensagem)
        SELECT u.id, 'candidatura', $1, $2
        FROM candidatos c JOIN users u ON u.id = c.user_id
-       WHERE c.id = $3`,
+       WHERE c.id = $3
+       RETURNING (SELECT c2.whatsapp FROM candidatos c2 WHERE c2.id = $3) as whatsapp`,
       [`Atualização na sua candidatura`, `Sua candidatura foi atualizada para: ${status}`, rows[0].candidato_id]
     );
+
+    // WhatsApp para o candidato
+    const { rows: candRows } = await pool.query(
+      'SELECT c.whatsapp, c.nome, v.titulo FROM candidatos c JOIN candidaturas ca ON ca.candidato_id=c.id JOIN vagas v ON v.id=ca.vaga_id WHERE ca.id=$1',
+      [req.params.id]
+    );
+    if (candRows[0]?.whatsapp) {
+      const statusLabel = { enviada:'Enviada', visualizada:'Visualizada', em_analise:'Em análise', entrevista:'Entrevista agendada! 🎉', aprovado:'Aprovado! 🎉', reprovado:'Não aprovado desta vez' };
+      await sendWhatsApp(candRows[0].whatsapp,
+        `Olá ${candRows[0].nome}! Sua candidatura para *${candRows[0].titulo}* foi atualizada:\n\n*${statusLabel[status] || status}*${feedback ? `\n\n_${feedback}_` : ''}\n\nAcompanhe em: ${APP_URL}/pages/candidato/candidaturas.html`
+      );
+    }
 
     res.json(rows[0]);
   } catch (err) {
