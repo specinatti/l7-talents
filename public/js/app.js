@@ -154,7 +154,7 @@ function initNavbar(role) {
         <span id="notif-count" class="hidden" style="position:absolute;top:4px;right:4px;background:#B85C6E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span>
       </div>
       <span style="font-size:13px;color:#6b7280;">${user?.email || ''}</span>
-      ${['rh','financeiro','admin'].includes(role) ? `<a href="/pages/2fa.html?mode=setup" style="font-size:12px;color:var(--gray-500);padding:4px 8px;border:1px solid var(--gray-200);border-radius:6px;" title="Configurar 2FA">🔐 2FA</a>` : ''}
+      ${['rh','financeiro','admin'].includes(role) ? `<a href="/pages/2fa.html?mode=manage" style="font-size:12px;color:var(--gray-500);padding:4px 8px;border:1px solid var(--gray-200);border-radius:6px;" title="Segurança">🔐 2FA</a>` : ''}
       <button class="btn btn-secondary btn-sm" onclick="logout()">Sair</button>
       <button class="hamburger" onclick="openDrawer()" aria-label="Menu">
         <span></span><span></span><span></span>

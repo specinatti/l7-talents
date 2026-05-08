@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   role VARCHAR(20) NOT NULL CHECK (role IN ('candidato', 'empregador', 'admin', 'financeiro', 'rh')),
   ativo BOOLEAN DEFAULT true,
   email_verificado BOOLEAN DEFAULT false,
+  email_alternativo VARCHAR(255),
   totp_secret VARCHAR(64),
   totp_enabled BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
