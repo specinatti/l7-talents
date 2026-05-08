@@ -64,13 +64,11 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="/js/app.js"></script>
 <script>
   const params = new URLSearchParams(location.search);
   const mode = params.get('mode') || 'verify';
 
-  // Dados temporários do login pendente (passados via sessionStorage)
   const pendingLogin = JSON.parse(sessionStorage.getItem('pending_2fa') || 'null');
 
   function show(id) {
@@ -83,12 +81,12 @@
   if (mode === 'setup') {
     if (!auth.isLogged()) { location.replace('/pages/login.html'); }
     show('section-setup');
-    // Solicitar setup ao servidor
     post('/auth/2fa/setup', {}).then(data => {
       document.getElementById('secret-box').textContent = data.secret;
-      QRCode.toCanvas(document.createElement('canvas'), data.otpauth_url, { width: 200 }, (err, canvas) => {
-        if (!err) document.getElementById('qr-container').appendChild(canvas);
-      });
+      const img = document.createElement('img');
+      img.src = data.qr_data_url;
+      img.style.cssText = 'width:200px;height:200px;';
+      document.getElementById('qr-container').appendChild(img);
     }).catch(err => showAlert(err.message, 'error', document.getElementById('alert-setup')));
 
     document.getElementById('form-setup').addEventListener('submit', async e => {
@@ -124,7 +122,6 @@
     });
 
   } else {
-    // mode=verify — login pendente
     if (!pendingLogin) { location.replace('/pages/login.html'); }
     show('section-verify');
 
@@ -133,11 +130,17 @@
       const btn = document.getElementById('btn-verify');
       setLoading(btn, true);
       try {
-        const data = await post('/auth/login', {
-          email: pendingLogin.email,
-          password: pendingLogin.password,
-          totp_code: document.getElementById('code-verify').value,
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: pendingLogin.email,
+            password: pendingLogin.password,
+            totp_code: document.getElementById('code-verify').value,
+          }),
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Código inválido');
         sessionStorage.removeItem('pending_2fa');
         auth.setSession(data.token, data.user);
         location.replace(`/pages/${data.user.role}/dashboard.html`);

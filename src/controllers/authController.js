@@ -51,16 +51,19 @@ async function setup2FA(req, res) {
     return res.status(403).json({ error: '2FA disponível apenas para RH, Financeiro e Admin' });
 
   const { Secret, TOTP } = require('otpauth');
+  const QRCode = require('qrcode');
+
   const secret = new Secret({ size: 20 });
   const secretB32 = secret.base32;
 
   const totp = new TOTP({ issuer: 'L7 Talents', label: req.user.email, algorithm: 'SHA1', digits: 6, period: 30, secret });
   const otpauthUrl = totp.toString();
 
-  // Salvar segredo temporariamente (não ativado ainda — só ativa após verify)
+  // Salvar segredo (não ativado ainda — só ativa após verify)
   await pool.query('UPDATE users SET totp_secret = $1, totp_enabled = false WHERE id = $2', [secretB32, req.user.id]);
 
-  res.json({ secret: secretB32, otpauth_url: otpauthUrl });
+  const qrDataUrl = await QRCode.toDataURL(otpauthUrl, { width: 200 });
+  res.json({ secret: secretB32, qr_data_url: qrDataUrl });
 }
 
 async function verify2FA(req, res) {
