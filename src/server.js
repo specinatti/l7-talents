@@ -60,13 +60,15 @@ app.use('/api', require('./routes/comunicacao'));
 const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/'];
 app.use((req, res, next) => {
   const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
-  if (isProtected && req.path.endsWith('.html') && !req.cookies?.auth_token) {
-    return res.redirect(302, '/pages/login.html');
+  if (isProtected && req.path.endsWith('.html')) {
+    if (!req.cookies?.auth_token) return res.redirect(302, '/pages/login.html');
+    // Servir o arquivo manualmente após validar cookie
+    return res.sendFile(path.join(__dirname, '../public', req.path));
   }
   next();
 });
 
-// Frontend estático
+// Frontend estático (apenas arquivos públicos chegam aqui)
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api'))
