@@ -95,4 +95,28 @@ async function getPedidos(req, res) {
   }
 }
 
-module.exports = { getPacotes, criarPreferencia, webhook, getPedidos };
+async function processar(req, res) {
+  try {
+    const { pedido_id, ...formData } = req.body;
+    const payment = new Payment(mp);
+    const result = await payment.create({ body: formData });
+
+    const status = result.status === 'approved' ? 'aprovado'
+      : result.status === 'rejected' ? 'recusado'
+      : 'pendente';
+
+    if (pedido_id) {
+      await pool.query(
+        'UPDATE pedidos SET status=$1, mp_payment_id=$2, mp_status=$3 WHERE id=$4',
+        [status, String(result.id), result.status, pedido_id]
+      );
+    }
+
+    res.json({ status: result.status, payment_id: result.id });
+  } catch (err) {
+    console.error('[PROCESSAR ERROR]', err.message);
+    res.status(500).json({ error: 'Erro ao processar pagamento' });
+  }
+}
+
+module.exports = { getPacotes, criarPreferencia, processar, webhook, getPedidos };
