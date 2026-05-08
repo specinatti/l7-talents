@@ -16,6 +16,7 @@ async function initDB() {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(64)`);
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT false`);
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_alternativo VARCHAR(255)`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20)`);
   await pool.query(`CREATE TABLE IF NOT EXISTS email_otp (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

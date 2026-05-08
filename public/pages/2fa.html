@@ -52,7 +52,11 @@
         <label class="form-label">Email alternativo <span style="color:var(--gray-400);font-weight:400;">(opcional)</span></label>
         <input type="email" id="email-alternativo" class="form-control" placeholder="backup@email.com">
       </div>
-      <button type="submit" class="btn btn-primary btn-block" id="btn-save-email">Salvar email alternativo</button>
+      <div class="form-group">
+        <label class="form-label">WhatsApp <span style="color:var(--gray-400);font-weight:400;">(opcional — recebe o código também)</span></label>
+        <input type="tel" id="whatsapp" class="form-control" placeholder="11983186310">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btn-save-email">Salvar contatos de segurança</button>
     </form>
     <p style="text-align:center;margin-top:20px;font-size:13px;">
       <a href="javascript:history.back()">← Voltar</a>
@@ -116,6 +120,7 @@
     get('/auth/me').then(user => {
       document.getElementById('email-principal').value = user.email;
       document.getElementById('email-alternativo').value = user.email_alternativo || '';
+      document.getElementById('whatsapp').value = user.whatsapp || '';
     }).catch(() => location.replace('/pages/login.html'));
 
     document.getElementById('form-alt-email').addEventListener('submit', async e => {
@@ -123,8 +128,11 @@
       const btn = document.getElementById('btn-save-email');
       setLoading(btn, true);
       try {
-        await put('/auth/email-alternativo', { email_alternativo: document.getElementById('email-alternativo').value || null });
-        showAlert('Email alternativo salvo!', 'success', document.getElementById('alert-manage'));
+        await put('/auth/email-alternativo', {
+          email_alternativo: document.getElementById('email-alternativo').value || null,
+          whatsapp: document.getElementById('whatsapp').value || null,
+        });
+        showAlert('Contatos de segurança salvos!', 'success', document.getElementById('alert-manage'));
       } catch (err) {
         showAlert(err.message, 'error', document.getElementById('alert-manage'));
       }

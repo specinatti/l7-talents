@@ -45,10 +45,10 @@ async function sendEmailOTP(user) {
     [user.id, code]
   );
 
-  // Enviar para email principal E alternativo se existir
   const destinations = [user.email];
   if (user.email_alternativo) destinations.push(user.email_alternativo);
 
+  // Enviar por email
   if (process.env.SMTP_HOST) {
     const nodemailer = require('nodemailer');
     const port = parseInt(process.env.SMTP_PORT) || 587;
@@ -75,6 +75,26 @@ async function sendEmailOTP(user) {
   } else {
     console.log(`[EMAIL OTP] ${destinations.join(', ')}: ${code}`);
   }
+
+  // Enviar por WhatsApp via Z-API se número cadastrado
+  if (process.env.ZAPI_INSTANCE && process.env.ZAPI_TOKEN && user.whatsapp) {
+    const phone = user.whatsapp.replace(/\D/g, '');
+    const fullPhone = phone.startsWith('55') ? phone : `55${phone}`;
+    try {
+      const fetch = require('node-fetch');
+      await fetch(`https://api.z-api.io/instances/${process.env.ZAPI_INSTANCE}/token/${process.env.ZAPI_TOKEN}/send-text`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: fullPhone,
+          message: `🔐 *L7 Talents* — Seu código de acesso:\n\n*${code}*\n\nVálido por 10 minutos. Não compartilhe.`
+        })
+      });
+      console.log(`[WHATSAPP OTP] Enviado para ${fullPhone}`);
+    } catch (waErr) {
+      console.error(`[WHATSAPP OTP ERROR] ${waErr.message}`);
+    }
+  }
 }
 
 async function verifyEmailOTP(userId, code) {
@@ -95,7 +115,7 @@ async function login(req, res) {
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, email, email_alternativo, password_hash, role, ativo, updated_at FROM users WHERE email = $1',
+      'SELECT id, email, email_alternativo, whatsapp, password_hash, role, ativo, updated_at FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
     const user = rows[0];
@@ -181,7 +201,7 @@ async function register(req, res) {
 async function me(req, res) {
   try {
     const { rows } = await pool.query(
-      'SELECT id, email, email_alternativo, role, created_at FROM users WHERE id = $1',
+      'SELECT id, email, email_alternativo, whatsapp, role, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -200,14 +220,17 @@ async function me(req, res) {
 }
 
 async function updateEmailAlternativo(req, res) {
-  const { email_alternativo } = req.body;
+  const { email_alternativo, whatsapp } = req.body;
   if (!SENSITIVE_ROLES.includes(req.user.role))
     return res.status(403).json({ error: 'Apenas contas administrativas' });
   try {
-    await pool.query('UPDATE users SET email_alternativo = $1 WHERE id = $2', [email_alternativo || null, req.user.id]);
-    res.json({ message: 'Email alternativo atualizado' });
+    await pool.query(
+      'UPDATE users SET email_alternativo = $1, whatsapp = $2 WHERE id = $3',
+      [email_alternativo || null, whatsapp ? whatsapp.replace(/\D/g, '') : null, req.user.id]
+    );
+    res.json({ message: 'Contatos de segurança atualizados' });
   } catch (err) {
-    res.status(500).json({ error: 'Erro ao atualizar email alternativo' });
+    res.status(500).json({ error: 'Erro ao atualizar contatos' });
   }
 }
 
