@@ -216,7 +216,6 @@ CREATE TABLE IF NOT EXISTS pedidos (
 );
 CREATE INDEX IF NOT EXISTS idx_pedidos_user ON pedidos(user_id);
 CREATE INDEX IF NOT EXISTS idx_pedidos_status ON pedidos(status);
-CREATE OR REPLACE TRIGGER trg_pedidos_updated BEFORE UPDATE ON pedidos FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_vagas_status ON vagas(status);
@@ -237,3 +236,4 @@ CREATE OR REPLACE TRIGGER trg_candidatos_updated BEFORE UPDATE ON candidatos FOR
 CREATE OR REPLACE TRIGGER trg_empregadores_updated BEFORE UPDATE ON empregadores FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE OR REPLACE TRIGGER trg_vagas_updated BEFORE UPDATE ON vagas FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE OR REPLACE TRIGGER trg_candidaturas_updated BEFORE UPDATE ON candidaturas FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE OR REPLACE TRIGGER trg_pedidos_updated BEFORE UPDATE ON pedidos FOR EACH ROW EXECUTE FUNCTION update_updated_at();

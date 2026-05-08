@@ -30,7 +30,7 @@ async function refresh(req, res) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { rows } = await pool.query('SELECT id, email, role, ativo, updated_at FROM users WHERE id = $1', [decoded.id]);
     if (!rows[0] || !rows[0].ativo) return res.status(401).json({ error: 'Usuário inativo' });
-    const newToken = generateToken(rows[0]);
+    const newToken = generateToken(rows[0], req);
     setTokenCookie(res, newToken);
     res.json({ token: newToken, user: { id: rows[0].id, email: rows[0].email, role: rows[0].role } });
   } catch {

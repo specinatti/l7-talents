@@ -42,10 +42,11 @@ app.post('/api/track', async (req, res) => {
   try {
     const { page, device } = req.body;
     if (!['mobile','desktop','tablet'].includes(device)) return;
+    if (typeof page !== 'string') return;
     const { pool } = require('./db');
     await pool.query(
       'INSERT INTO page_views (page, device) VALUES ($1, $2)',
-      [page?.substring(0,255) || '/', device]
+      [page.substring(0,255) || '/', device]
     );
   } catch {}
 });
