@@ -359,5 +359,10 @@
 
     setTimeout(()=>{ document.getElementById('onboarding-overlay').style.display='flex'; }, 800);
   </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>

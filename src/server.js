@@ -62,6 +62,28 @@ app.use('/api/rh', require('./routes/rh'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api', require('./routes/comunicacao'));
 
+// Bloquear acesso direto a qualquer página em /pages/
+// Só permite se vier com navegação interna (Referer do próprio site) ou com cookie de sessão válido
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/pages/') || !req.path.endsWith('.html')) return next();
+
+  const referer = req.headers.referer || '';
+  const host = req.headers.host || '';
+  const isInternalNav = referer.includes(host) && host.length > 0;
+  const hasSession = !!req.cookies?.auth_token;
+
+  // Páginas protegidas por login — já tratadas abaixo, deixar passar
+  const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/'];
+  const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
+
+  // Acesso direto sem referer interno e sem sessão → home
+  if (!isInternalNav && !hasSession) {
+    return res.redirect(302, '/');
+  }
+
+  next();
+});
+
 // Proteção server-side: páginas internas exigem cookie de sessão
 const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/'];
 app.use((req, res, next) => {

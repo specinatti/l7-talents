@@ -25,6 +25,17 @@ self.addEventListener('activate', (event) => {
 // Fetch - network first, no cache for HTML
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // Bloquear acesso direto a /pages/ via cache/histórico
+  // Se for navegação (document) para /pages/ sem referer interno → redirecionar para /
+  if (event.request.mode === 'navigate' && url.pathname.startsWith('/pages/')) {
+    const referer = event.request.referrer || '';
+    const isInternal = referer.startsWith(self.location.origin) && referer !== '';
+    if (!isInternal) {
+      event.respondWith(Response.redirect('/', 302));
+      return;
+    }
+  }
   
   // Never cache HTML pages
   if (event.request.destination === 'document' || url.pathname.endsWith('.html')) {
