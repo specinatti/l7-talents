@@ -39,9 +39,11 @@ function setTokenCookie(res, token, role) {
 // ── OTP por email ─────────────────────────────────────────────────────────
 async function sendEmailOTP(user) {
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
   await pool.query('DELETE FROM email_otp WHERE user_id = $1', [user.id]);
-  await pool.query('INSERT INTO email_otp (user_id, code, expires_at) VALUES ($1,$2,$3)', [user.id, code, expires]);
+  await pool.query(
+    "INSERT INTO email_otp (user_id, code, expires_at) VALUES ($1, $2, NOW() + INTERVAL '10 minutes')",
+    [user.id, code]
+  );
 
   // Enviar para email principal E alternativo se existir
   const destinations = [user.email];
