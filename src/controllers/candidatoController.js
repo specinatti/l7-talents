@@ -21,9 +21,10 @@ async function getPerfil(req, res) {
 }
 
 async function updatePerfil(req, res) {
-  const campos = ['nome','telefone','cidade','estado','linkedin','github','portfolio',
+  const campos = ['nome','telefone','whatsapp','cidade','estado','linkedin','github','portfolio',
     'cargo_desejado','area_atuacao','nivel_experiencia','pretensao_salarial',
-    'disponibilidade','modalidade','resumo_profissional','habilidades'];
+    'disponibilidade','modalidade','resumo_profissional','habilidades',
+    'alertas_vagas','alerta_email','alerta_whatsapp'];
   
   const sets = [], vals = [];
   campos.forEach(c => {

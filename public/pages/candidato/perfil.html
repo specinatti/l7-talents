@@ -49,6 +49,7 @@
           <div class="form-row">
             <div class="form-group"><label class="form-label">Nome completo</label><input type="text" id="nome" class="form-control"></div>
             <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="telefone" class="form-control" placeholder="(11) 99999-9999"></div>
+            <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" id="whatsapp" class="form-control" placeholder="(11) 99999-9999"></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="cidade" class="form-control"></div>
@@ -104,6 +105,18 @@
           <div class="form-group">
             <label class="form-label">Habilidades (separadas por vírgula)</label>
             <input type="text" id="habilidades" class="form-control" placeholder="JavaScript, React, Node.js, SQL...">
+          </div>
+          <div class="form-group" style="background:var(--cream2);border-radius:8px;padding:16px;margin-top:8px;">
+            <div style="font-weight:600;color:var(--navy);margin-bottom:12px;">🔔 Alertas de vagas</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="alertas_vagas"> <span class="form-label" style="margin:0;">Receber alertas de vagas compatíveis com meu perfil</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="alerta_email"> <span class="form-label" style="margin:0;">Alertas por e-mail</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="alerta_whatsapp"> <span class="form-label" style="margin:0;">Alertas por WhatsApp</span>
+            </label>
           </div>
         </form>
       </div>
@@ -201,13 +214,16 @@
     async function loadPerfil() {
       try {
         const p = await get('/candidatos/perfil');
-        ['nome','telefone','cidade','linkedin','github','cargo_desejado','area_atuacao',
+        ['nome','telefone','whatsapp','cidade','linkedin','github','cargo_desejado','area_atuacao',
          'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
           const el = document.getElementById(f);
           if (el) el.value = p[f] || '';
         });
         if (p.estado) document.getElementById('estado').value = p.estado;
         if (p.habilidades) document.getElementById('habilidades').value = p.habilidades.join(', ');
+        document.getElementById('alertas_vagas').checked = p.alertas_vagas !== false;
+        document.getElementById('alerta_email').checked = p.alerta_email !== false;
+        document.getElementById('alerta_whatsapp').checked = !!p.alerta_whatsapp;
 
         renderExps(p.experiencias || []);
         renderForms(p.formacoes || []);
@@ -251,12 +267,15 @@
       const habilidades = document.getElementById('habilidades').value
         .split(',').map(h => h.trim()).filter(Boolean);
       const body = {};
-      ['nome','telefone','cidade','estado','linkedin','github','cargo_desejado','area_atuacao',
+      ['nome','telefone','whatsapp','cidade','estado','linkedin','github','cargo_desejado','area_atuacao',
        'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
         const v = document.getElementById(f)?.value;
         if (v !== undefined) body[f] = v || null;
       });
       body.habilidades = habilidades;
+      body.alertas_vagas = document.getElementById('alertas_vagas').checked;
+      body.alerta_email = document.getElementById('alerta_email').checked;
+      body.alerta_whatsapp = document.getElementById('alerta_whatsapp').checked;
       try {
         await put('/candidatos/perfil', body);
         showAlert('Perfil salvo com sucesso!', 'success', document.getElementById('alert-container'));

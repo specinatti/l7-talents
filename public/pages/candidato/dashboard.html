@@ -111,7 +111,7 @@
           get('/candidatos/perfil'),
           get('/candidatos/candidaturas'),
           get('/candidatos/vagas-salvas'),
-          get('/vagas?limit=6'),
+          get('/vagas/recomendadas'),
         ]);
 
         document.getElementById('greeting').textContent = `Olá, ${perfil.nome?.split(' ')[0] || 'Candidato'}! 👋`;
@@ -161,7 +161,7 @@
                   ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
                   ${v.tipo_contrato ? `<span class="badge badge-gray">${v.tipo_contrato.toUpperCase()}</span>` : ''}
                 </div>
-                <div class="vaga-salario mt-8">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
+                <div class="vaga-salario mt-8">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>${v.match_score ? `<div style="font-size:11px;color:#166534;font-weight:600;margin-top:4px;">✓ ${v.match_score}% compatível</div>` : ''}
               </div>
             </a>
           `).join('');

@@ -70,4 +70,44 @@ async function candidatar(req, res) {
   }
 }
 
-module.exports = { listarVagas, getVaga, candidatar };
+async function vagasRecomendadas(req, res) {
+  try {
+    const { rows: perfil } = await pool.query(
+      'SELECT area_atuacao, nivel_experiencia, modalidade, estado, cidade, pretensao_salarial, habilidades FROM candidatos WHERE user_id = $1',
+      [req.user.id]
+    );
+    if (!perfil[0]) return res.json({ vagas: [] });
+    const c = perfil[0];
+
+    const { rows: vagas } = await pool.query(
+      `SELECT v.*, e.razao_social empresa, e.cidade emp_cidade, e.estado emp_estado
+       FROM vagas v JOIN empregadores e ON e.id = v.empregador_id
+       WHERE v.status = 'ativa' ORDER BY v.destaque DESC, v.created_at DESC LIMIT 50`
+    );
+
+    const scored = vagas.map(v => {
+      let score = 0;
+      if (c.area_atuacao && v.area && c.area_atuacao.toLowerCase() === v.area.toLowerCase()) score += 40;
+      if (c.nivel_experiencia && v.nivel && c.nivel_experiencia.toLowerCase() === v.nivel.toLowerCase()) score += 20;
+      if (c.modalidade && v.modalidade && c.modalidade.toLowerCase() === v.modalidade.toLowerCase()) score += 15;
+      if (c.estado && v.estado && c.estado === v.estado) score += 10;
+      if (c.cidade && v.cidade && c.cidade.toLowerCase() === v.cidade.toLowerCase()) score += 5;
+      if (c.pretensao_salarial && v.salario_max && Number(c.pretensao_salarial) <= Number(v.salario_max)) score += 5;
+      if (c.habilidades?.length && v.habilidades?.length) {
+        const match = c.habilidades.filter(h => v.habilidades.some(vh => vh.toLowerCase().includes(h.toLowerCase())));
+        score += Math.min(match.length * 5, 25);
+      }
+      return { ...v, match_score: score };
+    })
+    .filter(v => v.match_score > 0)
+    .sort((a, b) => b.match_score - a.match_score)
+    .slice(0, 20);
+
+    res.json({ vagas: scored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao buscar vagas recomendadas' });
+  }
+}
+
+module.exports = { listarVagas, getVaga, candidatar, vagasRecomendadas };

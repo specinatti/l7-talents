@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS candidatos (
   habilidades TEXT[],
   curriculo_url VARCHAR(500),
   foto_url VARCHAR(500),
+  whatsapp VARCHAR(50),
+  alertas_vagas BOOLEAN DEFAULT true,
+  alerta_email BOOLEAN DEFAULT true,
+  alerta_whatsapp BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -81,6 +85,7 @@ CREATE TABLE IF NOT EXISTS empregadores (
   site VARCHAR(255),
   linkedin VARCHAR(255),
   telefone VARCHAR(50),
+  whatsapp VARCHAR(50),
   cidade VARCHAR(100),
   estado VARCHAR(2),
   descricao TEXT,
