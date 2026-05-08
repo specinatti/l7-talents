@@ -84,11 +84,22 @@
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
       setLoading(btn, true);
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
       try {
-        const data = await post('/auth/login', {
-          email: document.getElementById('email').value,
-          password: document.getElementById('password').value,
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
         });
+        const data = await res.json();
+        if (res.status === 202 && data.requires_2fa) {
+          // Guardar credenciais temporariamente para reenviar com o código
+          sessionStorage.setItem('pending_2fa', JSON.stringify({ email, password }));
+          window.location.href = '/pages/2fa.html?mode=verify';
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || 'Erro ao fazer login');
         auth.setSession(data.token, data.user);
         window.location.href = `/pages/${data.user.role}/dashboard.html`;
       } catch (err) {

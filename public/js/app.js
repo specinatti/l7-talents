@@ -154,6 +154,7 @@ function initNavbar(role) {
         <span id="notif-count" class="hidden" style="position:absolute;top:4px;right:4px;background:#B85C6E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span>
       </div>
       <span style="font-size:13px;color:#6b7280;">${user?.email || ''}</span>
+      ${['rh','financeiro','admin'].includes(role) ? `<a href="/pages/2fa.html?mode=setup" style="font-size:12px;color:var(--gray-500);padding:4px 8px;border:1px solid var(--gray-200);border-radius:6px;" title="Configurar 2FA">🔐 2FA</a>` : ''}
       <button class="btn btn-secondary btn-sm" onclick="logout()">Sair</button>
       <button class="hamburger" onclick="openDrawer()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -194,9 +195,10 @@ function logout() {
 }
 
 // ── Sessão segura ──────────────────────────────────────────────────────────
-const SESSION_TIMEOUT = 30 * 60 * 1000;  // 30 min inatividade
-const WARN_BEFORE    =  2 * 60 * 1000;   // aviso 2 min antes
-const REFRESH_INTERVAL = 90 * 60 * 1000; // renovar token a cada 90 min
+const _role = auth.getUser()?.role;
+const SESSION_TIMEOUT  = ['rh','financeiro','admin'].includes(_role) ? 30 * 60 * 1000 : 8 * 60 * 60 * 1000;
+const WARN_BEFORE      =  2 * 60 * 1000;
+const REFRESH_INTERVAL = ['rh','financeiro','admin'].includes(_role) ? 25 * 60 * 1000 : 90 * 60 * 1000;
 
 let _idleTimer, _warnTimer, _warnEl;
 
