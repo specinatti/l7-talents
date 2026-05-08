@@ -126,6 +126,8 @@ function initNavbar(role) {
     ['/pages/candidato/perfil.html','Meu Perfil'],
   ] : role === 'financeiro' ? [
     ['/pages/financeiro/dashboard.html','Analytics'],
+  ] : role === 'rh' ? [
+    ['/pages/rh/dashboard.html','Dashboard RH'],
   ] : [
     ['/pages/empregador/dashboard.html','Dashboard'],
     ['/pages/empregador/vagas.html','Minhas Vagas'],

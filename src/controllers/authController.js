@@ -45,7 +45,7 @@ async function register(req, res) {
   if (!email || !password || !role || !nome)
     return res.status(400).json({ error: 'Campos obrigatórios: email, password, role, nome' });
 
-  if (!['candidato', 'empregador', 'financeiro'].includes(role))
+  if (!['candidato', 'empregador', 'financeiro', 'rh'].includes(role))
     return res.status(400).json({ error: 'Role inválido' });
 
   if (password.length < 6)

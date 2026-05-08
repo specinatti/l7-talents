@@ -54,10 +54,11 @@ app.use('/api/empregadores', require('./routes/empregadores'));
 app.use('/api/vagas', require('./routes/vagas'));
 app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api/pagamentos', require('./routes/pagamentos'));
+app.use('/api/rh', require('./routes/rh'));
 app.use('/api', require('./routes/comunicacao'));
 
 // Proteção server-side: páginas internas exigem cookie de sessão
-const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/'];
+const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/'];
 app.use((req, res, next) => {
   const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
   if (isProtected && req.path.endsWith('.html')) {

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(20) NOT NULL CHECK (role IN ('candidato', 'empregador', 'admin', 'financeiro')),
+  role VARCHAR(20) NOT NULL CHECK (role IN ('candidato', 'empregador', 'admin', 'financeiro', 'rh')),
   ativo BOOLEAN DEFAULT true,
   email_verificado BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
@@ -168,6 +168,18 @@ CREATE TABLE IF NOT EXISTS password_resets (
   created_at TIMESTAMP DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token);
+
+-- Comunicados enviados pela coordenadora de RH
+CREATE TABLE IF NOT EXISTS comunicados (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  titulo VARCHAR(255) NOT NULL,
+  mensagem TEXT NOT NULL,
+  destinatario VARCHAR(20) NOT NULL CHECK (destinatario IN ('todos','candidatos','empregadores')),
+  canal VARCHAR(20) NOT NULL CHECK (canal IN ('email','whatsapp','ambos')),
+  enviado_por UUID REFERENCES users(id),
+  total_enviados INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
 -- Rastreamento de acessos por device
 CREATE TABLE IF NOT EXISTS page_views (

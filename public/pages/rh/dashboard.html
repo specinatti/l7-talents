@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard RH - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .rh-layout { display: flex; min-height: calc(100vh - 64px); }
+    .rh-sidebar {
+      width: 220px; flex-shrink: 0; background: var(--cream2);
+      border-right: 1px solid rgba(27,42,74,.1); padding: 20px 12px;
+      position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
+    }
+    .rh-sidebar h3 { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: .08em; margin: 0 0 8px 8px; }
+    .rh-link { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 6px; font-size: 13px; color: var(--navy); text-decoration: none; margin-bottom: 2px; cursor: pointer; transition: background .15s; }
+    .rh-link:hover, .rh-link.active { background: var(--cream); color: var(--rose); text-decoration: none; font-weight: 600; }
+    .rh-content { flex: 1; padding: 28px; overflow-y: auto; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 14px; margin-bottom: 24px; }
+    .kpi { background: var(--cream2); border-radius: 10px; padding: 18px; border-left: 4px solid var(--rose); }
+    .kpi .val { font-size: 30px; font-weight: 700; color: var(--navy); }
+    .kpi .lbl { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+    .kpi .sub { font-size: 12px; color: var(--rose); font-weight: 600; margin-top: 2px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--cream2); padding: 10px 12px; text-align: left; color: var(--navy); font-weight: 600; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--cream2); color: #374151; }
+    .badge { display: inline-flex; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-yellow { background: #fef9c3; color: #854d0e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-blue { background: var(--cream2); color: var(--navy); }
+    .card { background: var(--cream2); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:768px){ .rh-sidebar{display:none;} .form-row2{grid-template-columns:1fr;} }
+    .btn-rh { padding: 10px 20px; background: var(--navy); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; }
+    .btn-rh:hover { background: var(--rose); }
+    .wa-link { display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; margin: 2px; }
+    #wa-links { margin-top: 16px; }
+    .alert-success { background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+    .alert-error { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="rh-layout">
+
+    <!-- Sidebar -->
+    <aside class="rh-sidebar">
+      <h3>Visão Geral</h3>
+      <a class="rh-link active" onclick="showSection('overview')">📊 Dashboard</a>
+      <h3 style="margin-top:16px;">Gestão</h3>
+      <a class="rh-link" onclick="showSection('empresas')">🏢 Empresas</a>
+      <a class="rh-link" onclick="showSection('candidatos')">👤 Candidatos</a>
+      <a class="rh-link" onclick="showSection('vagas')">📋 Vagas</a>
+      <a class="rh-link" onclick="showSection('candidaturas')">📨 Candidaturas</a>
+      <a class="rh-link" onclick="showSection('pacotes')">💳 Pacotes</a>
+      <h3 style="margin-top:16px;">Comunicação</h3>
+      <a class="rh-link" onclick="showSection('comunicados')">📣 Comunicados</a>
+      <a class="rh-link" onclick="showSection('historico')">📜 Histórico</a>
+    </aside>
+
+    <div class="rh-content">
+
+      <!-- OVERVIEW -->
+      <div id="sec-overview" class="section active">
+        <h2 class="section-title">Visão Geral do Portal</h2>
+        <div class="kpi-row" id="kpis">
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Candidatos ativos</div></div>
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Empresas cadastradas</div></div>
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Vagas ativas</div></div>
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Candidaturas</div></div>
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Pacotes ativos</div></div>
+          <div class="kpi"><div class="val skeleton">—</div><div class="lbl">Receita total</div></div>
+        </div>
+        <div class="card">
+          <div style="font-weight:600;color:var(--navy);margin-bottom:12px;">📨 Últimas candidaturas</div>
+          <table id="tbl-cand-overview"><thead><tr><th>Candidato</th><th>Vaga</th><th>Empresa</th><th>Status</th><th>Data</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- EMPRESAS -->
+      <div id="sec-empresas" class="section">
+        <h2 class="section-title">🏢 Empresas Cadastradas</h2>
+        <div class="card">
+          <table id="tbl-empresas"><thead><tr><th>Empresa</th><th>Setor</th><th>Cidade</th><th>Email</th><th>Vagas</th><th>Candidaturas</th><th>Cadastro</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- CANDIDATOS -->
+      <div id="sec-candidatos" class="section">
+        <h2 class="section-title">👤 Candidatos</h2>
+        <div class="card">
+          <table id="tbl-candidatos"><thead><tr><th>Nome</th><th>Cargo desejado</th><th>Área</th><th>Cidade</th><th>Email</th><th>Candidaturas</th><th>Cadastro</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- VAGAS -->
+      <div id="sec-vagas" class="section">
+        <h2 class="section-title">📋 Vagas</h2>
+        <div class="card">
+          <table id="tbl-vagas"><thead><tr><th>Título</th><th>Empresa</th><th>Área</th><th>Modalidade</th><th>Status</th><th>Candidaturas</th><th>Data</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- CANDIDATURAS -->
+      <div id="sec-candidaturas" class="section">
+        <h2 class="section-title">📨 Candidaturas</h2>
+        <div class="card">
+          <table id="tbl-candidaturas"><thead><tr><th>Candidato</th><th>Vaga</th><th>Empresa</th><th>Status</th><th>Data</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- PACOTES -->
+      <div id="sec-pacotes" class="section">
+        <h2 class="section-title">💳 Pacotes Contratados</h2>
+        <div class="card">
+          <table id="tbl-pacotes"><thead><tr><th>Cliente</th><th>Empresa</th><th>Pacote</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- COMUNICADOS -->
+      <div id="sec-comunicados" class="section">
+        <h2 class="section-title">📣 Enviar Comunicado</h2>
+        <div class="card">
+          <div id="alert-com"></div>
+          <div class="form-row2">
+            <div>
+              <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px;">Destinatários</label>
+              <select id="destinatario" style="width:100%;padding:10px;border:1px solid rgba(27,42,74,.2);border-radius:8px;background:var(--cream);font-size:14px;">
+                <option value="todos">Todos (candidatos + empresas)</option>
+                <option value="candidatos">Apenas candidatos</option>
+                <option value="empregadores">Apenas empresas</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px;">Canal</label>
+              <select id="canal" style="width:100%;padding:10px;border:1px solid rgba(27,42,74,.2);border-radius:8px;background:var(--cream);font-size:14px;">
+                <option value="email">E-mail</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="ambos">E-mail + WhatsApp</option>
+              </select>
+            </div>
+          </div>
+          <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin:12px 0 6px;">Assunto / Título</label>
+          <input type="text" id="titulo-com" placeholder="Ex: Nova funcionalidade disponível!" style="width:100%;padding:10px;border:1px solid rgba(27,42,74,.2);border-radius:8px;background:var(--cream);font-size:14px;margin-bottom:12px;">
+          <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px;">Mensagem</label>
+          <textarea id="mensagem-com" rows="5" placeholder="Digite a mensagem para os usuários..." style="width:100%;padding:10px;border:1px solid rgba(27,42,74,.2);border-radius:8px;background:var(--cream);font-size:14px;resize:vertical;margin-bottom:16px;"></textarea>
+          <button class="btn-rh" onclick="enviarComunicado()" id="btn-enviar">📣 Enviar comunicado</button>
+          <div id="wa-links"></div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div id="sec-historico" class="section">
+        <h2 class="section-title">📜 Histórico de Comunicados</h2>
+        <div class="card">
+          <table id="tbl-historico"><thead><tr><th>Título</th><th>Destinatários</th><th>Canal</th><th>Enviados</th><th>Data</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const _u = auth.getUser();
+    if (!_u || (_u.role !== 'rh' && _u.role !== 'admin')) { document.body.style.visibility='hidden'; location.replace('/pages/login.html'); }
+    else initNavbar('rh');
+
+    let _data = null;
+
+    function showSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.rh-link').forEach(l => l.classList.remove('active'));
+      document.getElementById('sec-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function statusBadgeRH(s) {
+      const map = { enviada:'badge-blue', visualizada:'badge-yellow', em_analise:'badge-yellow', entrevista:'badge-green', aprovado:'badge-green', reprovado:'badge-red', ativa:'badge-green', pausada:'badge-yellow', encerrada:'badge-red', aprovado_pag:'badge-green', pendente:'badge-yellow', recusado:'badge-red' };
+      return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`;
+    }
+
+    function fmt(d) { return d ? new Date(d).toLocaleDateString('pt-BR') : '—'; }
+    function money(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+
+    get('/rh/dashboard').then(d => {
+      _data = d;
+      const t = d.totais;
+
+      // KPIs
+      const vals = [t.candidatos, t.empregadores, t.vagas_ativas, t.candidaturas, t.pacotes_ativos, money(t.receita_total)];
+      document.querySelectorAll('.kpi').forEach((el,i) => { el.querySelector('.val').textContent = vals[i]; });
+
+      // Overview candidaturas
+      document.querySelector('#tbl-cand-overview tbody').innerHTML = d.candidaturas.slice(0,8).map(r =>
+        `<tr><td>${r.candidato}</td><td>${r.vaga}</td><td>${r.empresa}</td><td>${statusBadgeRH(r.status)}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Sem dados</td></tr>';
+
+      // Empresas
+      document.querySelector('#tbl-empresas tbody').innerHTML = d.empresas.map(r =>
+        `<tr><td><strong>${r.razao_social}</strong></td><td>${r.setor||'—'}</td><td>${r.cidade||'—'} ${r.estado||''}</td><td>${r.email}</td><td>${r.vagas}</td><td>${r.candidaturas}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="7" style="color:var(--gray-400)">Nenhuma empresa</td></tr>';
+
+      // Candidatos
+      document.querySelector('#tbl-candidatos tbody').innerHTML = d.candidatos.map(r =>
+        `<tr><td><strong>${r.nome}</strong></td><td>${r.cargo_desejado||'—'}</td><td>${r.area_atuacao||'—'}</td><td>${r.cidade||'—'}</td><td>${r.email}</td><td>${r.candidaturas}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="7" style="color:var(--gray-400)">Nenhum candidato</td></tr>';
+
+      // Vagas
+      document.querySelector('#tbl-vagas tbody').innerHTML = d.vagas.map(r =>
+        `<tr><td><strong>${r.titulo}</strong></td><td>${r.empresa}</td><td>${r.area||'—'}</td><td>${r.modalidade||'—'}</td><td>${statusBadgeRH(r.status)}</td><td>${r.candidaturas}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="7" style="color:var(--gray-400)">Nenhuma vaga</td></tr>';
+
+      // Candidaturas
+      document.querySelector('#tbl-candidaturas tbody').innerHTML = d.candidaturas.map(r =>
+        `<tr><td>${r.candidato}</td><td>${r.vaga}</td><td>${r.empresa}</td><td>${statusBadgeRH(r.status)}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Nenhuma candidatura</td></tr>';
+
+      // Pacotes
+      document.querySelector('#tbl-pacotes tbody').innerHTML = d.pedidos.map(r =>
+        `<tr><td>${r.nome_comprador||'—'}</td><td>${r.empresa||'—'}</td><td>${r.pacote}</td><td>${money(r.valor)}</td><td>${statusBadgeRH(r.status)}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="6" style="color:var(--gray-400)">Nenhum pedido</td></tr>';
+
+      // Histórico comunicados
+      document.querySelector('#tbl-historico tbody').innerHTML = d.comunicados.map(r =>
+        `<tr><td>${r.titulo}</td><td>${r.destinatario}</td><td>${r.canal}</td><td>${r.total_enviados}</td><td>${fmt(r.created_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" style="color:var(--gray-400)">Nenhum comunicado enviado</td></tr>';
+
+    }).catch(err => {
+      document.querySelector('.rh-content').innerHTML = `<div style="padding:40px;color:var(--rose)">Erro ao carregar: ${err.message}</div>`;
+    });
+
+    async function enviarComunicado() {
+      const titulo = document.getElementById('titulo-com').value.trim();
+      const mensagem = document.getElementById('mensagem-com').value.trim();
+      const destinatario = document.getElementById('destinatario').value;
+      const canal = document.getElementById('canal').value;
+      const alertEl = document.getElementById('alert-com');
+      const btn = document.getElementById('btn-enviar');
+
+      if (!titulo || !mensagem) { alertEl.className='alert-error'; alertEl.textContent='Título e mensagem são obrigatórios.'; return; }
+
+      btn.disabled = true; btn.textContent = 'Enviando...';
+      alertEl.textContent = '';
+
+      try {
+        const r = await post('/rh/comunicado', { titulo, mensagem, destinatario, canal });
+        alertEl.className = 'alert-success';
+        alertEl.textContent = `✅ Comunicado enviado para ${r.total_destinatarios} usuários. E-mails: ${r.emails_enviados}.`;
+
+        // Links WhatsApp
+        if (r.whatsapp_links?.length) {
+          document.getElementById('wa-links').innerHTML = `
+            <div style="margin-top:16px;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;">📱 Links WhatsApp (clique para abrir):</div>
+            ${r.whatsapp_links.map(w => `<a href="${w.link}" target="_blank" class="wa-link">📱 ${w.nome}</a>`).join('')}`;
+        }
+
+        document.getElementById('titulo-com').value = '';
+        document.getElementById('mensagem-com').value = '';
+      } catch(err) {
+        alertEl.className = 'alert-error';
+        alertEl.textContent = 'Erro: ' + err.message;
+      } finally {
+        btn.disabled = false; btn.textContent = '📣 Enviar comunicado';
+      }
+    }
+  </script>
+</body>
+</html>
