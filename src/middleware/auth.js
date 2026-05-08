@@ -46,4 +46,21 @@ function role(...roles) {
   };
 }
 
-module.exports = { auth, role };
+// Bloqueia empregadores sem plano ativo ou com plano expirado
+async function planoAtivo(req, res, next) {
+  if (req.user.role !== 'empregador') return next();
+  try {
+    const { rows } = await pool.query(
+      'SELECT plano_ativo, plano_expira_em FROM users WHERE id = $1', [req.user.id]
+    );
+    const u = rows[0];
+    if (!u?.plano_ativo || (u.plano_expira_em && new Date(u.plano_expira_em) < new Date())) {
+      return res.status(402).json({ error: 'Plano inativo. Adquira um pacote para acessar o painel.', redirect: '/pages/planos.html' });
+    }
+    next();
+  } catch {
+    res.status(500).json({ error: 'Erro ao verificar plano' });
+  }
+}
+
+module.exports = { auth, role, planoAtivo };

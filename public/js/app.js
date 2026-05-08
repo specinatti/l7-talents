@@ -50,6 +50,10 @@ async function api(method, path, body) {
 
   const res = await fetch(API + path, opts);
   const data = await res.json().catch(() => ({}));
+  if (res.status === 402) {
+    window.location.href = data.redirect || '/pages/planos.html';
+    throw new Error(data.error || 'Plano inativo');
+  }
   if (!res.ok) throw new Error(data.error || 'Erro na requisição');
   return data;
 }

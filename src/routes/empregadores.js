@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const { auth, role } = require('../middleware/auth');
+const { auth, role, planoAtivo } = require('../middleware/auth');
 const e = require('../controllers/empregadorController');
 
-router.use(auth, role('empregador'));
+router.use(auth, role('empregador'), planoAtivo);
 
 router.get('/dashboard', e.getDashboard);
 router.get('/perfil', e.getPerfil);
