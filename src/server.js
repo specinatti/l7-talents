@@ -11,7 +11,10 @@ const cacheBusting = require('../cacheBusting');
 const app = express();
 
 securityHeaders(app);
-app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? false : '*'),
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
@@ -55,6 +58,7 @@ app.use('/api/vagas', require('./routes/vagas'));
 app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api/pagamentos', require('./routes/pagamentos'));
 app.use('/api/rh', require('./routes/rh'));
+app.use('/api/upload', require('./routes/upload'));
 app.use('/api', require('./routes/comunicacao'));
 
 // Proteção server-side: páginas internas exigem cookie de sessão

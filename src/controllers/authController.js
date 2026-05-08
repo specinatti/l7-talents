@@ -6,7 +6,7 @@ function generateToken(user, req) {
   const ua = req?.headers?.['user-agent']?.substring(0, 100) || '';
   const ip = req?.ip || '';
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role, _ua: ua, _ip: ip },
+    { id: user.id, email: user.email, role: user.role, _ua: ua, _ip: ip, _pwt: user.updated_at ? new Date(user.updated_at).getTime() : 0 },
     process.env.JWT_SECRET,
     { expiresIn: '2h' }
   );
@@ -28,7 +28,7 @@ async function refresh(req, res) {
   if (!token) return res.status(401).json({ error: 'Token não fornecido' });
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { rows } = await pool.query('SELECT id, email, role, ativo FROM users WHERE id = $1', [decoded.id]);
+    const { rows } = await pool.query('SELECT id, email, role, ativo, updated_at FROM users WHERE id = $1', [decoded.id]);
     if (!rows[0] || !rows[0].ativo) return res.status(401).json({ error: 'Usuário inativo' });
     const newToken = generateToken(rows[0]);
     setTokenCookie(res, newToken);
@@ -48,8 +48,8 @@ async function register(req, res) {
   if (!['candidato', 'empregador', 'financeiro', 'rh'].includes(role))
     return res.status(400).json({ error: 'Role inválido' });
 
-  if (password.length < 6)
-    return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres' });
+  if (password.length < 8)
+    return res.status(400).json({ error: 'Senha deve ter no mínimo 8 caracteres' });
 
   const client = await pool.connect();
   try {
@@ -93,7 +93,7 @@ async function login(req, res) {
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, email, password_hash, role, ativo FROM users WHERE email = $1',
+      'SELECT id, email, password_hash, role, ativo, updated_at FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
     const user = rows[0];
@@ -140,8 +140,8 @@ async function changePassword(req, res) {
   const { senha_atual, nova_senha } = req.body;
   if (!senha_atual || !nova_senha)
     return res.status(400).json({ error: 'Campos obrigatórios: senha_atual, nova_senha' });
-  if (nova_senha.length < 6)
-    return res.status(400).json({ error: 'Nova senha deve ter no mínimo 6 caracteres' });
+  if (nova_senha.length < 8)
+    return res.status(400).json({ error: 'Nova senha deve ter no mínimo 8 caracteres' });
 
   try {
     const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [req.user.id]);
@@ -180,16 +180,19 @@ async function requestReset(req, res) {
     // Enviar email se SMTP configurado
     if (process.env.SMTP_HOST) {
       const nodemailer = require('nodemailer');
+      const port = parseInt(process.env.SMTP_PORT) || 587;
+      const secure = process.env.SMTP_SECURE === 'true' || port === 465;
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT || 587,
+        port,
+        secure,
         auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
       });
       await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'noreply@l7talents.com',
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to: email,
         subject: 'Recuperação de senha - L7 Talents',
-        html: `<p>Clique no link para redefinir sua senha (válido por 1 hora):</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+        html: `<p>Olá,</p><p>Clique no link abaixo para redefinir sua senha (válido por 1 hora):</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Se você não solicitou isso, ignore este email.</p>`
       });
     } else {
       console.log(`[RESET] Token para ${email}: ${resetUrl}`);
@@ -206,8 +209,8 @@ async function confirmReset(req, res) {
   const { token, nova_senha } = req.body;
   if (!token || !nova_senha)
     return res.status(400).json({ error: 'Token e nova senha obrigatórios' });
-  if (nova_senha.length < 6)
-    return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres' });
+  if (nova_senha.length < 8)
+    return res.status(400).json({ error: 'Senha deve ter no mínimo 8 caracteres' });
 
   try {
     const { rows } = await pool.query(

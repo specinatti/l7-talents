@@ -89,8 +89,10 @@ async function enviarComunicado(req, res) {
     let emailsEnviados = 0;
     if ((canal === 'email' || canal === 'ambos') && process.env.SMTP_HOST) {
       const nodemailer = require('nodemailer');
+      const _port = parseInt(process.env.SMTP_PORT) || 587;
       const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST, port: process.env.SMTP_PORT || 587,
+        host: process.env.SMTP_HOST, port: _port,
+        secure: process.env.SMTP_SECURE === 'true' || _port === 465,
         auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
       });
       for (const u of users) {

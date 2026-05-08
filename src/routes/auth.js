@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const { register, login, me, refresh, changePassword, requestReset, confirmReset } = require('../controllers/authController');
 const { auth } = require('../middleware/auth');
-const { formLimiter } = require('../../rateLimiter');
+const { formLimiter, loginLimiter } = require('../../rateLimiter');
 
 router.post('/register', formLimiter, register);
-router.post('/login', formLimiter, login);
+router.post('/login', loginLimiter, login);
 router.get('/me', auth, me);
 router.post('/refresh', auth, refresh);
 router.post('/logout', (req, res) => {

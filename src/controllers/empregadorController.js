@@ -85,7 +85,8 @@ async function notificarCandidatosMatch(vaga) {
     if (c.alerta_email && process.env.SMTP_HOST) {
       try {
         const nodemailer = require('nodemailer');
-        const t = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: process.env.SMTP_PORT||587, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
+        const _port = parseInt(process.env.SMTP_PORT) || 587;
+        const t = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: _port, secure: process.env.SMTP_SECURE === 'true' || _port === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
         await t.sendMail({
           from: process.env.SMTP_FROM || 'noreply@l7talents.online',
           to: c.email,
@@ -122,7 +123,7 @@ async function getMinhasVagas(req, res) {
 }
 
 async function updateVaga(req, res) {
-  const campos = ['titulo','descricao','requisitos','beneficios','area','nivel','modalidade',
+  const campos = ['titulo','descricao','requisitos','beneficios','area','nivel','modalidade','prazo_inscricao',
     'tipo_contrato','salario_min','salario_max','salario_oculto','cidade','estado','habilidades','status','destaque'];
   const sets = [], vals = [];
   campos.forEach(c => {

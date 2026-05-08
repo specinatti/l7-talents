@@ -21,4 +21,15 @@ const formLimiter = rateLimit({
   }
 });
 
-module.exports = { apiLimiter, formLimiter };
+// Very strict limit for login (brute force protection)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Muitas tentativas de login. Tente novamente em 15 minutos.', retryAfter: 900 });
+  }
+});
+
+module.exports = { apiLimiter, formLimiter, loginLimiter };
