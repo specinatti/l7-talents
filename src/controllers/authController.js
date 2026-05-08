@@ -210,6 +210,43 @@ async function register(req, res) {
   }
 }
 
+// ── OTP por email (admin) ─────────────────────────────────────────────────
+async function sendEmailOTP(user) {
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+  await pool.query('DELETE FROM email_otp WHERE user_id = $1', [user.id]);
+  await pool.query('INSERT INTO email_otp (user_id, code, expires_at) VALUES ($1,$2,$3)', [user.id, code, expires]);
+
+  if (process.env.SMTP_HOST) {
+    const nodemailer = require('nodemailer');
+    const port = parseInt(process.env.SMTP_PORT) || 587;
+    const t = nodemailer.createTransport({
+      host: process.env.SMTP_HOST, port,
+      secure: process.env.SMTP_SECURE === 'true' || port === 465,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+    await t.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@l7talents.online',
+      to: user.email,
+      subject: 'Código de acesso - L7 Talents',
+      html: `<p>Seu código de acesso é: <strong style="font-size:24px;letter-spacing:4px;">${code}</strong></p><p>Válido por 10 minutos.</p>`
+    });
+  } else {
+    console.log(`[EMAIL OTP] ${user.email}: ${code}`);
+  }
+}
+
+async function verifyEmailOTP(userId, code) {
+  const { rows } = await pool.query(
+    'SELECT id FROM email_otp WHERE user_id=$1 AND code=$2 AND used=false AND expires_at > NOW()',
+    [userId, code]
+  );
+  if (!rows[0]) return false;
+  await pool.query('UPDATE email_otp SET used=true WHERE id=$1', [rows[0].id]);
+  return true;
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 async function login(req, res) {
   const { email, password, totp_code } = req.body;
   if (!email || !password)
@@ -234,9 +271,18 @@ async function login(req, res) {
         // Forçar setup apenas para roles que exigem 2FA obrigatório
         if (FORCE_2FA_ROLES.includes(user.role))
           return res.status(202).json({ requires_2fa_setup: true, message: 'Configure o 2FA para continuar' });
-        // admin sem 2FA configurado → entra normalmente
+
+        // admin sem TOTP → OTP por email
+        if (user.role === 'admin') {
+          if (!totp_code) {
+            await sendEmailOTP(user);
+            return res.status(202).json({ requires_email_otp: true, message: 'Código enviado para seu email' });
+          }
+          const valid = await verifyEmailOTP(user.id, totp_code);
+          if (!valid) return res.status(401).json({ error: 'Código inválido ou expirado' });
+        }
       } else {
-        // Tem segredo — exigir código
+        // Tem TOTP configurado — exigir código
         if (!totp_code)
           return res.status(202).json({ requires_2fa: true, message: 'Informe o código 2FA' });
 

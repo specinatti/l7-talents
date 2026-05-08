@@ -37,6 +37,22 @@
     </p>
   </div>
 
+  <!-- ── OTP por email (admin) ── -->
+  <div id="section-email-otp" class="hidden">
+    <h1 style="font-size:20px;font-weight:700;margin-bottom:6px;">Código por email</h1>
+    <p style="color:var(--gray-500);font-size:14px;margin-bottom:24px;">Um código de 6 dígitos foi enviado para o seu email. Válido por 10 minutos.</p>
+    <div id="alert-email-otp"></div>
+    <form id="form-email-otp">
+      <div class="form-group">
+        <input type="text" id="code-email-otp" class="form-control code-input" maxlength="6" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-email-otp">Verificar</button>
+    </form>
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500);">
+      <a href="/pages/login.html">← Voltar ao login</a>
+    </p>
+  </div>
+
   <!-- ── Gerenciamento 2FA (usuário logado) ── -->
   <div id="section-manage" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -88,7 +104,7 @@
   const pendingLogin = JSON.parse(sessionStorage.getItem('pending_2fa') || 'null');
 
   function show(id) {
-    ['section-verify','section-manage'].forEach(s => document.getElementById(s).classList.add('hidden'));
+    ['section-verify','section-email-otp','section-manage'].forEach(s => document.getElementById(s).classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
   }
 
@@ -97,11 +113,41 @@
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
   }
 
+  // ── OTP por email ─────────────────────────────────────────────────────
+  if (mode === 'email_otp') {
+    if (!pendingLogin) { location.replace('/pages/login.html'); }
+    show('section-email-otp');
+
+    document.getElementById('form-email-otp').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-email-otp');
+      setLoading(btn, true);
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: pendingLogin.email,
+            password: pendingLogin.password,
+            totp_code: document.getElementById('code-email-otp').value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Código inválido');
+        sessionStorage.removeItem('pending_2fa');
+        auth.setSession(data.token, data.user);
+        location.replace(`/pages/${data.user.role}/dashboard.html`);
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-email-otp'));
+        document.getElementById('code-email-otp').value = '';
+        setLoading(btn, false);
+      }
+    });
+
   // ── Verificação no login ──────────────────────────────────────────────
-  if (mode === 'verify') {
+  } else if (mode === 'verify') {
     if (!pendingLogin) { location.replace('/pages/login.html'); }
     show('section-verify');
-
     document.getElementById('form-verify').addEventListener('submit', async e => {
       e.preventDefault();
       const btn = document.getElementById('btn-verify');
