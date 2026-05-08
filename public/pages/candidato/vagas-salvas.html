@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagas Salvas - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/pages/candidato/dashboard.html" class="sidebar-item">Dashboard</a>
+      <a href="/pages/vagas.html" class="sidebar-item">Buscar Vagas</a>
+      <a href="/pages/candidato/candidaturas.html" class="sidebar-item">Minhas Candidaturas</a>
+      <a href="/pages/candidato/vagas-salvas.html" class="sidebar-item active">Vagas Salvas</a>
+      <a href="/pages/candidato/perfil.html" class="sidebar-item">Meu Perfil</a>
+    </aside>
+    <main class="main-content">
+      <div class="card-header" style="margin-bottom:24px;">
+        <h1 style="font-size:24px;font-weight:700;">Vagas Salvas</h1>
+      </div>
+      <div id="vagas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+        <div style="text-align:center;padding:40px;color:var(--gray-400);">Carregando...</div>
+      </div>
+    </main>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>
+    if (!auth.redirectIfNotLogged('candidato')) { document.body.innerHTML=''; }
+    initNavbar('candidato');
+    get('/candidatos/vagas-salvas').then(data => {
+      const grid = document.getElementById('vagas-grid');
+      if (!data.length) { grid.innerHTML = '<p style="color:var(--gray-400)">Nenhuma vaga salva ainda.</p>'; return; }
+      grid.innerHTML = data.map(v => `
+        <a href="/pages/vaga.html?id=${v.id}" style="text-decoration:none;">
+          <div class="vaga-card">
+            <div class="vaga-empresa"><div class="vaga-logo">${v.empresa?.charAt(0)||'E'}</div>
+              <div><div style="font-size:13px;color:var(--gray-500);">${v.empresa||''}</div></div>
+            </div>
+            <div class="vaga-titulo">${v.titulo}</div>
+            <div class="vaga-info">
+              ${v.modalidade ? modalidadeBadge(v.modalidade) : ''}
+              ${v.area ? `<span class="badge badge-gray">${v.area}</span>` : ''}
+            </div>
+            <div class="vaga-salario mt-8">${formatSalary(v.salario_min, v.salario_max, v.salario_oculto)}</div>
+          </div>
+        </a>`).join('');
+    }).catch(() => { document.getElementById('vagas-grid').innerHTML = '<p style="color:var(--gray-400)">Erro ao carregar.</p>'; });
+  </script>
+</body>
+</html>
