@@ -81,7 +81,13 @@
             <div class="form-group"><label class="form-label">Estado</label>
               <select id="estado" class="form-control">
                 <option value="">Selecione</option>
-                ${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(e => `<option value="${e}">${e}</option>`).join('')}
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                <option>SP</option><option>SE</option><option>TO</option>
               </select>
             </div>
           </div>
@@ -292,21 +298,6 @@
       `).join('');
     }
 
-    async function savePerfil() {
-      const habilidades = document.getElementById('habilidades').value
-        .split(',').map(h => h.trim()).filter(Boolean);
-      const body = {};
-      ['nome','telefone','whatsapp','cidade','estado','linkedin','github','cargo_desejado','area_atuacao',
-       'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
-        const v = document.getElementById(f)?.value;
-        if (v !== undefined) body[f] = v || null;
-      });
-      body.habilidades = habilidades;
-      body.alertas_vagas = document.getElementById('alertas_vagas').checked;
-      body.alerta_email = document.getElementById('alerta_email').checked;
-      body.alerta_whatsapp = document.getElementById('alerta_whatsapp').checked;
-      body.disponivel_para_trabalho = document.getElementById('disponivel_para_trabalho').checked;
-
     async function uploadFoto(input) {
       if (!input.files[0]) return;
       const fd = new FormData(); fd.append('foto', input.files[0]);
@@ -336,6 +327,21 @@
       const bar = document.getElementById('progress-bar');
       if (bar) { bar.style.width = pct+'%'; document.getElementById('progress-label').textContent = `Perfil ${pct}% completo`; }
     }
+
+    async function savePerfil() {
+      const habilidades = document.getElementById('habilidades').value
+        .split(',').map(h => h.trim()).filter(Boolean);
+      const body = {};
+      ['nome','telefone','whatsapp','cidade','estado','linkedin','github','cargo_desejado','area_atuacao',
+       'nivel_experiencia','pretensao_salarial','disponibilidade','modalidade','resumo_profissional'].forEach(f => {
+        const v = document.getElementById(f)?.value;
+        if (v !== undefined) body[f] = v || null;
+      });
+      body.habilidades = habilidades;
+      body.alertas_vagas = document.getElementById('alertas_vagas').checked;
+      body.alerta_email = document.getElementById('alerta_email').checked;
+      body.alerta_whatsapp = document.getElementById('alerta_whatsapp').checked;
+      body.disponivel_para_trabalho = document.getElementById('disponivel_para_trabalho').checked;
       try {
         await put('/candidatos/perfil', body);
         showAlert('Perfil salvo com sucesso!', 'success', document.getElementById('alert-container'));
