@@ -8,24 +8,27 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     body { background:var(--cream); display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
-    .auth-card { background:var(--cream2); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:40px; width:100%; max-width:420px; border:1px solid rgba(27,42,74,.08); }
+    .auth-card { background:var(--cream2); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:40px; width:100%; max-width:440px; border:1px solid rgba(27,42,74,.08); }
     .code-input { font-size:28px; letter-spacing:12px; text-align:center; font-weight:700; }
+    .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+    .status-on  { background:#dcfce7; color:#166534; }
+    .status-off { background:#fee2e2; color:#991b1b; }
   </style>
 </head>
 <body>
 <div class="auth-card">
-  <div style="text-align:center;margin-bottom:28px;">
-    <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:48px;">
+  <div style="text-align:center;margin-bottom:24px;">
+    <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:44px;">
   </div>
 
-  <!-- Verificação no login -->
-  <div id="section-verify">
+  <!-- ── Verificação no login ── -->
+  <div id="section-verify" class="hidden">
     <h1 style="font-size:20px;font-weight:700;margin-bottom:6px;">Verificação em duas etapas</h1>
     <p style="color:var(--gray-500);font-size:14px;margin-bottom:24px;">Abra o Google Authenticator e insira o código de 6 dígitos.</p>
     <div id="alert-verify"></div>
     <form id="form-verify">
       <div class="form-group">
-        <input type="text" id="code-verify" class="form-control code-input" maxlength="6" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" required>
+        <input type="text" id="code-verify" class="form-control code-input" maxlength="6" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" required autofocus>
       </div>
       <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-verify">Verificar</button>
     </form>
@@ -34,94 +37,68 @@
     </p>
   </div>
 
-  <!-- Setup 2FA (para usuários já logados) -->
-  <div id="section-setup" class="hidden">
-    <h1 style="font-size:20px;font-weight:700;margin-bottom:6px;">Configurar 2FA</h1>
-    <p style="color:var(--gray-500);font-size:14px;margin-bottom:20px;">Escaneie o QR Code com o Google Authenticator ou Authy.</p>
-    <div id="alert-setup"></div>
-    <div id="qr-container" style="text-align:center;margin-bottom:20px;"></div>
-    <div id="secret-box" style="background:var(--cream);border-radius:8px;padding:12px;text-align:center;margin-bottom:20px;font-family:monospace;font-size:14px;word-break:break-all;"></div>
-    <form id="form-setup">
-      <div class="form-group">
-        <label class="form-label">Confirme com o código gerado</label>
-        <input type="text" id="code-setup" class="form-control code-input" maxlength="6" placeholder="000000" inputmode="numeric" required>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block" id="btn-setup">Ativar 2FA</button>
-    </form>
-  </div>
+  <!-- ── Gerenciamento 2FA (usuário logado) ── -->
+  <div id="section-manage" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h1 style="font-size:20px;font-weight:700;">Autenticação 2FA</h1>
+      <span id="status-badge" class="status-badge"></span>
+    </div>
+    <div id="alert-manage"></div>
 
-  <!-- Desativar 2FA -->
-  <div id="section-disable" class="hidden">
-    <h1 style="font-size:20px;font-weight:700;margin-bottom:6px;">Desativar 2FA</h1>
-    <p style="color:var(--gray-500);font-size:14px;margin-bottom:20px;">Insira o código atual para confirmar a desativação.</p>
-    <div id="alert-disable"></div>
-    <form id="form-disable">
-      <div class="form-group">
-        <input type="text" id="code-disable" class="form-control code-input" maxlength="6" placeholder="000000" inputmode="numeric" required>
-      </div>
-      <button type="submit" class="btn btn-secondary btn-block" id="btn-disable">Desativar 2FA</button>
-    </form>
+    <!-- Estado: desativado → mostrar setup -->
+    <div id="panel-setup">
+      <p style="color:var(--gray-600);font-size:14px;margin-bottom:20px;">
+        Adicione uma camada extra de segurança. Escaneie o QR Code com o <strong>Google Authenticator</strong> ou <strong>Authy</strong>.
+      </p>
+      <div id="qr-container" style="text-align:center;margin-bottom:16px;min-height:60px;"></div>
+      <div id="secret-box" style="background:var(--cream);border-radius:8px;padding:10px;text-align:center;margin-bottom:20px;font-family:monospace;font-size:13px;word-break:break-all;display:none;"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:16px;" onclick="toggleSecret()">Mostrar chave manual</button>
+      <form id="form-activate">
+        <div class="form-group">
+          <label class="form-label">Digite o código gerado pelo app para confirmar</label>
+          <input type="text" id="code-activate" class="form-control code-input" maxlength="6" placeholder="000000" inputmode="numeric" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-activate">✓ Ativar 2FA</button>
+      </form>
+    </div>
+
+    <!-- Estado: ativado → mostrar desativação -->
+    <div id="panel-disable" class="hidden">
+      <p style="color:var(--gray-600);font-size:14px;margin-bottom:20px;">
+        O 2FA está ativo. Para desativar, confirme com o código atual do seu app autenticador.
+      </p>
+      <form id="form-deactivate">
+        <div class="form-group">
+          <input type="text" id="code-deactivate" class="form-control code-input" maxlength="6" placeholder="000000" inputmode="numeric" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-block" id="btn-deactivate">Desativar 2FA</button>
+      </form>
+    </div>
+
+    <p style="text-align:center;margin-top:20px;font-size:13px;">
+      <a href="javascript:history.back()">← Voltar</a>
+    </p>
   </div>
 </div>
 
 <script src="/js/app.js"></script>
 <script>
   const params = new URLSearchParams(location.search);
-  const mode = params.get('mode') || 'verify';
-
+  const mode = params.get('mode') || 'manage';
   const pendingLogin = JSON.parse(sessionStorage.getItem('pending_2fa') || 'null');
 
   function show(id) {
-    ['section-verify','section-setup','section-disable'].forEach(s =>
-      document.getElementById(s).classList.add('hidden')
-    );
+    ['section-verify','section-manage'].forEach(s => document.getElementById(s).classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
   }
 
-  if (mode === 'setup') {
-    if (!auth.isLogged()) { location.replace('/pages/login.html'); }
-    show('section-setup');
-    post('/auth/2fa/setup', {}).then(data => {
-      document.getElementById('secret-box').textContent = data.secret;
-      const img = document.createElement('img');
-      img.src = data.qr_data_url;
-      img.style.cssText = 'width:200px;height:200px;';
-      document.getElementById('qr-container').appendChild(img);
-    }).catch(err => showAlert(err.message, 'error', document.getElementById('alert-setup')));
+  function toggleSecret() {
+    const box = document.getElementById('secret-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
 
-    document.getElementById('form-setup').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-setup');
-      setLoading(btn, true);
-      try {
-        await post('/auth/2fa/verify', { code: document.getElementById('code-setup').value });
-        showAlert('2FA ativado com sucesso!', 'success', document.getElementById('alert-setup'));
-        setTimeout(() => location.replace(`/pages/${auth.getUser().role}/dashboard.html`), 1500);
-      } catch (err) {
-        showAlert(err.message, 'error', document.getElementById('alert-setup'));
-        setLoading(btn, false);
-      }
-    });
-
-  } else if (mode === 'disable') {
-    if (!auth.isLogged()) { location.replace('/pages/login.html'); }
-    show('section-disable');
-
-    document.getElementById('form-disable').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-disable');
-      setLoading(btn, true);
-      try {
-        await post('/auth/2fa/disable', { code: document.getElementById('code-disable').value });
-        showAlert('2FA desativado.', 'success', document.getElementById('alert-disable'));
-        setTimeout(() => location.replace(`/pages/${auth.getUser().role}/dashboard.html`), 1500);
-      } catch (err) {
-        showAlert(err.message, 'error', document.getElementById('alert-disable'));
-        setLoading(btn, false);
-      }
-    });
-
-  } else {
+  // ── Verificação no login ──────────────────────────────────────────────
+  if (mode === 'verify') {
     if (!pendingLogin) { location.replace('/pages/login.html'); }
     show('section-verify');
 
@@ -146,6 +123,68 @@
         location.replace(`/pages/${data.user.role}/dashboard.html`);
       } catch (err) {
         showAlert(err.message, 'error', document.getElementById('alert-verify'));
+        document.getElementById('code-verify').value = '';
+        setLoading(btn, false);
+      }
+    });
+
+  // ── Gerenciamento (setup / disable) ──────────────────────────────────
+  } else {
+    if (!auth.isLogged()) { location.replace('/pages/login.html'); }
+    show('section-manage');
+
+    // Buscar estado atual do 2FA
+    get('/auth/me').then(user => {
+      const enabled = !!user.totp_enabled;
+      const badge = document.getElementById('status-badge');
+      badge.textContent = enabled ? '🔒 Ativo' : '🔓 Inativo';
+      badge.className = 'status-badge ' + (enabled ? 'status-on' : 'status-off');
+
+      if (enabled) {
+        document.getElementById('panel-setup').classList.add('hidden');
+        document.getElementById('panel-disable').classList.remove('hidden');
+      } else {
+        document.getElementById('panel-disable').classList.add('hidden');
+        document.getElementById('panel-setup').classList.remove('hidden');
+        // Gerar QR Code
+        post('/auth/2fa/setup', {}).then(data => {
+          document.getElementById('secret-box').textContent = data.secret;
+          const img = document.createElement('img');
+          img.src = data.qr_data_url;
+          img.style.cssText = 'width:180px;height:180px;border-radius:8px;';
+          document.getElementById('qr-container').appendChild(img);
+        }).catch(err => showAlert(err.message, 'error', document.getElementById('alert-manage')));
+      }
+    }).catch(() => location.replace('/pages/login.html'));
+
+    // Ativar
+    document.getElementById('form-activate').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-activate');
+      setLoading(btn, true);
+      try {
+        await post('/auth/2fa/verify', { code: document.getElementById('code-activate').value });
+        showAlert('2FA ativado com sucesso!', 'success', document.getElementById('alert-manage'));
+        setTimeout(() => location.reload(), 1200);
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-manage'));
+        document.getElementById('code-activate').value = '';
+        setLoading(btn, false);
+      }
+    });
+
+    // Desativar
+    document.getElementById('form-deactivate').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-deactivate');
+      setLoading(btn, true);
+      try {
+        await post('/auth/2fa/disable', { code: document.getElementById('code-deactivate').value });
+        showAlert('2FA desativado.', 'success', document.getElementById('alert-manage'));
+        setTimeout(() => location.reload(), 1200);
+      } catch (err) {
+        showAlert(err.message, 'error', document.getElementById('alert-manage'));
+        document.getElementById('code-deactivate').value = '';
         setLoading(btn, false);
       }
     });
