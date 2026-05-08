@@ -24,7 +24,7 @@ const formLimiter = rateLimit({
 // Very strict limit for login (brute force protection)
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
