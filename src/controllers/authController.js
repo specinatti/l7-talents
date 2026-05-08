@@ -59,10 +59,37 @@ async function setup2FA(req, res) {
   const totp = new TOTP({ issuer: 'L7 Talents', label: req.user.email, algorithm: 'SHA1', digits: 6, period: 30, secret });
   const otpauthUrl = totp.toString();
 
-  // Salvar segredo (não ativado ainda — só ativa após verify)
   await pool.query('UPDATE users SET totp_secret = $1, totp_enabled = false WHERE id = $2', [secretB32, req.user.id]);
 
   const qrDataUrl = await QRCode.toDataURL(otpauthUrl, { width: 200 });
+  res.json({ secret: secretB32, qr_data_url: qrDataUrl });
+}
+
+// Setup sem autenticação — usado quando o login força configuração do 2FA
+// Recebe email+senha para identificar o usuário
+async function setup2FAPublic(req, res) {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Credenciais obrigatórias' });
+
+  const { rows } = await pool.query(
+    'SELECT id, email, role, password_hash, ativo FROM users WHERE email = $1',
+    [email.toLowerCase()]
+  );
+  const user = rows[0];
+  if (!user || !await require('bcryptjs').compare(password, user.password_hash))
+    return res.status(401).json({ error: 'Credenciais inválidas' });
+  if (!user.ativo) return res.status(403).json({ error: 'Conta desativada' });
+  if (!SENSITIVE_ROLES.includes(user.role))
+    return res.status(403).json({ error: 'Não aplicável' });
+
+  const { Secret, TOTP } = require('otpauth');
+  const QRCode = require('qrcode');
+
+  const secret = new Secret({ size: 20 });
+  const secretB32 = secret.base32;
+  const totp = new TOTP({ issuer: 'L7 Talents', label: user.email, algorithm: 'SHA1', digits: 6, period: 30, secret });
+  await pool.query('UPDATE users SET totp_secret = $1, totp_enabled = false WHERE id = $2', [secretB32, user.id]);
+  const qrDataUrl = await QRCode.toDataURL(totp.toString(), { width: 200 });
   res.json({ secret: secretB32, qr_data_url: qrDataUrl });
 }
 
@@ -78,6 +105,28 @@ async function verify2FA(req, res) {
   if (delta === null) return res.status(401).json({ error: 'Código inválido' });
 
   await pool.query('UPDATE users SET totp_enabled = true WHERE id = $1', [req.user.id]);
+  res.json({ message: '2FA ativado com sucesso' });
+}
+
+// Verify sem auth — usado no fluxo de primeiro acesso (setup_required)
+async function verify2FAPublic(req, res) {
+  const { email, password, code } = req.body;
+  if (!email || !password || !code) return res.status(400).json({ error: 'Campos obrigatórios' });
+
+  const { rows } = await pool.query(
+    'SELECT id, email, role, password_hash, ativo, totp_secret, updated_at FROM users WHERE email = $1',
+    [email.toLowerCase()]
+  );
+  const user = rows[0];
+  if (!user || !await require('bcryptjs').compare(password, user.password_hash))
+    return res.status(401).json({ error: 'Credenciais inválidas' });
+  if (!user.totp_secret) return res.status(400).json({ error: '2FA não configurado' });
+
+  const totp = getTOTP(user.totp_secret);
+  const delta = totp.validate({ token: code.replace(/\s/g, ''), window: 2 });
+  if (delta === null) return res.status(401).json({ error: 'Código inválido' });
+
+  await pool.query('UPDATE users SET totp_enabled = true WHERE id = $1', [user.id]);
   res.json({ message: '2FA ativado com sucesso' });
 }
 
@@ -177,13 +226,17 @@ async function login(req, res) {
     if (!user.ativo)
       return res.status(403).json({ error: 'Conta desativada' });
 
-    // 2FA obrigatório para roles sensíveis quando ativado
-    if (SENSITIVE_ROLES.includes(user.role) && user.totp_enabled) {
+    // 2FA sempre obrigatório para roles sensíveis
+    if (SENSITIVE_ROLES.includes(user.role)) {
+      if (!user.totp_enabled) {
+        // Nunca configurou — forçar setup antes de entrar
+        return res.status(202).json({ requires_2fa_setup: true, message: 'Configure o 2FA para continuar' });
+      }
       if (!totp_code)
         return res.status(202).json({ requires_2fa: true, message: 'Informe o código 2FA' });
 
       const totp = getTOTP(user.totp_secret);
-      const delta = totp.validate({ token: totp_code.replace(/\s/g, ''), window: 1 });
+      const delta = totp.validate({ token: totp_code.replace(/\s/g, ''), window: 2 });
       if (delta === null)
         return res.status(401).json({ error: 'Código 2FA inválido' });
     }
@@ -315,4 +368,4 @@ async function confirmReset(req, res) {
   }
 }
 
-module.exports = { register, login, me, refresh, changePassword, requestReset, confirmReset, setup2FA, verify2FA, disable2FA };
+module.exports = { register, login, me, refresh, changePassword, requestReset, confirmReset, setup2FA, setup2FAPublic, verify2FA, verify2FAPublic, disable2FA };

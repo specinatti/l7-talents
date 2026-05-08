@@ -130,12 +130,21 @@
 
   // ── Gerenciamento (setup / disable) ──────────────────────────────────
   } else {
-    if (!auth.isLogged()) { location.replace('/pages/login.html'); }
+    if (!auth.isLogged() && mode !== 'setup_required') { location.replace('/pages/login.html'); }
     show('section-manage');
 
-    // Buscar estado atual do 2FA
-    get('/auth/me').then(user => {
-      const enabled = !!user.totp_enabled;
+    const pending = JSON.parse(sessionStorage.getItem('pending_2fa') || 'null');
+    const isSetupRequired = mode === 'setup_required';
+
+    if (isSetupRequired && !pending) { location.replace('/pages/login.html'); }
+
+    // Buscar estado atual do 2FA (se logado) ou assumir inativo (setup_required)
+    const statePromise = auth.isLogged()
+      ? get('/auth/me')
+      : Promise.resolve({ totp_enabled: false });
+
+    statePromise.then(user => {
+      const enabled = !!user.totp_enabled && !isSetupRequired;
       const badge = document.getElementById('status-badge');
       badge.textContent = enabled ? '🔒 Ativo' : '🔓 Inativo';
       badge.className = 'status-badge ' + (enabled ? 'status-on' : 'status-off');
@@ -146,8 +155,17 @@
       } else {
         document.getElementById('panel-disable').classList.add('hidden');
         document.getElementById('panel-setup').classList.remove('hidden');
-        // Gerar QR Code
-        post('/auth/2fa/setup', {}).then(data => {
+
+        // Gerar QR Code — usar endpoint público se não estiver logado
+        const setupCall = auth.isLogged()
+          ? post('/auth/2fa/setup', {})
+          : fetch('/api/auth/2fa/setup-public', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: pending.email, password: pending.password }),
+            }).then(r => r.json()).then(d => { if (d.error) throw new Error(d.error); return d; });
+
+        setupCall.then(data => {
           document.getElementById('secret-box').textContent = data.secret;
           const img = document.createElement('img');
           img.src = data.qr_data_url;
@@ -162,9 +180,37 @@
       e.preventDefault();
       const btn = document.getElementById('btn-activate');
       setLoading(btn, true);
+      const code = document.getElementById('code-activate').value;
       try {
-        await post('/auth/2fa/verify', { code: document.getElementById('code-activate').value });
-        showAlert('2FA ativado com sucesso!', 'success', document.getElementById('alert-manage'));
+        // Usar endpoint público se não estiver logado (setup_required)
+        if (!auth.isLogged()) {
+          const r = await fetch('/api/auth/2fa/verify-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pending.email, password: pending.password, code }),
+          });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Código inválido');
+        } else {
+          await post('/auth/2fa/verify', { code });
+        }
+        showAlert('2FA ativado! Fazendo login...', 'success', document.getElementById('alert-manage'));
+        // Fazer login com o código recém-confirmado
+        const loginPending = JSON.parse(sessionStorage.getItem('pending_2fa') || 'null');
+        if (loginPending) {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: loginPending.email, password: loginPending.password, totp_code: code }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            sessionStorage.removeItem('pending_2fa');
+            auth.setSession(data.token, data.user);
+            location.replace(`/pages/${data.user.role}/dashboard.html`);
+            return;
+          }
+        }
         setTimeout(() => location.reload(), 1200);
       } catch (err) {
         showAlert(err.message, 'error', document.getElementById('alert-manage'));

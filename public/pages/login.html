@@ -93,6 +93,12 @@
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
+        if (res.status === 202 && data.requires_2fa_setup) {
+          // Precisa configurar 2FA antes de entrar — salvar credenciais e ir para setup
+          sessionStorage.setItem('pending_2fa', JSON.stringify({ email, password }));
+          window.location.href = '/pages/2fa.html?mode=setup_required';
+          return;
+        }
         if (res.status === 202 && data.requires_2fa) {
           // Guardar credenciais temporariamente para reenviar com o código
           sessionStorage.setItem('pending_2fa', JSON.stringify({ email, password }));
