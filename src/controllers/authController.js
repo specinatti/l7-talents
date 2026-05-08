@@ -4,6 +4,8 @@ const { pool } = require('../db');
 
 // Roles que exigem 2FA e têm sessão mais curta
 const SENSITIVE_ROLES = ['rh', 'financeiro', 'admin'];
+// Roles que FORÇAM setup do 2FA no primeiro login (não podem entrar sem configurar)
+const FORCE_2FA_ROLES = ['rh', 'financeiro'];
 
 // Timeout de sessão por role (em segundos para JWT, ms para cookie)
 const SESSION_TTL = {
@@ -229,21 +231,23 @@ async function login(req, res) {
     // 2FA sempre obrigatório para roles sensíveis
     if (SENSITIVE_ROLES.includes(user.role)) {
       if (!user.totp_secret) {
-        // Nunca configurou — forçar setup antes de entrar
-        return res.status(202).json({ requires_2fa_setup: true, message: 'Configure o 2FA para continuar' });
+        // Forçar setup apenas para roles que exigem 2FA obrigatório
+        if (FORCE_2FA_ROLES.includes(user.role))
+          return res.status(202).json({ requires_2fa_setup: true, message: 'Configure o 2FA para continuar' });
+        // admin sem 2FA configurado → entra normalmente
+      } else {
+        // Tem segredo — exigir código
+        if (!totp_code)
+          return res.status(202).json({ requires_2fa: true, message: 'Informe o código 2FA' });
+
+        const totp = getTOTP(user.totp_secret);
+        const delta = totp.validate({ token: totp_code.replace(/\s/g, ''), window: 2 });
+        if (delta === null)
+          return res.status(401).json({ error: 'Código 2FA inválido' });
+
+        if (!user.totp_enabled)
+          await pool.query('UPDATE users SET totp_enabled = true WHERE id = $1', [user.id]);
       }
-      // Tem segredo (enabled ou pendente de confirmação) — exigir código
-      if (!totp_code)
-        return res.status(202).json({ requires_2fa: true, message: 'Informe o código 2FA' });
-
-      const totp = getTOTP(user.totp_secret);
-      const delta = totp.validate({ token: totp_code.replace(/\s/g, ''), window: 2 });
-      if (delta === null)
-        return res.status(401).json({ error: 'Código 2FA inválido' });
-
-      // Garantir que totp_enabled fica true após validação bem-sucedida
-      if (!user.totp_enabled)
-        await pool.query('UPDATE users SET totp_enabled = true WHERE id = $1', [user.id]);
     }
 
     const token = generateToken(user, req);
