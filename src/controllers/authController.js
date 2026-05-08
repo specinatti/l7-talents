@@ -74,7 +74,7 @@ async function verify2FA(req, res) {
   if (!rows[0]?.totp_secret) return res.status(400).json({ error: '2FA não configurado' });
 
   const totp = getTOTP(rows[0].totp_secret);
-  const delta = totp.validate({ token: code.replace(/\s/g, ''), window: 1 });
+  const delta = totp.validate({ token: code.replace(/\s/g, ''), window: 2 });
   if (delta === null) return res.status(401).json({ error: 'Código inválido' });
 
   await pool.query('UPDATE users SET totp_enabled = true WHERE id = $1', [req.user.id]);
@@ -89,7 +89,7 @@ async function disable2FA(req, res) {
   if (!rows[0]?.totp_secret) return res.status(400).json({ error: '2FA não configurado' });
 
   const totp = getTOTP(rows[0].totp_secret);
-  const delta = totp.validate({ token: code.replace(/\s/g, ''), window: 1 });
+  const delta = totp.validate({ token: code.replace(/\s/g, ''), window: 2 });
   if (delta === null) return res.status(401).json({ error: 'Código inválido' });
 
   await pool.query('UPDATE users SET totp_secret = NULL, totp_enabled = false WHERE id = $1', [req.user.id]);
