@@ -90,6 +90,24 @@
   <div class="plans-section">
     <div class="plans-grid">
 
+      <!-- Teste -->
+      <div class="plan" style="border:2px dashed var(--rose);opacity:.9;">
+        <div class="plan-icon">🧪</div>
+        <div class="plan-name">Teste</div>
+        <div class="plan-tagline">Experimente a plataforma por 7 dias</div>
+        <div class="plan-price">
+          <div class="amount">R$ 5</div>
+          <div class="period">pagamento único · validade 7 dias</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Acesso completo ao painel</li>
+          <li><span class="check">✓</span> Publicação de vagas</li>
+          <li><span class="check">✓</span> Gestão de candidatos</li>
+          <li><span class="check">✓</span> Ideal para testar o sistema</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="ir('teste')">Testar por R$ 5</button>
+      </div>
+
       <!-- Starter -->
       <div class="plan">
         <div class="plan-icon">🎯</div>
@@ -225,6 +243,7 @@
   <script src="/js/app.js"></script>
   <script>
     const PLANOS = {
+      teste:     { nome: 'Teste',      valor: 5 },
       starter:   { nome: 'Starter',    valor: 490 },
       business:  { nome: 'Business',   valor: 1290 },
       premium:   { nome: 'Premium',    valor: 2490 },
