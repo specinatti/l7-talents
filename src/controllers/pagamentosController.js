@@ -55,7 +55,7 @@ async function criarPreferencia(req, res) {
 
     res.json({ preference_id: result.id, init_point: result.init_point, pedido_id: pedidoId });
   } catch (err) {
-    console.error('[MP ERROR]', err);
+    console.error('[MP ERROR]', err.message, err.status || '');
     res.status(500).json({ error: 'Erro ao criar preferência de pagamento' });
   }
 }

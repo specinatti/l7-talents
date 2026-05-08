@@ -15,6 +15,15 @@ app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
+// Forçar HTTPS em produção
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https')
+      return res.redirect(301, 'https://' + req.headers.host + req.url);
+    next();
+  });
+}
+
 // Rate limit global
 app.use('/api', apiLimiter);
 
