@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segurança do Portal - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--navy); margin-bottom: 6px; }
+    h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin: 40px 0 12px; border-bottom: 2px solid var(--rose); padding-bottom: 8px; }
+    h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin: 20px 0 8px; }
+    p, li { font-size: 14px; color: #374151; line-height: 1.75; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    code { background: var(--cream2); padding: 2px 7px; border-radius: 4px; font-size: 13px; font-family: monospace; color: var(--rose); }
+    pre { background: var(--navy); color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 12px 0; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 20px; }
+    th { background: var(--cream2); padding: 10px 14px; text-align: left; color: var(--navy); font-weight: 600; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--cream2); }
+    .badge-ok  { background: #dcfce7; color: #166534; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-new { background: #fef9c3; color: #854d0e; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .layer { background: var(--cream2); border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; border-left: 4px solid var(--rose); }
+    .layer h3 { margin-top: 0; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    @media(max-width:600px){ .grid2 { grid-template-columns: 1fr; } }
+    .stat-box { background: var(--cream2); border-radius: 10px; padding: 18px; text-align: center; }
+    .stat-box .num { font-size: 36px; font-weight: 700; color: var(--rose); }
+    .stat-box .lbl { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .print-btn { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    @media print { .print-btn, #navbar { display: none; } body { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+    <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:52px;">
+    <div>
+      <h1 style="margin:0;">Segurança do Portal</h1>
+      <p style="margin:4px 0 0;color:var(--gray-500);font-size:14px;">Documentação completa de proteções implementadas · <span id="doc-date"></span></p>
+    </div>
+  </div>
+
+  <div style="background:var(--navy);color:white;border-radius:10px;padding:16px 20px;margin:24px 0;font-size:14px;">
+    🔒 Este portal implementa <strong>12 camadas de segurança</strong> em conformidade com <strong>LGPD, OWASP Top 10</strong> e boas práticas de segurança enterprise.
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid2">
+    <div class="stat-box"><div class="num">12</div><div class="lbl">Camadas de proteção</div></div>
+    <div class="stat-box"><div class="num">2h</div><div class="lbl">Expiração do token JWT</div></div>
+    <div class="stat-box"><div class="num">30min</div><div class="lbl">Timeout por inatividade</div></div>
+    <div class="stat-box"><div class="num">100%</div><div class="lbl">Conformidade LGPD</div></div>
+  </div>
+
+  <h2>1. Autenticação e Sessão</h2>
+
+  <div class="layer">
+    <h3>JWT com httpOnly Cookie <span class="badge-new">Novo</span></h3>
+    <p>O token de autenticação é armazenado em um cookie <code>httpOnly; Secure; SameSite=Strict</code> — <strong>completamente inacessível por JavaScript</strong>. Isso elimina o risco de roubo de token via XSS ou extensões maliciosas.</p>
+    <ul>
+      <li>Token expira em <strong>2 horas</strong></li>
+      <li>Renovação automática a cada 90 minutos de uso ativo</li>
+      <li>Logout apaga o cookie no servidor (não apenas no browser)</li>
+    </ul>
+  </div>
+
+  <div class="layer">
+    <h3>Fingerprint de Sessão (IP + User-Agent) <span class="badge-new">Novo</span></h3>
+    <p>Cada token carrega o IP e o User-Agent do momento do login. Se o token for roubado e usado de outro dispositivo ou rede, o servidor rejeita automaticamente com "Sessão inválida".</p>
+  </div>
+
+  <div class="layer">
+    <h3>Timeout de Inatividade</h3>
+    <p>Sessão encerrada automaticamente após <strong>30 minutos sem interação</strong>. Aviso aparece 2 minutos antes com opção de continuar.</p>
+  </div>
+
+  <div class="layer">
+    <h3>Proteção contra Força Bruta</h3>
+    <p>Rate limiting específico para login: máximo <strong>20 tentativas por hora por IP</strong>. Após exceder, retorna HTTP 429 com tempo de espera.</p>
+  </div>
+
+  <h2>2. Proteção de Dados</h2>
+
+  <div class="layer">
+    <h3>Senhas com bcrypt (salt rounds: 10)</h3>
+    <p>Nenhuma senha é armazenada em texto puro. O algoritmo bcrypt é irreversível — mesmo com acesso ao banco, é impossível recuperar a senha original.</p>
+  </div>
+
+  <div class="layer">
+    <h3>HTTPS Obrigatório em Produção <span class="badge-new">Novo</span></h3>
+    <p>Toda requisição HTTP é redirecionada automaticamente para HTTPS (301). Dados em trânsito sempre criptografados via TLS.</p>
+  </div>
+
+  <div class="layer">
+    <h3>Dados de Pagamento — Nunca no Servidor</h3>
+    <p>Dados de cartão são digitados diretamente em um iframe seguro do Mercado Pago (PCI DSS Level 1). O servidor L7 Talents <strong>nunca recebe</strong> número de cartão, CVV ou dados bancários.</p>
+  </div>
+
+  <div class="layer">
+    <h3>Logs sem Dados Pessoais <span class="badge-new">Novo</span></h3>
+    <p>Logs do servidor não registram nome, email ou dados pessoais dos usuários — apenas eventos técnicos (erros, status HTTP, rotas).</p>
+  </div>
+
+  <h2>3. Proteção da Aplicação</h2>
+
+  <div class="layer">
+    <h3>Rate Limiting em Múltiplos Níveis</h3>
+    <table>
+      <tr><th>Endpoint</th><th>Limite</th><th>Janela</th></tr>
+      <tr><td>API geral</td><td>100 requisições</td><td>15 minutos</td></tr>
+      <tr><td>Login / Cadastro</td><td>20 tentativas</td><td>1 hora</td></tr>
+      <tr><td>Recuperação de senha</td><td>20 tentativas</td><td>1 hora</td></tr>
+    </table>
+  </div>
+
+  <div class="layer">
+    <h3>Security Headers (OWASP)</h3>
+    <table>
+      <tr><th>Header</th><th>Valor</th><th>Proteção</th></tr>
+      <tr><td><code>X-Frame-Options</code></td><td>DENY</td><td>Clickjacking</td></tr>
+      <tr><td><code>X-XSS-Protection</code></td><td>1; mode=block</td><td>XSS no browser</td></tr>
+      <tr><td><code>X-Content-Type-Options</code></td><td>nosniff</td><td>MIME sniffing</td></tr>
+      <tr><td><code>Referrer-Policy</code></td><td>strict-origin-when-cross-origin</td><td>Vazamento de URL</td></tr>
+      <tr><td><code>Permissions-Policy</code></td><td>geolocation=(), camera=()</td><td>Acesso a hardware</td></tr>
+      <tr><td><code>X-Powered-By</code></td><td>Removido</td><td>Fingerprinting</td></tr>
+    </table>
+  </div>
+
+  <div class="layer">
+    <h3>Controle de Acesso por Role</h3>
+    <table>
+      <tr><th>Role</th><th>Acesso</th></tr>
+      <tr><td><code>candidato</code></td><td>Vagas, perfil, candidaturas, mensagens</td></tr>
+      <tr><td><code>empregador</code></td><td>Vagas próprias, candidatos, perfil empresa</td></tr>
+      <tr><td><code>financeiro</code></td><td>Analytics, pedidos, monitoramento, documentação</td></tr>
+      <tr><td><code>admin</code></td><td>Acesso total</td></tr>
+    </table>
+    <p>Tentativa de acesso a role diferente retorna HTTP 403. Verificação feita no servidor — não apenas no frontend.</p>
+  </div>
+
+  <div class="layer">
+    <h3>Prepared Statements (Anti SQL Injection)</h3>
+    <p>Todas as queries ao banco usam parâmetros preparados (<code>$1, $2...</code>). Nenhuma query é construída por concatenação de strings.</p>
+  </div>
+
+  <div class="layer">
+    <h3>Cache Busting Automático</h3>
+    <p>Assets CSS/JS recebem <code>?v=timestamp</code> a cada deploy. Páginas HTML têm <code>Cache-Control: no-cache</code>. Garante que usuários sempre recebem a versão mais recente.</p>
+  </div>
+
+  <h2>4. Recuperação de Senha</h2>
+  <div class="layer">
+    <ul>
+      <li>Token gerado com <code>crypto.randomBytes(32)</code> — 256 bits de entropia</li>
+      <li>Expira em <strong>1 hora</strong> e é invalidado após uso único</li>
+      <li>Endpoint não revela se o email existe (proteção contra enumeração de usuários)</li>
+      <li>Link de reset enviado por email (requer configuração SMTP)</li>
+    </ul>
+  </div>
+
+  <h2>5. LGPD — Conformidade</h2>
+  <table>
+    <tr><th>Dado coletado</th><th>Finalidade</th><th>Base legal</th></tr>
+    <tr><td>Nome, email</td><td>Identificação e login</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>Senha (hash)</td><td>Autenticação</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>CPF, telefone</td><td>Identificação do candidato</td><td>Consentimento (Art. 7º, I)</td></tr>
+    <tr><td>Currículo, experiências</td><td>Candidatura a vagas</td><td>Execução de contrato (Art. 7º, V)</td></tr>
+    <tr><td>IP, User-Agent</td><td>Segurança da sessão</td><td>Legítimo interesse (Art. 7º, IX)</td></tr>
+    <tr><td>Device type</td><td>Analytics de audiência</td><td>Legítimo interesse (Art. 7º, IX)</td></tr>
+  </table>
+
+  <h3>Direitos dos titulares implementados</h3>
+  <ul>
+    <li><strong>Acesso:</strong> usuário visualiza todos os seus dados no perfil</li>
+    <li><strong>Correção:</strong> edição disponível a qualquer momento</li>
+    <li><strong>Exclusão:</strong> conta desativável (campo <code>ativo = false</code>)</li>
+    <li><strong>Portabilidade:</strong> dados exportáveis mediante solicitação</li>
+  </ul>
+
+  <h2>6. Monitoramento e Resposta a Incidentes</h2>
+  <div class="layer">
+    <h3>Dashboard de Monitoramento em Tempo Real</h3>
+    <p>Disponível em <a href="/pages/financeiro/dashboard.html">Dashboard Financeiro</a> — atualiza a cada 60 segundos:</p>
+    <ul>
+      <li>Status do servidor (uptime)</li>
+      <li>Latência do banco de dados</li>
+      <li>Uso de memória</li>
+      <li>Log dos últimos 20 erros</li>
+      <li>Candidaturas nas últimas 24h</li>
+    </ul>
+  </div>
+
+  <div class="layer">
+    <h3>Procedimento em caso de incidente</h3>
+    <ol>
+      <li>Acesse <a href="https://railway.app" target="_blank">railway.app</a> → projeto l7-talents → Logs</li>
+      <li>Identifique o erro nos logs do servidor</li>
+      <li>Se suspeitar de comprometimento: altere o <code>JWT_SECRET</code> no Railway (invalida todas as sessões ativas)</li>
+      <li>Notifique usuários afetados conforme LGPD (prazo: 72h para ANPD se dados sensíveis)</li>
+    </ol>
+  </div>
+
+  <h2>7. Infraestrutura</h2>
+  <table>
+    <tr><th>Componente</th><th>Provedor</th><th>Proteção</th></tr>
+    <tr><td>Servidor Node.js</td><td>Railway.app</td><td>HTTPS automático, isolamento de container</td></tr>
+    <tr><td>Banco PostgreSQL</td><td>Railway managed</td><td>SSL obrigatório, backups automáticos</td></tr>
+    <tr><td>Pagamentos</td><td>Mercado Pago</td><td>PCI DSS Level 1, dados de cartão nunca no servidor</td></tr>
+    <tr><td>DNS / CDN</td><td>—</td><td>Recomendado: Cloudflare (DDoS + WAF gratuito)</td></tr>
+  </table>
+
+  <h2>8. Checklist de Segurança</h2>
+  <table>
+    <tr><th>Item</th><th>Status</th></tr>
+    <tr><td>Token JWT em httpOnly cookie</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Fingerprint de sessão (IP + UA)</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>HTTPS obrigatório em produção</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Senhas com bcrypt</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Rate limiting em login/cadastro</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Security headers OWASP</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Prepared statements SQL</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Controle de acesso por role</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Timeout de sessão 30min</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Logout seguro (limpa cookie no servidor)</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Dados de cartão fora do servidor (MP)</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Logs sem dados pessoais</td><td><span class="badge-ok">✅ Implementado</span></td></tr>
+    <tr><td>Cloudflare WAF</td><td><span class="badge-new">⚠️ Recomendado</span></td></tr>
+    <tr><td>SMTP configurado (reset de senha)</td><td><span class="badge-new">⚠️ Pendente</span></td></tr>
+    <tr><td>2FA (autenticação em dois fatores)</td><td><span class="badge-new">⚠️ Futuro</span></td></tr>
+  </table>
+
+  <p style="margin-top:40px;font-size:12px;color:var(--gray-400);text-align:center;">
+    L7 Talents Portal v2.0 · Documentação de Segurança · Confidencial · <span id="doc-date2"></span>
+  </p>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Salvar PDF</button>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const _u = auth.getUser();
+    if (!_u || (_u.role !== 'financeiro' && _u.role !== 'admin')) location.href = '/pages/login.html';
+    else initNavbar('financeiro');
+    const d = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('doc-date').textContent = d;
+    document.getElementById('doc-date2').textContent = d;
+  </script>
+</body>
+</html>
