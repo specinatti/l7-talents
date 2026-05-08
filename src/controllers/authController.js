@@ -55,16 +55,21 @@ async function sendEmailOTP(user) {
       secure: process.env.SMTP_SECURE === 'true' || port === 465,
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     });
-    await t.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@l7talents.online',
-      to: destinations.join(','),
-      subject: 'Código de acesso - L7 Talents',
-      html: `<div style="font-family:Arial;max-width:480px;margin:0 auto;">
-        <h2 style="color:#1B2A4A;">Código de acesso</h2>
-        <p style="font-size:36px;font-weight:700;letter-spacing:8px;color:#B85C6E;">${code}</p>
-        <p style="color:#6b7280;font-size:14px;">Válido por 10 minutos. Não compartilhe este código.</p>
-      </div>`
-    });
+    try {
+      const info = await t.sendMail({
+        from: process.env.SMTP_FROM || 'noreply@l7talents.online',
+        to: destinations.join(','),
+        subject: 'Código de acesso - L7 Talents',
+        html: `<div style="font-family:Arial;max-width:480px;margin:0 auto;">
+          <h2 style="color:#1B2A4A;">Código de acesso</h2>
+          <p style="font-size:36px;font-weight:700;letter-spacing:8px;color:#B85C6E;">${code}</p>
+          <p style="color:#6b7280;font-size:14px;">Válido por 10 minutos. Não compartilhe este código.</p>
+        </div>`
+      });
+      console.log(`[EMAIL OTP] Enviado para ${destinations.join(', ')} — messageId: ${info.messageId}`);
+    } catch (smtpErr) {
+      console.error(`[EMAIL OTP ERROR] ${smtpErr.message}`);
+    }
   } else {
     console.log(`[EMAIL OTP] ${destinations.join(', ')}: ${code}`);
   }
