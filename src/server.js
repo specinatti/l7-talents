@@ -59,6 +59,7 @@ app.use('/api/vagas', require('./routes/vagas'));
 app.use('/api/financeiro', require('./routes/financeiro'));
 app.use('/api/pagamentos', require('./routes/pagamentos'));
 app.use('/api/rh', require('./routes/rh'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api', require('./routes/comunicacao'));
 
@@ -73,7 +74,7 @@ app.use((req, res, next) => {
   const hasSession = !!req.cookies?.auth_token;
 
   // Páginas protegidas por login — já tratadas abaixo, deixar passar
-  const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/'];
+  const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/', '/pages/admin/'];
   const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
 
   // Acesso direto sem referer interno e sem sessão → home
@@ -85,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 // Proteção server-side: páginas internas exigem cookie de sessão
-const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/'];
+const PROTECTED_PATHS = ['/pages/candidato/', '/pages/empregador/', '/pages/financeiro/', '/pages/rh/', '/pages/admin/'];
 app.use((req, res, next) => {
   const isProtected = PROTECTED_PATHS.some(p => req.path.startsWith(p));
   if (isProtected && req.path.endsWith('.html')) {

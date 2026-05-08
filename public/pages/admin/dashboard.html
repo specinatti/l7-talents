@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - L7 Talents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .tab-bar { display:flex; gap:4px; border-bottom:2px solid var(--cream2); margin-bottom:24px; }
+    .tab { padding:10px 18px; font-size:14px; font-weight:500; cursor:pointer; border-radius:8px 8px 0 0; color:var(--gray-500); border:none; background:none; }
+    .tab.active { color:var(--navy); background:var(--cream2); font-weight:600; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:24px; }
+    .stat-card { background:var(--cream2); border-radius:var(--radius); padding:16px; }
+    .stat-val { font-size:28px; font-weight:700; color:var(--navy); }
+    .stat-lbl { font-size:12px; color:var(--gray-500); margin-top:2px; }
+    .log-line { font-family:monospace; font-size:12px; padding:6px 10px; border-bottom:1px solid var(--cream2); display:flex; gap:12px; }
+    .log-line:hover { background:var(--cream2); }
+    .log-ts { color:var(--gray-400); white-space:nowrap; }
+    .log-err { color:var(--danger); }
+    .badge-ok { background:#dcfce7; color:#166534; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+    .badge-warn { background:#fef9c3; color:#854d0e; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+    .color-swatch { width:40px; height:40px; border-radius:8px; border:1px solid rgba(0,0,0,.1); cursor:pointer; }
+    .section { display:none; }
+    .section.active { display:block; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; padding:10px 12px; background:var(--cream2); color:var(--gray-600); font-weight:600; font-size:12px; }
+    td { padding:10px 12px; border-bottom:1px solid var(--cream2); }
+    tr:hover td { background:var(--cream); }
+  </style>
+</head>
+<body>
+<div id="navbar"></div>
+<div class="layout">
+  <aside class="sidebar">
+    <a href="/pages/admin/dashboard.html" class="sidebar-item active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Admin
+    </a>
+    <a href="/pages/2fa.html?mode=manage" class="sidebar-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Segurança
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:22px;font-weight:700;">Painel Admin</h1>
+      <p class="text-muted" style="font-size:13px;">Design, usuários, logs e monitoramento do sistema.</p>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('monitor')">📊 Monitor</button>
+      <button class="tab" onclick="switchTab('usuarios')">👥 Usuários</button>
+      <button class="tab" onclick="switchTab('design')">🎨 Design</button>
+      <button class="tab" onclick="switchTab('logs')">📋 Logs</button>
+    </div>
+
+    <!-- ── MONITOR ── -->
+    <div id="tab-monitor" class="section active">
+      <div class="stat-grid" id="monitor-stats"></div>
+      <div class="card">
+        <div class="card-header"><h2 class="card-title">Status do sistema</h2><button class="btn btn-secondary btn-sm" onclick="loadMonitor()">↻ Atualizar</button></div>
+        <div id="monitor-detail" style="font-size:13px;"></div>
+      </div>
+    </div>
+
+    <!-- ── USUÁRIOS ── -->
+    <div id="tab-usuarios" class="section">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Usuários administrativos</h2>
+          <button class="btn btn-primary btn-sm" onclick="openModalNovoAdmin()">+ Novo admin</button>
+        </div>
+        <div id="alert-usuarios"></div>
+        <table>
+          <thead><tr><th>Email</th><th>Role</th><th>Email alternativo</th><th>Ativo</th><th>Ações</th></tr></thead>
+          <tbody id="tbody-usuarios"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── DESIGN ── -->
+    <div id="tab-design" class="section">
+      <div class="card mb-24">
+        <div class="card-header"><h2 class="card-title">Paleta de cores</h2></div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;padding:8px 0;">
+          <div style="text-align:center;">
+            <div class="color-swatch" style="background:#1B2A4A;" title="#1B2A4A"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Navy<br>#1B2A4A</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="color-swatch" style="background:#B85C6E;" title="#B85C6E"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Rose<br>#B85C6E</div>
+          </div>
+          <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">
+            <div class="color-swatch" style="background:#FAF7F4;" title="#FAF7F4"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Cream<br>#FAF7F4</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="color-swatch" style="background:#F2EDE8;" title="#F2EDE8"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Cream2<br>#F2EDE8</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="color-swatch" style="background:#16a34a;" title="#16a34a"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Success<br>#16a34a</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="color-swatch" style="background:#dc2626;" title="#dc2626"></div>
+            <div style="font-size:11px;margin-top:4px;color:var(--gray-500);">Danger<br>#dc2626</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-24">
+        <div class="card-header"><h2 class="card-title">Tipografia</h2></div>
+        <div style="padding:8px 0;">
+          <div style="font-size:32px;font-weight:700;color:var(--navy);margin-bottom:8px;">Inter Bold 700</div>
+          <div style="font-size:20px;font-weight:600;color:var(--navy);margin-bottom:8px;">Inter SemiBold 600</div>
+          <div style="font-size:16px;font-weight:500;color:var(--navy);margin-bottom:8px;">Inter Medium 500</div>
+          <div style="font-size:14px;font-weight:400;color:var(--gray-600);margin-bottom:8px;">Inter Regular 400 — texto padrão</div>
+          <div style="font-size:12px;color:var(--gray-400);">Inter 12px — labels e metadados</div>
+        </div>
+      </div>
+
+      <div class="card mb-24">
+        <div class="card-header"><h2 class="card-title">Componentes</h2></div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;padding:8px 0;align-items:center;">
+          <button class="btn btn-primary">Primário</button>
+          <button class="btn btn-secondary">Secundário</button>
+          <button class="btn btn-danger">Danger</button>
+          <button class="btn btn-success">Success</button>
+          <span class="badge badge-blue">Badge Blue</span>
+          <span class="badge badge-green">Badge Green</span>
+          <span class="badge badge-red">Badge Red</span>
+          <span class="badge badge-yellow">Badge Yellow</span>
+          <span class="badge badge-purple">Badge Purple</span>
+          <span class="badge badge-gray">Badge Gray</span>
+        </div>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;max-width:320px;">
+          <input type="text" class="form-control" placeholder="Input padrão">
+          <select class="form-control"><option>Select padrão</option></select>
+          <textarea class="form-control" rows="2" placeholder="Textarea"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2 class="card-title">Arquivos de estilo</h2></div>
+        <div style="font-size:13px;color:var(--gray-600);line-height:2;">
+          <div>📄 <code>/public/css/style.css</code> — Design system principal</div>
+          <div>📄 <code>/public/js/app.js</code> — Helpers frontend (auth, api, navbar)</div>
+          <div>📄 <code>/public/images/l7-logo.svg</code> — Logo SVG</div>
+          <div>📄 <code>/public/images/l7-logo.jpg</code> — Logo JPG</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div id="tab-logs" class="section">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Erros recentes</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadLogs()">↻ Atualizar</button>
+        </div>
+        <div id="log-container" style="max-height:500px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal novo admin -->
+<div id="modal-admin" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Novo usuário administrativo</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-admin').classList.add('hidden')">×</button>
+    </div>
+    <div id="alert-modal-admin"></div>
+    <form id="form-novo-admin">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="admin-email" class="form-control" required></div>
+      <div class="form-group"><label class="form-label">Senha</label><input type="password" id="admin-senha" class="form-control" minlength="8" required></div>
+      <div class="form-group"><label class="form-label">Nome</label><input type="text" id="admin-nome" class="form-control" required></div>
+      <div class="form-group"><label class="form-label">Role</label>
+        <select id="admin-role" class="form-control">
+          <option value="admin">Admin</option>
+          <option value="rh">RH</option>
+          <option value="financeiro">Financeiro</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btn-novo-admin">Criar conta</button>
+    </form>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  if (!auth.redirectIfNotLogged('admin')) { document.body.innerHTML = ''; }
+  initNavbar('admin');
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['monitor','usuarios','design','logs'][i] === name));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'monitor') loadMonitor();
+    if (name === 'usuarios') loadUsuarios();
+    if (name === 'logs') loadLogs();
+  }
+
+  // ── Monitor ──────────────────────────────────────────────────────────
+  async function loadMonitor() {
+    try {
+      const d = await get('/financeiro/monitor');
+      document.getElementById('monitor-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-val">${d.stats.usuarios_ativos}</div><div class="stat-lbl">Usuários ativos</div></div>
+        <div class="stat-card"><div class="stat-val">${d.stats.vagas_ativas}</div><div class="stat-lbl">Vagas ativas</div></div>
+        <div class="stat-card"><div class="stat-val">${d.stats.candidaturas_24h}</div><div class="stat-lbl">Candidaturas 24h</div></div>
+        <div class="stat-card"><div class="stat-val">${d.memory_mb}MB</div><div class="stat-lbl">Memória</div></div>
+        <div class="stat-card"><div class="stat-val">${d.db_latency_ms}ms</div><div class="stat-lbl">Latência DB</div></div>
+        <div class="stat-card"><div class="stat-val">${d.uptime_human}</div><div class="stat-lbl">Uptime</div></div>
+      `;
+      document.getElementById('monitor-detail').innerHTML = `
+        <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;">
+          <span>Status: <span class="badge-ok">${d.status}</span></span>
+          <span>DB: <span class="${d.db_status === 'ok' ? 'badge-ok' : 'badge-warn'}">${d.db_status}</span></span>
+          <span style="color:var(--gray-500);">Node ${d.node_version}</span>
+          <span style="color:var(--gray-500);">${new Date(d.timestamp).toLocaleString('pt-BR')}</span>
+        </div>
+      `;
+    } catch (err) {
+      document.getElementById('monitor-stats').innerHTML = `<p class="text-muted">${err.message}</p>`;
+    }
+  }
+
+  // ── Usuários ─────────────────────────────────────────────────────────
+  async function loadUsuarios() {
+    try {
+      const data = await get('/rh/dashboard');
+      const admins = [...(data.candidatos || [])].filter(() => false); // só admins
+      // Buscar via endpoint dedicado
+      const res = await fetch('/api/admin/usuarios', { headers: { Authorization: `Bearer ${auth.getToken()}` } });
+      const users = await res.json();
+      const tbody = document.getElementById('tbody-usuarios');
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.email}</td>
+          <td><span class="badge badge-blue">${u.role}</span></td>
+          <td style="color:var(--gray-500);">${u.email_alternativo || '—'}</td>
+          <td><span class="badge ${u.ativo ? 'badge-green' : 'badge-red'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="toggleAtivo('${u.id}', ${u.ativo})">${u.ativo ? 'Desativar' : 'Ativar'}</button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      document.getElementById('alert-usuarios').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+    }
+  }
+
+  async function toggleAtivo(id, ativo) {
+    if (!confirm(`${ativo ? 'Desativar' : 'Ativar'} este usuário?`)) return;
+    try {
+      await put(`/admin/usuarios/${id}`, { ativo: !ativo });
+      loadUsuarios();
+    } catch (err) {
+      showAlert(err.message, 'error', document.getElementById('alert-usuarios'));
+    }
+  }
+
+  function openModalNovoAdmin() {
+    document.getElementById('modal-admin').classList.remove('hidden');
+  }
+
+  document.getElementById('form-novo-admin').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-novo-admin');
+    setLoading(btn, true);
+    try {
+      await post('/admin/usuarios', {
+        email: document.getElementById('admin-email').value,
+        password: document.getElementById('admin-senha').value,
+        nome: document.getElementById('admin-nome').value,
+        role: document.getElementById('admin-role').value,
+      });
+      document.getElementById('modal-admin').classList.add('hidden');
+      document.getElementById('form-novo-admin').reset();
+      loadUsuarios();
+    } catch (err) {
+      showAlert(err.message, 'error', document.getElementById('alert-modal-admin'));
+      setLoading(btn, false);
+    }
+  });
+
+  // ── Logs ─────────────────────────────────────────────────────────────
+  async function loadLogs() {
+    try {
+      const d = await get('/financeiro/monitor');
+      const container = document.getElementById('log-container');
+      if (!d.recent_errors?.length) {
+        container.innerHTML = '<p class="text-muted text-sm" style="padding:16px;">Nenhum erro registrado.</p>';
+        return;
+      }
+      container.innerHTML = d.recent_errors.map(e => `
+        <div class="log-line">
+          <span class="log-ts">${e.ts}</span>
+          <span style="color:var(--gray-500);">${e.method || ''} ${e.path || ''}</span>
+          <span class="log-err">${e.error || ''}</span>
+        </div>
+      `).join('');
+    } catch (err) {
+      document.getElementById('log-container').innerHTML = `<p class="text-muted" style="padding:16px;">${err.message}</p>`;
+    }
+  }
+
+  loadMonitor();
+</script>
+</body>
+</html>

@@ -128,6 +128,10 @@ function initNavbar(role) {
     ['/pages/financeiro/dashboard.html','Analytics'],
   ] : role === 'rh' ? [
     ['/pages/rh/dashboard.html','Dashboard RH'],
+  ] : role === 'admin' ? [
+    ['/pages/admin/dashboard.html','Admin'],
+    ['/pages/financeiro/dashboard.html','Analytics'],
+    ['/pages/rh/dashboard.html','RH'],
   ] : [
     ['/pages/empregador/dashboard.html','Dashboard'],
     ['/pages/empregador/vagas.html','Minhas Vagas'],
