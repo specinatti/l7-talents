@@ -111,6 +111,10 @@
             <input type="checkbox" id="v-oculto"> <span class="form-label" style="margin:0;">Ocultar salário</span>
           </label>
         </div>
+        <div class="form-group">
+          <label class="form-label">Prazo de inscrição</label>
+          <input type="date" id="v-prazo" class="form-control">
+        </div>
         <div id="v-status-group" class="form-group hidden">
           <label class="form-label">Status</label>
           <select id="v-status" class="form-control">
@@ -182,6 +186,7 @@
       document.getElementById('v-estado').value = v.estado || '';
       document.getElementById('v-habilidades').value = (v.habilidades || []).join(', ');
       document.getElementById('v-oculto').checked = v.salario_oculto || false;
+      document.getElementById('v-prazo').value = v.prazo_inscricao ? v.prazo_inscricao.substring(0,10) : '';
       document.getElementById('v-status').value = v.status || 'ativa';
       document.getElementById('v-status-group').classList.remove('hidden');
       document.getElementById('modal-title').textContent = 'Editar Vaga';

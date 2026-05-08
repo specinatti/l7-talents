@@ -33,6 +33,12 @@
       <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
         <div>
           <h1 style="font-size:24px;font-weight:700;">Meu Perfil</h1>
+          <div style="margin-top:12px;">
+            <div style="font-size:13px;color:var(--gray-500);margin-bottom:6px;" id="progress-label">Calculando...</div>
+            <div style="background:var(--cream2);border-radius:20px;height:8px;width:100%;max-width:300px;">
+              <div id="progress-bar" style="height:100%;border-radius:20px;background:linear-gradient(90deg,var(--navy),var(--rose));transition:width .5s;width:0%"></div>
+            </div>
+          </div>
           <p class="text-muted">Mantenha seu perfil atualizado para se destacar.</p>
         </div>
       </div>
@@ -50,6 +56,25 @@
             <div class="form-group"><label class="form-label">Nome completo</label><input type="text" id="nome" class="form-control"></div>
             <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="telefone" class="form-control" placeholder="(11) 99999-9999"></div>
             <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" id="whatsapp" class="form-control" placeholder="(11) 99999-9999"></div>
+            <div class="form-group" style="background:var(--cream2);border-radius:8px;padding:14px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="disponivel_para_trabalho">
+                <span style="font-weight:600;color:var(--navy);font-size:14px;">🟢 Aberto a oportunidades</span>
+              </label>
+              <p style="font-size:12px;color:var(--gray-500);margin:6px 0 0 24px;">Recrutadores verão que você está disponível</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Foto de perfil</label>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <img id="foto-preview" src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;background:var(--cream2);display:none;">
+                <input type="file" id="foto-input" accept="image/jpeg,image/png,image/webp" style="font-size:13px;" onchange="uploadFoto(this)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Currículo (PDF ou DOC, máx 5MB)</label>
+              <input type="file" id="curriculo-input" accept=".pdf,.doc,.docx" style="font-size:13px;" onchange="uploadCurriculo(this)">
+              <div id="curriculo-link" style="margin-top:6px;font-size:13px;"></div>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="cidade" class="form-control"></div>
@@ -224,6 +249,10 @@
         document.getElementById('alertas_vagas').checked = p.alertas_vagas !== false;
         document.getElementById('alerta_email').checked = p.alerta_email !== false;
         document.getElementById('alerta_whatsapp').checked = !!p.alerta_whatsapp;
+        document.getElementById('disponivel_para_trabalho').checked = !!p.disponivel_para_trabalho;
+        if (p.foto_url) { const img = document.getElementById('foto-preview'); img.src = p.foto_url; img.style.display='block'; }
+        if (p.curriculo_url) document.getElementById('curriculo-link').innerHTML = `<a href="${p.curriculo_url}" target="_blank">📄 Ver currículo atual</a>`;
+        calcProgress(p);
 
         renderExps(p.experiencias || []);
         renderForms(p.formacoes || []);
@@ -276,6 +305,37 @@
       body.alertas_vagas = document.getElementById('alertas_vagas').checked;
       body.alerta_email = document.getElementById('alerta_email').checked;
       body.alerta_whatsapp = document.getElementById('alerta_whatsapp').checked;
+      body.disponivel_para_trabalho = document.getElementById('disponivel_para_trabalho').checked;
+
+    async function uploadFoto(input) {
+      if (!input.files[0]) return;
+      const fd = new FormData(); fd.append('foto', input.files[0]);
+      const r = await fetch('/api/upload/foto', { method:'POST', headers:{ Authorization:`Bearer ${auth.getToken()}` }, body: fd });
+      const d = await r.json();
+      if (d.url) { const img = document.getElementById('foto-preview'); img.src = d.url; img.style.display='block'; }
+    }
+
+    async function uploadCurriculo(input) {
+      if (!input.files[0]) return;
+      const fd = new FormData(); fd.append('curriculo', input.files[0]);
+      const r = await fetch('/api/upload/curriculo', { method:'POST', headers:{ Authorization:`Bearer ${auth.getToken()}` }, body: fd });
+      const d = await r.json();
+      if (d.url) document.getElementById('curriculo-link').innerHTML = `<a href="${d.url}" target="_blank">📄 Currículo enviado</a>`;
+    }
+
+    function calcProgress(p) {
+      const fields = ['nome','telefone','cidade','cargo_desejado','area_atuacao','resumo_profissional','linkedin'];
+      const filled = fields.filter(f => p[f]).length;
+      const hasExp = p.experiencias?.length > 0;
+      const hasForm = p.formacoes?.length > 0;
+      const hasHab = p.habilidades?.length > 0;
+      const hasFoto = !!p.foto_url;
+      const total = fields.length + 4;
+      const done = filled + (hasExp?1:0) + (hasForm?1:0) + (hasHab?1:0) + (hasFoto?1:0);
+      const pct = Math.round(done/total*100);
+      const bar = document.getElementById('progress-bar');
+      if (bar) { bar.style.width = pct+'%'; document.getElementById('progress-label').textContent = `Perfil ${pct}% completo`; }
+    }
       try {
         await put('/candidatos/perfil', body);
         showAlert('Perfil salvo com sucesso!', 'success', document.getElementById('alert-container'));

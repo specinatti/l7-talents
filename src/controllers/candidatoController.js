@@ -24,7 +24,7 @@ async function updatePerfil(req, res) {
   const campos = ['nome','telefone','whatsapp','cidade','estado','linkedin','github','portfolio',
     'cargo_desejado','area_atuacao','nivel_experiencia','pretensao_salarial',
     'disponibilidade','modalidade','resumo_profissional','habilidades',
-    'alertas_vagas','alerta_email','alerta_whatsapp'];
+    'alertas_vagas','alerta_email','alerta_whatsapp','disponivel_para_trabalho'];
   
   const sets = [], vals = [];
   campos.forEach(c => {
