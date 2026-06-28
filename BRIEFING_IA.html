@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L7 Talents — Briefing Completo para IA</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',Arial,sans-serif; background:#f8f7f4; color:#1a1a2e; line-height:1.7; }
+  .cover { background:linear-gradient(135deg,#1B2A4A 0%,#B85C6E 100%); color:white; padding:80px 60px; text-align:center; }
+  .cover h1 { font-size:42px; font-weight:800; margin-bottom:12px; }
+  .cover p { font-size:18px; opacity:.85; margin-bottom:8px; }
+  .cover .meta { font-size:13px; opacity:.65; margin-top:24px; }
+  .container { max-width:900px; margin:0 auto; padding:48px 40px; }
+  h2 { font-size:26px; color:#1B2A4A; border-left:5px solid #B85C6E; padding-left:16px; margin:48px 0 20px; }
+  h3 { font-size:18px; color:#1B2A4A; margin:28px 0 12px; }
+  h4 { font-size:15px; color:#B85C6E; margin:20px 0 8px; font-weight:700; }
+  p { margin-bottom:12px; color:#374151; }
+  ul, ol { padding-left:24px; margin-bottom:16px; }
+  li { margin-bottom:6px; color:#374151; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:700; margin:2px; }
+  .badge-green { background:#dcfce7; color:#15803d; }
+  .badge-blue { background:#dbeafe; color:#1d4ed8; }
+  .badge-yellow { background:#fef9c3; color:#a16207; }
+  .badge-red { background:#fee2e2; color:#dc2626; }
+  .badge-gray { background:#f3f4f6; color:#6b7280; }
+  .badge-purple { background:#ede9fe; color:#7c3aed; }
+  table { width:100%; border-collapse:collapse; margin:16px 0 24px; }
+  th { background:#1B2A4A; color:white; padding:10px 14px; text-align:left; font-size:13px; }
+  td { padding:10px 14px; border-bottom:1px solid #e5e7eb; font-size:13px; }
+  tr:nth-child(even) { background:#f9fafb; }
+  .box { background:white; border-radius:12px; padding:24px; margin:16px 0; border:1px solid #e5e7eb; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .box-warn { background:#fffbeb; border:1px solid #fbbf24; }
+  .box-danger { background:#fff1f2; border:1px solid #f87171; }
+  .box-success { background:#f0fdf4; border:1px solid #86efac; }
+  .box-info { background:#eff6ff; border:1px solid #93c5fd; }
+  .toc a { display:block; color:#1B2A4A; text-decoration:none; padding:6px 0; border-bottom:1px dashed #e5e7eb; font-size:14px; }
+  .toc a:hover { color:#B85C6E; }
+  .toc a span { float:right; color:#9ca3af; font-size:12px; }
+  code { background:#f1f5f9; color:#B85C6E; padding:2px 7px; border-radius:4px; font-size:13px; font-family:monospace; }
+  pre { background:#1e293b; color:#e2e8f0; padding:20px; border-radius:8px; overflow-x:auto; font-size:13px; margin:12px 0; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+  .status-ok::before { content:"✅ "; }
+  .status-warn::before { content:"⚠️ "; }
+  .status-no::before { content:"❌ "; }
+  .status-todo::before { content:"🔲 "; }
+  hr { border:none; border-top:2px solid #e5e7eb; margin:40px 0; }
+  @media print {
+    body { background:white; }
+    .cover { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    h2 { page-break-before:auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>L7 Talents</h1>
+  <p>Portal de RH — Briefing Completo para Assistente de IA</p>
+  <p style="font-size:15px;opacity:.7;">Este documento contém tudo que você precisa saber para continuar o desenvolvimento</p>
+  <div class="meta">Gerado em: 28/06/2026 · Versão: commit d90f930 · Repositório: github.com/specinatti/l7-talents</div>
+</div>
+
+<div class="container">
+
+  <!-- ÍNDICE -->
+  <div class="box box-info" style="margin-top:32px;">
+    <h3 style="margin-top:0;">Índice</h3>
+    <div class="toc">
+      <a href="#visao">1. Visão Geral do Projeto <span>→</span></a>
+      <a href="#stack">2. Stack Tecnológica <span>→</span></a>
+      <a href="#estrutura">3. Estrutura de Arquivos <span>→</span></a>
+      <a href="#banco">4. Banco de Dados <span>→</span></a>
+      <a href="#autenticacao">5. Autenticação e Segurança <span>→</span></a>
+      <a href="#negocio">6. Modelo de Negócio e Pagamentos <span>→</span></a>
+      <a href="#features">7. Features Implementadas <span>→</span></a>
+      <a href="#api">8. API — Todas as Rotas <span>→</span></a>
+      <a href="#frontend">9. Frontend — Todas as Páginas <span>→</span></a>
+      <a href="#falta">10. O que Falta Implementar <span>→</span></a>
+      <a href="#env">11. Variáveis de Ambiente <span>→</span></a>
+      <a href="#infra">12. Infraestrutura e Deploy <span>→</span></a>
+      <a href="#nova-maquina">13. Configurar Nova Máquina <span>→</span></a>
+    </div>
+  </div>
+
+  <!-- 1. VISÃO GERAL -->
+  <h2 id="visao">1. Visão Geral do Projeto</h2>
+  <div class="box">
+    <p><strong>L7 Talents</strong> é um portal completo de RH com duas frentes: <strong>candidatos</strong> (buscam emprego) e <strong>empregadores</strong> (publicam vagas e contratam). O projeto está em produção no Railway e em desenvolvimento ativo.</p>
+    <p><strong>Propósito:</strong> Ser um portal de recrutamento profissional competitivo com os grandes do mercado (LinkedIn, Indeed, Gupy), com foco no mercado brasileiro.</p>
+    <p><strong>Diferenciais já implementados:</strong> match de perfil com vagas (Top/High/Bom/Low como o LinkedIn), pagamento via Mercado Pago, notificações por WhatsApp via Z-API, autenticação com OTP por email, 2FA, proteção por plano para empregadores.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="box box-success">
+      <h4 style="margin-top:0;">✅ Status atual</h4>
+      <ul>
+        <li>Código 100% no GitHub</li>
+        <li>Banco PostgreSQL no Railway</li>
+        <li>Deploy automático via Railway</li>
+        <li>7 usuários cadastrados</li>
+        <li>Backup do banco salvo no repo</li>
+      </ul>
+    </div>
+    <div class="box box-warn">
+      <h4 style="margin-top:0;">⚠️ Pendências críticas</h4>
+      <ul>
+        <li>Modelo free vs pago para candidato não definido</li>
+        <li>Empregador pode registrar sem pagar (bug)</li>
+        <li>Perfil público de candidato não existe</li>
+        <li>Easy Apply não implementado</li>
+        <li>Timeline de candidatura ausente</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. STACK -->
+  <h2 id="stack">2. Stack Tecnológica</h2>
+  <table>
+    <tr><th>Camada</th><th>Tecnologia</th><th>Detalhe</th></tr>
+    <tr><td>Backend</td><td>Node.js + Express</td><td>v18+, CommonJS, sem TypeScript</td></tr>
+    <tr><td>Banco</td><td>PostgreSQL 18</td><td>Railway (produção) / localhost:5432 (dev)</td></tr>
+    <tr><td>Auth</td><td>JWT + bcryptjs</td><td>Cookie httpOnly + fingerprint IP+UA</td></tr>
+    <tr><td>2FA</td><td>OTP por email + WhatsApp</td><td>Nodemailer + Z-API</td></tr>
+    <tr><td>Pagamentos</td><td>Mercado Pago SDK v2</td><td>Preferências + Webhook</td></tr>
+    <tr><td>Upload</td><td>Multer</td><td>Fotos e currículos</td></tr>
+    <tr><td>Email</td><td>Nodemailer</td><td>SMTP privado (privateemail.com)</td></tr>
+    <tr><td>WhatsApp</td><td>Z-API</td><td>Notificações automáticas</td></tr>
+    <tr><td>Frontend</td><td>HTML/CSS/JS Vanilla</td><td>Sem frameworks, sem bundler</td></tr>
+    <tr><td>CSS</td><td>Custom Design System</td><td>/public/css/style.css — variáveis CSS</td></tr>
+    <tr><td>Segurança</td><td>Helmet + Rate Limit</td><td>express-rate-limit, headers de segurança</td></tr>
+    <tr><td>Dev</td><td>Nodemon</td><td>npm run dev</td></tr>
+    <tr><td>Deploy</td><td>Railway</td><td>Git push → deploy automático</td></tr>
+  </table>
+
+  <!-- 3. ESTRUTURA DE ARQUIVOS -->
+  <h2 id="estrutura">3. Estrutura de Arquivos</h2>
+  <pre>l7-talents/
+├── src/
+│   ├── server.js                  # Servidor principal, middlewares, rotas
+│   ├── db/index.js                # Pool PostgreSQL + initDB (schema + migrations)
+│   ├── middleware/
+│   │   └── auth.js                # JWT auth, role(), planoAtivo()
+│   ├── controllers/
+│   │   ├── authController.js      # register, login, me, changePassword, OTP, reset
+│   │   ├── candidatoController.js # perfil, experiências, formações, candidaturas, vagas salvas
+│   │   ├── vagaController.js      # listar, detalhe, candidatar, recomendadas, match
+│   │   ├── empregadorController.js# perfil empresa, vagas CRUD, candidatos por vaga
+│   │   ├── pagamentosController.js# Mercado Pago, webhook, ativar plano, notificar
+│   │   ├── analyticsController.js # dashboard métricas empregador
+│   │   ├── mensagemController.js  # chat candidato ↔ empregador
+│   │   └── rhController.js        # área RH interna
+│   └── routes/
+│       ├── auth.js
+│       ├── candidatos.js
+│       ├── vagas.js
+│       ├── empregadores.js
+│       ├── pagamentos.js
+│       ├── financeiro.js
+│       ├── rh.js
+│       ├── admin.js
+│       ├── upload.js
+│       └── comunicacao.js
+├── public/
+│   ├── index.html                 # Landing page
+│   ├── privacy-policy.html
+│   ├── css/style.css              # Design system completo
+│   ├── js/app.js                  # Helpers: get(), post(), auth.getUser(), formatDate()...
+│   ├── images/                    # Logo SVG, imagens
+│   ├── sw.js                      # Service Worker (PWA básico)
+│   └── pages/
+│       ├── login.html
+│       ├── cadastro.html
+│       ├── vagas.html             # Listagem com match badge
+│       ├── vaga.html              # Detalhe com match + completude
+│       ├── planos.html            # Página de planos empregador
+│       ├── checkout.html          # Checkout Mercado Pago
+│       ├── 2fa.html
+│       ├── esqueci-senha.html
+│       ├── candidato/
+│       │   ├── dashboard.html
+│       │   ├── perfil.html
+│       │   ├── candidaturas.html
+│       │   └── vagas-salvas.html
+│       ├── empregador/
+│       │   ├── dashboard.html
+│       │   ├── perfil.html
+│       │   ├── vagas.html
+│       │   └── candidatos.html
+│       ├── rh/dashboard.html
+│       ├── financeiro/            # 4 páginas
+│       └── admin/dashboard.html
+├── database/
+│   ├── schema.sql                 # Schema completo (CREATE TABLE IF NOT EXISTS)
+│   └── init.sql
+├── backup_l7talents.sql           # Backup dos dados do Railway (28/06/2026)
+├── MIGRACAO.md                    # Guia para nova máquina
+├── BRIEFING_IA.html               # Este documento
+├── .env                           # Segredos (não vai ao Git)
+├── .env.example                   # Template
+├── package.json
+├── railway.json
+├── Procfile
+├── rateLimiter.js
+├── securityHeaders.js
+├── inputValidator.js
+├── encryption.js
+├── auditLogger.js
+└── cacheBusting.js</pre>
+
+  <!-- 4. BANCO DE DADOS -->
+  <h2 id="banco">4. Banco de Dados</h2>
+  <p>PostgreSQL 18 no Railway em produção. Localmente PostgreSQL 16 na porta 5432. O schema é idempotente (<code>CREATE TABLE IF NOT EXISTS</code>) e roda automaticamente no start.</p>
+
+  <table>
+    <tr><th>Tabela</th><th>Propósito</th><th>Colunas principais</th></tr>
+    <tr><td><code>users</code></td><td>Todos os usuários</td><td>email, password_hash, role (candidato/empregador/rh/financeiro/admin), plano_ativo, plano_expira_em, totp_secret, totp_enabled, senha_temporaria</td></tr>
+    <tr><td><code>candidatos</code></td><td>Perfil do candidato</td><td>nome, habilidades (text[]), nivel_experiencia, area_atuacao, modalidade, pretensao_salarial, cargo_desejado, curriculo_url, foto_url, disponivel_para_trabalho</td></tr>
+    <tr><td><code>empregadores</code></td><td>Perfil da empresa</td><td>razao_social, nome_fantasia, logo_url, site, setor, porte, descricao, whatsapp</td></tr>
+    <tr><td><code>experiencias</code></td><td>Histórico profissional</td><td>candidato_id, empresa, cargo, data_inicio, data_fim, atual, descricao</td></tr>
+    <tr><td><code>formacoes</code></td><td>Formação acadêmica</td><td>candidato_id, instituicao, curso, nivel, data_inicio, em_andamento</td></tr>
+    <tr><td><code>vagas</code></td><td>Vagas de emprego</td><td>titulo, descricao, requisitos, beneficios, area, nivel, modalidade, tipo_contrato, salario_min, salario_max, habilidades (text[]), status (ativa/pausada/encerrada), destaque</td></tr>
+    <tr><td><code>candidaturas</code></td><td>Candidato → Vaga</td><td>vaga_id, candidato_id, status (enviada/visualizada/em_analise/entrevista/aprovado/reprovado), carta_apresentacao, feedback</td></tr>
+    <tr><td><code>mensagens</code></td><td>Chat interno</td><td>candidatura_id, remetente_id, conteudo, lida</td></tr>
+    <tr><td><code>vagas_salvas</code></td><td>Favoritos do candidato</td><td>candidato_id, vaga_id</td></tr>
+    <tr><td><code>notificacoes</code></td><td>Alertas in-app</td><td>user_id, tipo, titulo, mensagem, lida, link</td></tr>
+    <tr><td><code>pedidos</code></td><td>Compras/pagamentos</td><td>pacote, valor, status (pendente/aprovado/recusado), mp_preference_id, mp_payment_id, email_comprador</td></tr>
+    <tr><td><code>page_views</code></td><td>Analytics básico</td><td>page, device, created_at</td></tr>
+    <tr><td><code>password_resets</code></td><td>Reset de senha</td><td>token, expires_at, used</td></tr>
+    <tr><td><code>email_otp</code></td><td>OTP 2FA</td><td>user_id, code, expires_at, used</td></tr>
+    <tr><td><code>comunicados</code></td><td>Avisos internos RH</td><td>titulo, conteudo, created_at</td></tr>
+  </table>
+
+  <div class="box box-info">
+    <strong>Migrations incrementais:</strong> rodadas automaticamente no start via <code>ALTER TABLE ... ADD COLUMN IF NOT EXISTS</code> no <code>src/db/index.js</code>. Colunas adicionadas pós-schema inicial: <code>disponivel_para_trabalho</code>, <code>totp_secret</code>, <code>totp_enabled</code>, <code>plano_ativo</code>, <code>plano_expira_em</code>, <code>senha_temporaria</code>, <code>whatsapp</code>, <code>email_alternativo</code>.
+  </div>

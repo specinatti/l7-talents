@@ -7,54 +7,142 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    body { background: var(--cream); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
-    .auth-card { background: var(--cream2); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 40px; width: 100%; max-width: 420px; border: 1px solid rgba(27,42,74,.08); }
-    .auth-logo { text-align: center; margin-bottom: 32px; }
-    .auth-logo a { font-size: 24px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-    .auth-sub { color: var(--gray-500); font-size: 14px; margin-bottom: 28px; }
-    .divider { text-align: center; color: var(--gray-400); font-size: 13px; margin: 20px 0; position: relative; }
-    .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--gray-200); }
+    body { margin: 0; padding: 0; background: #FAF7F4; font-family: 'Inter', sans-serif; }
+
+    .auth-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Painel esquerdo ── */
+    .auth-panel {
+      background: #1B2A4A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      gap: 32px;
+    }
+    .auth-panel img { width: 180px; max-width: 80%; filter: brightness(0) invert(1); }
+    .auth-panel-tagline {
+      color: #FAF7F4;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .auth-panel-tagline span { color: #B85C6E; }
+    .auth-panel-bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .auth-panel-bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: #F2EDE8;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .auth-panel-bullets li .bullet-icon { font-size: 20px; flex-shrink: 0; }
+
+    /* ── Lado direito ── */
+    .auth-form-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: #FAF7F4;
+    }
+    .auth-card {
+      background: #F2EDE8;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(27,42,74,.10);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid rgba(27,42,74,.08);
+    }
+    .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #1B2A4A; }
+    .auth-sub { color: #6b7280; font-size: 14px; margin-bottom: 28px; }
+    .divider { text-align: center; color: #9ca3af; font-size: 13px; margin: 20px 0; position: relative; }
+    .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: #e5e7eb; }
     .divider::before { left: 0; }
     .divider::after { right: 0; }
+
+    /* Mobile: esconder painel esquerdo */
+    @media (max-width: 768px) {
+      .auth-grid { grid-template-columns: 1fr; }
+      .auth-panel { display: none; }
+      .auth-form-side { padding: 24px 16px; }
+    }
   </style>
 </head>
 <body>
-  <div class="auth-card">
-    <div class="auth-logo">
-      <a href="/">
-        <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:52px;object-fit:contain;">
-      </a>
+  <div class="auth-grid">
+
+    <!-- Painel esquerdo navy -->
+    <div class="auth-panel">
+      <img src="/images/l7-logo.svg" alt="L7 Talents">
+      <p class="auth-panel-tagline">Conectando <span>talentos</span><br>às melhores oportunidades</p>
+      <ul class="auth-panel-bullets">
+        <li>
+          <span class="bullet-icon">🚀</span>
+          <span>Acesse centenas de vagas exclusivas e candidate-se em segundos</span>
+        </li>
+        <li>
+          <span class="bullet-icon">💬</span>
+          <span>Converse diretamente com recrutadores pelo chat integrado</span>
+        </li>
+        <li>
+          <span class="bullet-icon">📊</span>
+          <span>Acompanhe o status de todas as suas candidaturas em tempo real</span>
+        </li>
+      </ul>
     </div>
 
-    <h1 class="auth-title">Bem-vindo de volta</h1>
-    <p class="auth-sub">Entre na sua conta para continuar</p>
+    <!-- Lado direito: formulário -->
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <h1 class="auth-title">👋 Bem-vindo de volta</h1>
+        <p class="auth-sub">Entre na sua conta para continuar</p>
 
-    <div id="alert-container"></div>
+        <div id="alert-container"></div>
 
-    <form id="login-form">
-      <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">📧 E-mail</label>
+            <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between;">
+              🔒 Senha
+              <a href="/pages/esqueci-senha.html" style="font-weight:400;font-size:13px;">Esqueci a senha</a>
+            </label>
+            <div style="position:relative;">
+              <input type="password" id="password" class="form-control" placeholder="••••••••" required style="padding-right:40px;">
+              <button type="button" onclick="toggleSenha()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:18px;" id="toggle-senha">👁</button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Entrar →</button>
+        </form>
+
+        <div class="divider">ou</div>
+
+        <p class="text-center text-sm" style="color:var(--gray-600);">
+          Não tem conta? <a href="/pages/cadastro.html">✨ Criar conta grátis</a>
+        </p>
       </div>
-      <div class="form-group">
-        <label class="form-label" style="display:flex;justify-content:space-between;">
-          Senha
-          <a href="/pages/esqueci-senha.html" style="font-weight:400;font-size:13px;">Esqueci a senha</a>
-        </label>
-        <div style="position:relative;">
-        <input type="password" id="password" class="form-control" placeholder="••••••••" required style="padding-right:40px;">
-        <button type="button" onclick="toggleSenha()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:18px;" id="toggle-senha">👁</button>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Entrar</button>
-    </form>
+    </div>
 
-    <div class="divider">ou</div>
-
-    <p class="text-center text-sm" style="color:var(--gray-600);">
-      Não tem conta? <a href="/pages/cadastro.html">Criar conta grátis</a>
-    </p>
   </div>
 
   <script src="/js/app.js"></script>
@@ -68,7 +156,6 @@
 
     if (auth.isLogged()) {
       const user = auth.getUser();
-      // Mostrar banner "já logado" em vez de redirecionar automaticamente
       const banner = document.createElement('div');
       banner.style.cssText = 'background:var(--cream2);border:1px solid rgba(184,92,110,.3);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:14px;display:flex;justify-content:space-between;align-items:center;';
       banner.innerHTML = `<span>Você está logado como <strong>${user.email}</strong></span>

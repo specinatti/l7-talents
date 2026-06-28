@@ -7,69 +7,159 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    body { background: var(--cream); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .auth-card { background: var(--cream2); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 40px; width: 100%; max-width: 480px; border: 1px solid rgba(27,42,74,.08); }
-    .auth-logo { text-align: center; margin-bottom: 28px; }
-    .auth-logo a { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    body { margin: 0; padding: 0; background: #FAF7F4; font-family: 'Inter', sans-serif; }
+
+    .auth-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Painel esquerdo ── */
+    .auth-panel {
+      background: #1B2A4A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      gap: 32px;
+    }
+    .auth-panel img { width: 180px; max-width: 80%; filter: brightness(0) invert(1); }
+    .auth-panel-tagline {
+      color: #FAF7F4;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .auth-panel-tagline span { color: #B85C6E; }
+    .auth-panel-bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .auth-panel-bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: #F2EDE8;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .auth-panel-bullets li .bullet-icon { font-size: 20px; flex-shrink: 0; }
+
+    /* ── Lado direito ── */
+    .auth-form-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: #FAF7F4;
+    }
+    .auth-card {
+      background: #F2EDE8;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(27,42,74,.10);
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid rgba(27,42,74,.08);
+    }
+    .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #1B2A4A; }
+    .auth-sub { color: #6b7280; font-size: 14px; margin-bottom: 20px; }
     .role-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
     .role-tab { padding: 12px; border: 2px solid var(--gray-200); border-radius: var(--radius); text-align: center; cursor: pointer; font-weight: 500; font-size: 14px; transition: all .15s; }
     .role-tab.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
     .role-tab:hover:not(.active) { border-color: var(--gray-300); background: var(--cream); }
+
+    /* Mobile: esconder painel esquerdo */
+    @media (max-width: 768px) {
+      .auth-grid { grid-template-columns: 1fr; }
+      .auth-panel { display: none; }
+      .auth-form-side { padding: 24px 16px; }
+    }
   </style>
 </head>
 <body>
-  <div class="auth-card">
-    <div class="auth-logo">
-      <a href="/">
-        <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:52px;object-fit:contain;">
-      </a>
+  <div class="auth-grid">
+
+    <!-- Painel esquerdo navy -->
+    <div class="auth-panel">
+      <img src="/images/l7-logo.svg" alt="L7 Talents">
+      <p class="auth-panel-tagline">Sua carreira<br>começa <span>aqui</span></p>
+      <ul class="auth-panel-bullets">
+        <li>
+          <span class="bullet-icon">🎯</span>
+          <span>Crie seu perfil e seja encontrado pelas melhores empresas</span>
+        </li>
+        <li>
+          <span class="bullet-icon">⚡</span>
+          <span>Candidate-se a vagas em segundos com seu perfil completo</span>
+        </li>
+        <li>
+          <span class="bullet-icon">🔔</span>
+          <span>Receba notificações de vagas compatíveis com seu perfil</span>
+        </li>
+      </ul>
     </div>
 
-    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">Criar conta</h1>
-    <p style="color:var(--gray-500);font-size:14px;margin-bottom:20px;">Escolha seu tipo de conta</p>
+    <!-- Lado direito: formulário -->
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <h1 class="auth-title">✨ Criar conta</h1>
+        <p class="auth-sub">Escolha seu tipo de conta</p>
 
-    <div class="role-tabs">
-      <div class="role-tab" id="tab-candidato" onclick="setRole('candidato')">👤 Candidato</div>
-      <div class="role-tab" id="tab-empregador" onclick="setRole('empregador')">🏢 Empresa</div>
+        <div class="role-tabs">
+          <div class="role-tab" id="tab-candidato" onclick="setRole('candidato')">👤 Candidato</div>
+          <div class="role-tab" id="tab-empregador" onclick="setRole('empregador')">🏢 Empresa</div>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="cadastro-form">
+          <input type="hidden" id="role" value="candidato">
+
+          <div class="form-group">
+            <label class="form-label" id="nome-label">👤 Seu nome completo</label>
+            <input type="text" id="nome" class="form-control" placeholder="João Silva" required>
+          </div>
+
+          <div class="form-group" id="razao-group" style="display:none;">
+            <label class="form-label">🏢 Razão social da empresa</label>
+            <input type="text" id="razao_social" class="form-control" placeholder="Empresa LTDA">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">📧 E-mail</label>
+            <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">🔒 Senha</label>
+              <input type="password" id="password" class="form-control" placeholder="Mínimo 8 caracteres" required minlength="8">
+            </div>
+            <div class="form-group">
+              <label class="form-label">🔁 Confirmar senha</label>
+              <input type="password" id="confirm" class="form-control" placeholder="Repita a senha" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Criar conta →</button>
+        </form>
+
+        <p class="text-center text-sm mt-16" style="color:var(--gray-600);">
+          Já tem conta? <a href="/pages/login.html">Entrar</a>
+        </p>
+      </div>
     </div>
 
-    <div id="alert-container"></div>
-
-    <form id="cadastro-form">
-      <input type="hidden" id="role" value="candidato">
-
-      <div class="form-group">
-        <label class="form-label" id="nome-label">Seu nome completo</label>
-        <input type="text" id="nome" class="form-control" placeholder="João Silva" required>
-      </div>
-
-      <div class="form-group" id="razao-group" style="display:none;">
-        <label class="form-label">Razão social da empresa</label>
-        <input type="text" id="razao_social" class="form-control" placeholder="Empresa LTDA">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input type="email" id="email" class="form-control" placeholder="seu@email.com" required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" id="password" class="form-control" placeholder="Mínimo 8 caracteres" required minlength="8">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirmar senha</label>
-          <input type="password" id="confirm" class="form-control" placeholder="Repita a senha" required>
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">Criar conta</button>
-    </form>
-
-    <p class="text-center text-sm mt-16" style="color:var(--gray-600);">
-      Já tem conta? <a href="/pages/login.html">Entrar</a>
-    </p>
   </div>
 
   <script src="/js/app.js"></script>
@@ -77,16 +167,13 @@
     if (auth.isLogged()) {
       const user = auth.getUser();
       const roleParam = new URLSearchParams(location.search).get('role');
-      // Se já logado com o mesmo role, vai pro dashboard
       if (!roleParam || roleParam === user.role) {
         window.location.href = `/pages/${user.role}/dashboard.html`;
       } else {
-        // Role diferente: faz logout e deixa cadastrar nova conta
         auth.clear();
       }
     }
 
-    // Pré-selecionar role pela URL
     const params = new URLSearchParams(location.search);
     const roleParam = params.get('role');
     setRole(roleParam === 'empregador' ? 'empregador' : 'candidato');
@@ -95,7 +182,7 @@
       document.getElementById('role').value = role;
       document.getElementById('tab-candidato').classList.toggle('active', role === 'candidato');
       document.getElementById('tab-empregador').classList.toggle('active', role === 'empregador');
-      document.getElementById('nome-label').textContent = role === 'candidato' ? 'Seu nome completo' : 'Nome do responsável';
+      document.getElementById('nome-label').textContent = role === 'candidato' ? '👤 Seu nome completo' : '👤 Nome do responsável';
       document.getElementById('razao-group').style.display = role === 'empregador' ? 'block' : 'none';
     }
 

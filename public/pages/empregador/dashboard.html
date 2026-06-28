@@ -29,10 +29,10 @@
       </a>
     </aside>
 
-    <main class="main-content">
-      <div style="margin-bottom:24px;">
-        <h1 style="font-size:24px;font-weight:700;" id="greeting">Dashboard</h1>
-        <p class="text-muted">Gerencie suas vagas e candidatos.</p>
+    <main class="main-content" style="border-top:3px solid #B85C6E;">
+      <div style="margin-bottom:24px;background:linear-gradient(135deg,#1B2A4A 0%,#2a3f6e 100%);border-radius:12px;padding:24px 28px;color:#fff;">
+        <h1 style="font-size:26px;font-weight:700;margin:0 0 4px;" id="greeting">Dashboard</h1>
+        <p style="margin:0;opacity:0.75;font-size:14px;">Gerencie suas vagas e candidatos.</p>
       </div>
 
       <div class="stats-grid">
@@ -40,19 +40,19 @@
           <div class="stat-icon blue">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0 1 12 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2m4 6h.01M5 20h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-vagas">-</div><div class="stat-label">Vagas Ativas</div></div>
+          <div><div class="stat-value" id="stat-vagas">-</div><div class="stat-label">💼 Vagas Ativas</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-candidaturas">-</div><div class="stat-label">Candidaturas</div></div>
+          <div><div class="stat-value" id="stat-candidaturas">-</div><div class="stat-label">👥 Candidaturas</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-views">-</div><div class="stat-label">Visualizações</div></div>
+          <div><div class="stat-value" id="stat-views">-</div><div class="stat-label">👁 Visualizações</div></div>
         </div>
       </div>
 
@@ -68,7 +68,7 @@
       <!-- Vagas recentes -->
       <div class="card mb-24">
         <div class="card-header">
-          <h2 class="card-title">Vagas Recentes</h2>
+          <h2 class="card-title">💼 Vagas Recentes</h2>
           <a href="/pages/empregador/vagas.html" class="btn btn-primary btn-sm">+ Nova Vaga</a>
         </div>
         <div id="vagas-list">
@@ -79,7 +79,7 @@
       <!-- Candidatos recentes -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Candidatos Recentes</h2>
+          <h2 class="card-title">👤 Candidatos Recentes</h2>
           <a href="/pages/empregador/candidatos.html" class="btn btn-secondary btn-sm">Ver todos</a>
         </div>
         <div id="candidatos-list">

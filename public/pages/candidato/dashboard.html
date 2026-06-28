@@ -11,7 +11,7 @@
   <div id="navbar"></div>
   <div class="layout">
     <aside class="sidebar">
-      <a href="/pages/candidato/dashboard.html" class="sidebar-item">
+      <a href="/pages/candidato/dashboard.html" class="sidebar-item active">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </a>
@@ -34,9 +34,11 @@
     </aside>
 
     <main class="main-content">
-      <div style="margin-bottom:24px;">
-        <h1 style="font-size:24px;font-weight:700;" id="greeting">Olá! 👋</h1>
-        <p class="text-muted">Acompanhe suas candidaturas e encontre novas oportunidades.</p>
+      <div style="margin-bottom:24px;background:linear-gradient(135deg,#1B2A4A 60%,#B85C6E);border-radius:12px;padding:28px 32px;color:#fff;">
+        <h1 style="font-size:24px;font-weight:700;color:#fff;margin:0 0 6px;" id="greeting">Olá! 👋</h1>
+        <div style="height:2px;width:48px;background:rgba(184,92,110,0.7);border-radius:2px;margin-bottom:8px;" id="greeting-divider"></div>
+        <p id="greeting-sub" style="opacity:0.85;margin:0;font-size:14px;">Acompanhe suas candidaturas e encontre novas oportunidades.</p>
+        <p id="greeting-cargo" style="opacity:0.7;margin:4px 0 0;font-size:13px;display:none;"></p>
       </div>
 
       <div class="stats-grid">
@@ -44,25 +46,25 @@
           <div class="stat-icon blue">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-total">-</div><div class="stat-label">Candidaturas</div></div>
+          <div><div class="stat-value" id="stat-total">-</div><div class="stat-label">📄 Candidaturas</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon yellow">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-analise">-</div><div class="stat-label">Em análise</div></div>
+          <div><div class="stat-value" id="stat-analise">-</div><div class="stat-label">🔍 Em análise</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-entrevista">-</div><div class="stat-label">Entrevistas</div></div>
+          <div><div class="stat-value" id="stat-entrevista">-</div><div class="stat-label">🎯 Entrevistas</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <div><div class="stat-value" id="stat-salvas">-</div><div class="stat-label">Vagas Salvas</div></div>
+          <div><div class="stat-value" id="stat-salvas">-</div><div class="stat-label">🔖 Vagas Salvas</div></div>
         </div>
       </div>
 
@@ -78,7 +80,7 @@
       <!-- Candidaturas recentes -->
       <div class="card mb-24">
         <div class="card-header">
-          <h2 class="card-title">Candidaturas Recentes</h2>
+          <h2 class="card-title">📋 Candidaturas Recentes</h2>
           <a href="/pages/candidato/candidaturas.html" class="btn btn-secondary btn-sm">Ver todas</a>
         </div>
         <div id="candidaturas-list">
@@ -89,7 +91,7 @@
       <!-- Vagas recomendadas -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Vagas para Você</h2>
+          <h2 class="card-title">✨ Vagas para Você</h2>
           <a href="/pages/vagas.html" class="btn btn-secondary btn-sm">Ver todas</a>
         </div>
         <div id="vagas-rec" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
@@ -115,6 +117,7 @@
         ]);
 
         document.getElementById('greeting').textContent = `Olá, ${perfil.nome?.split(' ')[0] || 'Candidato'}! 👋`;
+        if (perfil.cargo_desejado) { const el = document.getElementById('greeting-cargo'); el.textContent = `🎯 ${perfil.cargo_desejado}`; el.style.display='block'; }
 
         // Stats
         document.getElementById('stat-total').textContent = candidaturas.length;
