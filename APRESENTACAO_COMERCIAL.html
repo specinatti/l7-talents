@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L7 Talents — Apresentação Comercial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#FDFAF7; color:#1B2A4A; }
+
+  /* HERO */
+  .hero { background:linear-gradient(135deg,#1B2A4A 0%,#2d4a7a 50%,#B85C6E 100%); color:white; padding:80px 40px; text-align:center; }
+  .hero-logo { font-family:'Playfair Display',serif; font-size:52px; font-weight:900; margin-bottom:8px; }
+  .hero-logo span { color:#f9c74f; }
+  .hero-sub { font-size:20px; opacity:.85; margin-bottom:32px; }
+  .hero-desc { font-size:16px; max-width:600px; margin:0 auto 40px; opacity:.8; line-height:1.8; }
+  .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+  .btn-hero { padding:14px 32px; border-radius:50px; font-size:15px; font-weight:700; text-decoration:none; transition:.2s; }
+  .btn-gold { background:#f9c74f; color:#1B2A4A; }
+  .btn-outline-w { background:transparent; color:white; border:2px solid white; }
+
+  /* NUMBERS */
+  .numbers { background:white; padding:48px 40px; display:flex; justify-content:center; gap:0; flex-wrap:wrap; border-bottom:3px solid #f3f4f6; }
+  .num-item { text-align:center; padding:20px 40px; border-right:1px solid #e5e7eb; }
+  .num-item:last-child { border-right:none; }
+  .num-val { font-size:42px; font-weight:800; color:#B85C6E; font-family:'Playfair Display',serif; }
+  .num-label { font-size:13px; color:#6b7280; margin-top:4px; }
+
+  /* SECTIONS */
+  section { padding:72px 40px; }
+  .section-inner { max-width:1100px; margin:0 auto; }
+  .section-tag { display:inline-block; background:#fce7ec; color:#B85C6E; font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:16px; letter-spacing:.05em; text-transform:uppercase; }
+  .section-title { font-family:'Playfair Display',serif; font-size:36px; color:#1B2A4A; margin-bottom:12px; line-height:1.3; }
+  .section-desc { font-size:16px; color:#6b7280; max-width:580px; line-height:1.8; margin-bottom:40px; }
+
+  /* CARDS */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+  .card { background:white; border-radius:16px; padding:28px; border:1px solid #e5e7eb; transition:.25s; }
+  .card:hover { box-shadow:0 12px 32px rgba(184,92,110,.12); transform:translateY(-4px); border-color:#B85C6E; }
+  .card-icon { font-size:36px; margin-bottom:16px; }
+  .card-title { font-size:17px; font-weight:700; color:#1B2A4A; margin-bottom:8px; }
+  .card-desc { font-size:14px; color:#6b7280; line-height:1.7; }
+
+  /* PLANOS */
+  .planos-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+  .plano { background:white; border-radius:16px; padding:28px; border:2px solid #e5e7eb; position:relative; }
+  .plano.destaque { border-color:#B85C6E; }
+  .plano-badge { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:#B85C6E; color:white; font-size:11px; font-weight:700; padding:4px 14px; border-radius:20px; white-space:nowrap; }
+  .plano-nome { font-family:'Playfair Display',serif; font-size:22px; color:#1B2A4A; margin-bottom:4px; }
+  .plano-desc { font-size:12px; color:#B85C6E; font-weight:600; margin-bottom:16px; }
+  .plano-preco { font-size:36px; font-weight:800; color:#1B2A4A; }
+  .plano-preco sup { font-size:16px; }
+  .plano-periodo { font-size:12px; color:#9ca3af; margin-bottom:20px; }
+  .plano-items { list-style:none; }
+  .plano-items li { font-size:13px; color:#374151; padding:7px 0; border-bottom:1px solid #f3f4f6; display:flex; gap:8px; }
+  .plano-items li:last-child { border-bottom:none; }
+
+  /* CANDIDATOS */
+  .cand-bg { background:linear-gradient(135deg,#1B2A4A,#2d4a7a); }
+  .cand-bg .section-title, .cand-bg .section-desc { color:white; }
+  .cand-bg .section-desc { opacity:.8; }
+  .cand-bg .section-tag { background:rgba(249,199,79,.2); color:#f9c74f; }
+  .cand-bg .card { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
+  .cand-bg .card-title { color:white; }
+  .cand-bg .card-desc { color:rgba(255,255,255,.7); }
+
+  /* FREE VS PAGO */
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .compare-col { background:white; border-radius:16px; padding:28px; border:2px solid #e5e7eb; }
+  .compare-col.pago { border-color:#f9c74f; background:#fffdf0; }
+  .compare-title { font-size:18px; font-weight:700; margin-bottom:16px; }
+  .compare-items { list-style:none; }
+  .compare-items li { font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6; display:flex; gap:10px; align-items:center; color:#374151; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">L7 <span>Talents</span></div>
+  <div class="hero-sub">A plataforma de RH que conecta empresas aos melhores talentos</div>
+  <div class="hero-desc">Recrutamento inteligente, gestão de candidatos e processos seletivos modernos — tudo em um só lugar, com tecnologia de ponta e atendimento humano.</div>
+  <div class="hero-btns">
+    <a href="#empresas" class="btn-hero btn-gold">Sou Empresa</a>
+    <a href="#candidatos" class="btn-hero btn-outline-w">Sou Candidato</a>
+  </div>
+</div>
+
+<!-- NUMBERS -->
+<div class="numbers">
+  <div class="num-item"><div class="num-val">100%</div><div class="num-label">Digital e Online 24h</div></div>
+  <div class="num-item"><div class="num-val">7 dias</div><div class="num-label">Para testar por R$ 5</div></div>
+  <div class="num-item"><div class="num-val">🔥</div><div class="num-label">Match Inteligente de Perfil</div></div>
+  <div class="num-item"><div class="num-val">WhatsApp</div><div class="num-label">Notificações em tempo real</div></div>
+</div>
+
+<!-- PARA EMPRESAS -->
+<section id="empresas" style="background:#f8f7f4;">
+  <div class="section-inner">
+    <div class="section-tag">Para Empresas</div>
+    <div class="section-title">Contrate mais rápido,<br>com mais qualidade</div>
+    <div class="section-desc">Publique vagas, receba candidatos qualificados, gerencie todo o processo seletivo e se comunique diretamente com os talentos — sem planilhas, sem e-mails perdidos.</div>
+
+    <div class="cards">
+      <div class="card"><div class="card-icon">📢</div><div class="card-title">Publique suas vagas</div><div class="card-desc">Crie vagas detalhadas com requisitos, benefícios, faixa salarial e habilidades. Sua vaga aparece para candidatos compatíveis automaticamente.</div></div>
+      <div class="card"><div class="card-icon">🎯</div><div class="card-title">Candidatos com Match</div><div class="card-desc">O sistema compara o perfil de cada candidato com os requisitos da vaga e mostra um score de compatibilidade — Top, Alto, Bom ou Baixo.</div></div>
+      <div class="card"><div class="card-icon">📋</div><div class="card-title">Gestão do processo seletivo</div><div class="card-desc">Acompanhe cada candidato: recebido → em análise → entrevista → aprovado ou reprovado. Tudo organizado em um painel visual.</div></div>
+      <div class="card"><div class="card-icon">💬</div><div class="card-title">Chat direto com candidatos</div><div class="card-desc">Troque mensagens diretamente com os candidatos dentro da plataforma, sem precisar de e-mail ou WhatsApp externo.</div></div>
+      <div class="card"><div class="card-icon">📊</div><div class="card-title">Dashboard com métricas</div><div class="card-desc">Veja quantas pessoas viram sua vaga, quantas se candidataram e como está o funil do seu processo seletivo.</div></div>
+      <div class="card"><div class="card-icon">🔔</div><div class="card-title">Alertas por WhatsApp</div><div class="card-desc">Receba uma notificação no WhatsApp toda vez que um novo candidato se inscrever em uma das suas vagas.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANOS EMPRESA -->
+<section style="background:white;">
+  <div class="section-inner">
+    <div class="section-tag">Planos para Empresas</div>
+    <div class="section-title">Escolha o plano ideal para seu momento</div>
+    <div class="section-desc">Sem mensalidade. Pague uma vez e use pelo período contratado. Acesso liberado imediatamente após o pagamento — login e senha enviados por e-mail.</div>
+
+    <div class="planos-grid">
+      <div class="plano">
+        <div class="plano-nome">🧪 Teste</div>
+        <div class="plano-desc">Experimente tudo por 7 dias</div>
+        <div class="plano-preco"><sup>R$</sup>5</div>
+        <div class="plano-periodo">pagamento único · 7 dias</div>
+        <ul class="plano-items">
+          <li>✅ Acesso completo ao painel</li>
+          <li>✅ Publicar vagas</li>
+          <li>✅ Gerenciar candidatos</li>
+          <li>✅ Ideal para conhecer a plataforma</li>
+        </ul>
+      </div>
+
+      <div class="plano">
+        <div class="plano-nome">🎯 Starter</div>
+        <div class="plano-desc">Primeira contratação</div>
+        <div class="plano-preco"><sup>R$</sup>490</div>
+        <div class="plano-periodo">pagamento único · 30 dias</div>
+        <ul class="plano-items">
+          <li>✅ 1 vaga publicada</li>
+          <li>✅ Triagem de currículos</li>
+          <li>✅ Processo seletivo básico</li>
+          <li>✅ Apresentação dos finalistas</li>
+        </ul>
+      </div>
+
+      <div class="plano destaque">
+        <div class="plano-badge">⭐ Mais contratado</div>
+        <div class="plano-nome">🚀 Business</div>
+        <div class="plano-desc">Empresas em crescimento</div>
+        <div class="plano-preco"><sup>R$</sup>1.290</div>
+        <div class="plano-periodo">pagamento único · 60 dias</div>
+        <ul class="plano-items">
+          <li>✅ 3 vagas publicadas</li>
+          <li>✅ Hunting direcionado</li>
+          <li>✅ Avaliação comportamental</li>
+          <li>✅ Inteligência salarial de mercado</li>
+          <li>✅ Relatório de candidatos</li>
+        </ul>
+      </div>
+
+      <div class="plano">
+        <div class="plano-nome">💎 Premium</div>
+        <div class="plano-desc">Processo completo e estratégico</div>
+        <div class="plano-preco"><sup>R$</sup>2.490</div>
+        <div class="plano-periodo">pagamento único · 90 dias</div>
+        <ul class="plano-items">
+          <li>✅ 5 vagas publicadas</li>
+          <li>✅ Hunting + inteligência de mercado</li>
+          <li>✅ Avaliação técnica e comportamental</li>
+          <li>✅ Posicionamento salarial</li>
+          <li>✅ Acompanhamento pós-contratação</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:#1B2A4A;border-radius:16px;padding:40px;margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:white;margin-bottom:8px;">Enterprise — Sob Consulta</div>
+        <div style="color:rgba(255,255,255,.7);font-size:14px;max-width:480px;line-height:1.7;">Vagas ilimitadas, RH estruturado, gestão contínua de talentos e relatórios mensais. Para empresas que precisam de uma solução completa.</div>
+      </div>
+      <a href="mailto:comercial@l7talents.online" style="background:#f9c74f;color:#1B2A4A;padding:14px 28px;border-radius:50px;font-weight:700;text-decoration:none;white-space:nowrap;">Falar com consultor →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PARA CANDIDATOS -->
+<section id="candidatos" class="cand-bg">
+  <div class="section-inner">
+    <div class="section-tag">Para Candidatos</div>
+    <div class="section-title">Encontre sua próxima<br>oportunidade de forma inteligente</div>
+    <div class="section-desc">Cadastro gratuito. Monte seu perfil profissional completo e deixe as melhores empresas te encontrarem — ou busque as vagas que combinam com você.</div>
+
+    <div class="cards">
+      <div class="card"><div class="card-icon">👤</div><div class="card-title">Perfil profissional completo</div><div class="card-desc">Cadastre experiências, formações, habilidades, foto, currículo e muito mais. Seu perfil é o seu cartão de visitas.</div></div>
+      <div class="card"><div class="card-icon">🔥</div><div class="card-title">Match com as vagas</div><div class="card-desc">Veja o quanto seu perfil combina com cada vaga: Top Match, High Match, Bom Match ou Low Match — igual ao LinkedIn.</div></div>
+      <div class="card"><div class="card-icon">🔍</div><div class="card-title">Busca com filtros avançados</div><div class="card-desc">Filtre vagas por área, modalidade (remoto/presencial/híbrido), nível, tipo de contrato e localização.</div></div>
+      <div class="card"><div class="card-icon">📩</div><div class="card-title">Candidatura com carta</div><div class="card-desc">Se candidate e envie uma carta de apresentação personalizada para se destacar entre os candidatos.</div></div>
+      <div class="card"><div class="card-icon">📌</div><div class="card-title">Salvar vagas favoritas</div><div class="card-desc">Guarde as vagas que te interessam para se candidatar depois, sem perder o fio.</div></div>
+      <div class="card"><div class="card-icon">🔔</div><div class="card-title">Acompanhe suas candidaturas</div><div class="card-desc">Veja em tempo real o status de cada candidatura: enviada, visualizada, em análise, entrevista, aprovado.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE VS PAGO CANDIDATO -->
+<section style="background:#f8f7f4;">
+  <div class="section-inner">
+    <div class="section-tag">Para Candidatos</div>
+    <div class="section-title">Grátis para sempre — ou turbine seu perfil</div>
+    <div class="section-desc">A base é 100% gratuita. Para quem quer se destacar ainda mais, teremos recursos premium em breve.</div>
+
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-title">🆓 Plano Gratuito</div>
+        <ul class="compare-items">
+          <li>✅ Cadastro e perfil completo</li>
+          <li>✅ Ver todas as vagas</li>
+          <li>✅ Match de compatibilidade</li>
+          <li>✅ Se candidatar às vagas</li>
+          <li>✅ Salvar vagas favoritas</li>
+          <li>✅ Acompanhar candidaturas</li>
+          <li>✅ Chat com recrutadores</li>
+          <li>✅ Notificações de novas vagas</li>
+        </ul>
+      </div>
+      <div class="compare-col pago">
+        <div class="compare-title">⭐ Premium (em breve)</div>
+        <ul class="compare-items">
+          <li>✅ Tudo do plano gratuito</li>
+          <li>🔥 Destaque nas candidaturas</li>
+          <li>🔥 Ver quem visualizou seu perfil</li>
+          <li>🔥 Badge "Disponível para trabalhar"</li>
+          <li>🔥 Candidaturas ilimitadas</li>
+          <li>🔥 Perfil público com URL própria</li>
+          <li>🔥 Prioridade nas recomendações</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section style="background:white;">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-tag" style="margin:0 auto 16px;">Por que L7 Talents?</div>
+    <div class="section-title" style="margin-bottom:12px;">Tecnologia + Atendimento Humano</div>
+    <div class="section-desc" style="margin:0 auto 48px;">Não somos só uma plataforma. Somos uma consultoria de RH com tecnologia para escalar.</div>
+
+    <div class="cards">
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">Match inteligente de perfil</div>
+        <div class="card-desc">Algoritmo que cruza habilidades, nível, área, modalidade e pretensão salarial para mostrar o quanto cada candidato combina com a vaga.</div>
+      </div>
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">📱</div>
+        <div class="card-title">Notificações por WhatsApp</div>
+        <div class="card-desc">Empresa recebe alerta no WhatsApp quando um candidato se inscreve. Candidato é notificado quando o status muda.</div>
+      </div>
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">🔐</div>
+        <div class="card-title">Segurança de nível bancário</div>
+        <div class="card-desc">Autenticação dupla (2FA), tokens JWT, proteção contra força bruta e criptografia em todas as comunicações.</div>
+      </div>
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Acesso imediato após pagamento</div>
+        <div class="card-desc">Empresa paga e recebe login + senha no e-mail automaticamente. Sem esperar aprovação manual.</div>
+      </div>
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">🇧🇷</div>
+        <div class="card-title">100% brasileiro</div>
+        <div class="card-desc">Pagamento via Mercado Pago (Pix, cartão, boleto). Suporte em português. Foco no mercado nacional.</div>
+      </div>
+      <div class="card" style="text-align:left;">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">Consultoria especializada</div>
+        <div class="card-desc">Além da plataforma, oferecemos hunting, avaliação comportamental, estruturação de RH e inteligência de mercado salarial.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section style="background:linear-gradient(135deg,#1B2A4A,#B85C6E);text-align:center;">
+  <div class="section-inner">
+    <div style="font-family:'Playfair Display',serif;font-size:40px;color:white;margin-bottom:16px;">Pronto para começar?</div>
+    <div style="color:rgba(255,255,255,.8);font-size:16px;max-width:500px;margin:0 auto 40px;line-height:1.8;">
+      Teste a plataforma por apenas <strong style="color:#f9c74f;">R$ 5</strong> durante 7 dias.<br>
+      Candidatos se cadastram <strong style="color:#f9c74f;">gratuitamente</strong>.
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;">
+      <a href="https://l7talents.online/pages/planos.html" style="background:#f9c74f;color:#1B2A4A;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Contratar plano →</a>
+      <a href="https://l7talents.online/pages/cadastro.html?role=candidato" style="background:transparent;color:white;border:2px solid white;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Cadastro gratuito →</a>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.2);padding-top:32px;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;">
+      <div style="color:rgba(255,255,255,.7);font-size:14px;">📧 comercial@l7talents.online</div>
+      <div style="color:rgba(255,255,255,.7);font-size:14px;">🌐 l7talents.online</div>
+      <div style="color:rgba(255,255,255,.7);font-size:14px;">📱 WhatsApp disponível na plataforma</div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#111827;color:rgba(255,255,255,.4);text-align:center;padding:20px;font-size:12px;">
+  © 2026 L7 Talents · Todos os direitos reservados · comercial@l7talents.online
+</footer>
+
+</body>
+</html>
