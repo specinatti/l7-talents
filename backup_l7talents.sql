@@ -1,6 +1,4 @@
--- Backup L7 Talents 2026-06-28T12:45:04.885Z
--- Restaurar: psql DATABASE_URL < backup_l7talents.sql
-
+-- Backup L7 Talents 2026-06-28T12:47:38.323Z
 SET session_replication_role = replica;
 
 DELETE FROM users;
@@ -11,29 +9,36 @@ INSERT INTO users ("id","email","password_hash","role","ativo","email_verificado
 INSERT INTO users ("id","email","password_hash","role","ativo","email_verificado","created_at","updated_at","totp_secret","totp_enabled","email_alternativo","whatsapp","plano_ativo","plano_expira_em","senha_temporaria") VALUES ('3472d774-bfb5-4d50-855c-68397f4b371c','comercial@l7talents.online','$2a$10$iCpPfqI9qfvL7ZNCJIMcPeE8R6OIu7OMraoMyHJsFz1XMNs0hj.vW','financeiro',true,false,'2026-05-08T02:22:18.135Z','2026-05-08T16:34:26.915Z','GGDJ2WX5BLPAAWFS3T2SW7LN37FL5RIN',false,NULL,NULL,NULL,NULL,false);
 INSERT INTO users ("id","email","password_hash","role","ativo","email_verificado","created_at","updated_at","totp_secret","totp_enabled","email_alternativo","whatsapp","plano_ativo","plano_expira_em","senha_temporaria") VALUES ('e0d9f69b-56aa-4b42-8de6-3ae3bab0ec7e','specinatti@gmail.com','$2a$10$EaNbDUJMoou1Ye4YnpOMIODmGY5aCa8.UYB3UTHVWS0Qr5qT1TWWy','admin',true,false,'2026-05-08T16:39:47.761Z','2026-05-08T18:14:18.259Z',NULL,false,'vincitore.corp@gmail.com','11983186310',NULL,NULL,false);
 INSERT INTO users ("id","email","password_hash","role","ativo","email_verificado","created_at","updated_at","totp_secret","totp_enabled","email_alternativo","whatsapp","plano_ativo","plano_expira_em","senha_temporaria") VALUES ('f4e01b06-156b-467c-b6ed-af9dc7e52bc1','gil.aninha1988@gmail.com','$2a$10$DOwU/GtMi/MJT5v6WF8WTeoZG372Ii/y9MY/VmYjRLK9k4XNY8Z5.','candidato',true,false,'2026-05-12T18:37:39.687Z','2026-05-12T18:37:39.687Z',NULL,false,NULL,NULL,NULL,NULL,false);
--- users: 7 registros
+-- 7 registros
 
 DELETE FROM candidatos;
-INSERT INTO candidatos ("id","user_id","nome","telefone","cpf","data_nascimento","cidade","estado","linkedin","github","portfolio","cargo_desejado","area_atuacao","nivel_experiencia","pretensao_salarial","disponibilidade","modalidade","resumo_profissional","habilidades","curriculo_url","foto_url","created_at","updated_at","whatsapp","alertas_vagas","alerta_email","alerta_whatsapp","disponivel_para_trabalho") VALUES ('78ddd981-b8b7-46a9-bc2d-b37dd70464b9','6d1066a9-8453-44d5-923b-de56cd0051ce','SANDRO BENTO PECINATTI','11983186310',NULL,NULL,'São Paulo',NULL,'https://www.linkedin.com/in/specinatti',NULL,NULL,'Desenvolvedor','Operações','Sênior','6000.00','Imediata','remoto','hhhhhhhhh','["kubernetes"]'::jsonb,NULL,NULL,'2026-05-02T22:34:09.505Z','2026-05-08T14:31:26.909Z','11983186310',true,true,true,true);
+INSERT INTO candidatos ("id","user_id","nome","telefone","cpf","data_nascimento","cidade","estado","linkedin","github","portfolio","cargo_desejado","area_atuacao","nivel_experiencia","pretensao_salarial","disponibilidade","modalidade","resumo_profissional","habilidades","curriculo_url","foto_url","created_at","updated_at","whatsapp","alertas_vagas","alerta_email","alerta_whatsapp","disponivel_para_trabalho") VALUES ('78ddd981-b8b7-46a9-bc2d-b37dd70464b9','6d1066a9-8453-44d5-923b-de56cd0051ce','SANDRO BENTO PECINATTI','11983186310',NULL,NULL,'São Paulo',NULL,'https://www.linkedin.com/in/specinatti',NULL,NULL,'Desenvolvedor','Operações','Sênior','6000.00','Imediata','remoto','hhhhhhhhh',ARRAY['kubernetes']::text[],NULL,NULL,'2026-05-02T22:34:09.505Z','2026-05-08T14:31:26.909Z','11983186310',true,true,true,true);
 INSERT INTO candidatos ("id","user_id","nome","telefone","cpf","data_nascimento","cidade","estado","linkedin","github","portfolio","cargo_desejado","area_atuacao","nivel_experiencia","pretensao_salarial","disponibilidade","modalidade","resumo_profissional","habilidades","curriculo_url","foto_url","created_at","updated_at","whatsapp","alertas_vagas","alerta_email","alerta_whatsapp","disponivel_para_trabalho") VALUES ('8a7768fd-ee04-4815-88a3-5a14aac83c43','f4e01b06-156b-467c-b6ed-af9dc7e52bc1','Ana Paula Gil de Almeida',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-05-12T18:37:39.687Z','2026-05-12T18:37:39.687Z',NULL,true,true,false,false);
--- candidatos: 2 registros
+-- 2 registros
 
 DELETE FROM empregadores;
 INSERT INTO empregadores ("id","user_id","nome_contato","razao_social","nome_fantasia","cnpj","setor","porte","site","linkedin","telefone","cidade","estado","descricao","logo_url","created_at","updated_at","whatsapp") VALUES ('55fdef59-6cb4-45a2-91bd-c4f7bba2569e','7d116850-7fe4-4ff9-91a3-68836ccccc0b','vincitore info','teste ltda',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-05-02T22:52:59.985Z','2026-05-02T22:52:59.985Z',NULL);
--- empregadores: 1 registros
+-- 1 registros
 
 -- experiencias: vazio
+
 -- formacoes: vazio
+
 -- vagas: vazio
+
 -- candidaturas: vazio
+
 -- mensagens: vazio
+
 -- vagas_salvas: vazio
+
 -- notificacoes: vazio
+
 DELETE FROM pedidos;
 INSERT INTO pedidos ("id","user_id","pacote","descricao","valor","status","mp_preference_id","mp_payment_id","mp_status","email_comprador","nome_comprador","empresa","created_at","updated_at") VALUES ('b7b96aa1-6ff2-435e-a0a2-2f551bf534ad',NULL,'business','3 vagas, hunting direcionado, avaliação comportamental, 60 dias','1290.00','pendente',NULL,NULL,NULL,'specinatti@gmail.com','SANDRO BENTO PECINATTI','Vincitore.corp','2026-05-08T02:55:56.338Z','2026-05-08T02:55:56.338Z');
 INSERT INTO pedidos ("id","user_id","pacote","descricao","valor","status","mp_preference_id","mp_payment_id","mp_status","email_comprador","nome_comprador","empresa","created_at","updated_at") VALUES ('aa398212-03cb-4d75-8ab2-a3c2902ba141',NULL,'business','3 vagas, hunting direcionado, avaliação comportamental, 60 dias','1290.00','pendente','3387103184-6a94127b-bf70-45b5-a070-4ced5b91794f',NULL,NULL,'specinatti@gmail.com','SANDRO BENTO PECINATTI',NULL,'2026-05-08T02:59:01.240Z','2026-05-08T02:59:02.287Z');
 INSERT INTO pedidos ("id","user_id","pacote","descricao","valor","status","mp_preference_id","mp_payment_id","mp_status","email_comprador","nome_comprador","empresa","created_at","updated_at") VALUES ('1de04998-12d3-415f-a91b-1d6531eeecbf',NULL,'teste','Pacote de teste — acesso completo por 7 dias','5.00','pendente','3387103184-4f3dfe3e-4137-4605-9d00-a4513c0808b0',NULL,NULL,'sre@vincitore.space','Novo Comprador','Beethiven First tecnologia','2026-05-08T17:50:54.913Z','2026-05-08T17:50:56.158Z');
--- pedidos: 3 registros
+-- 3 registros
 
 DELETE FROM page_views;
 INSERT INTO page_views ("id","page","device","user_id","created_at") VALUES ('d3eaac4c-e180-4244-99fd-964db8ec6173','/','desktop',NULL,'2026-05-08T02:53:38.704Z');
@@ -281,18 +286,19 @@ INSERT INTO page_views ("id","page","device","user_id","created_at") VALUES ('ec
 INSERT INTO page_views ("id","page","device","user_id","created_at") VALUES ('8d5c834b-0381-46d0-9f22-182f5346a1a5','/','mobile',NULL,'2026-06-12T03:24:41.081Z');
 INSERT INTO page_views ("id","page","device","user_id","created_at") VALUES ('69628c92-d760-4d19-8911-06596280e586','/','desktop',NULL,'2026-06-12T03:24:41.428Z');
 INSERT INTO page_views ("id","page","device","user_id","created_at") VALUES ('06f8dd8c-c101-4c1f-a985-4772e6692f8c','/','desktop',NULL,'2026-06-14T23:31:15.666Z');
--- page_views: 245 registros
+-- 245 registros
 
 -- comunicados: vazio
+
 DELETE FROM password_resets;
 INSERT INTO password_resets ("id","user_id","token","expires_at","used","created_at") VALUES ('fa8eeb52-ec2f-45c9-bcfd-10421f43d4df','6d1066a9-8453-44d5-923b-de56cd0051ce','d20e6c1f5740f1a8ae028a3d4b3eea4e9e1ca34e04b6d4aa32c52a5097539824','2026-05-02T23:48:05.014Z',false,'2026-05-02T22:48:05.014Z');
 INSERT INTO password_resets ("id","user_id","token","expires_at","used","created_at") VALUES ('71a5447e-0f79-4e2b-8119-5336556c3910','6d1066a9-8453-44d5-923b-de56cd0051ce','9ab99448fc554d4051010f5f8b4a976bd84302897dddf43fee3006f1d53d062b','2026-05-03T00:39:22.041Z',false,'2026-05-02T23:39:22.040Z');
 INSERT INTO password_resets ("id","user_id","token","expires_at","used","created_at") VALUES ('ae8e4ec5-09c0-44ca-8b09-115fbc03c8e8','6d1066a9-8453-44d5-923b-de56cd0051ce','b936977c39efc7d8eea1a93c2eac1934959ae931549d04c065201dbf729eba52','2026-05-02T21:59:11.513Z',false,'2026-05-02T23:59:12.344Z');
--- password_resets: 3 registros
+-- 3 registros
 
 DELETE FROM email_otp;
 INSERT INTO email_otp ("id","user_id","code","expires_at","used","created_at") VALUES ('e9a482bc-1409-458a-acdf-81d5837e57e4','e0d9f69b-56aa-4b42-8de6-3ae3bab0ec7e','765689','2026-05-08T18:25:10.949Z',false,'2026-05-08T18:15:10.949Z');
 INSERT INTO email_otp ("id","user_id","code","expires_at","used","created_at") VALUES ('5a1d58af-ce53-402f-b2e2-308b7a42ef54','3472d774-bfb5-4d50-855c-68397f4b371c','467646','2026-05-08T18:34:10.634Z',false,'2026-05-08T18:24:10.634Z');
--- email_otp: 2 registros
+-- 2 registros
 
 SET session_replication_role = DEFAULT;
