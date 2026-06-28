@@ -1,27 +1,29 @@
-// Utilitário de envio WhatsApp via Z-API
+const twilio = require('twilio');
+
 async function sendWhatsApp(phone, message) {
-  if (!process.env.ZAPI_INSTANCE || !process.env.ZAPI_TOKEN) return;
   if (!phone) return;
 
   const num = String(phone).replace(/\D/g, '');
   if (num.length < 10) return;
   const fullPhone = num.startsWith('55') ? num : `55${num}`;
 
+  if (process.env.WHATSAPP_DEBUG === 'true') {
+    console.log(`[WHATSAPP DEBUG] Para: +${fullPhone}\n${message}`);
+    return;
+  }
+
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return;
+
   try {
-    const fetch = require('node-fetch');
-    const res = await fetch(
-      `https://api.z-api.io/instances/${process.env.ZAPI_INSTANCE}/token/${process.env.ZAPI_TOKEN}/send-text`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Client-Token': process.env.ZAPI_CLIENT_TOKEN },
-        body: JSON.stringify({ phone: fullPhone, message })
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) console.error(`[WHATSAPP ERROR] ${fullPhone}: ${JSON.stringify(data)}`);
-    else console.log(`[WHATSAPP] Enviado para ${fullPhone}`);
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    await client.messages.create({
+      from: `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`,
+      to: `whatsapp:+${fullPhone}`,
+      body: message
+    });
+    console.log(`[WHATSAPP] Enviado para +${fullPhone}`);
   } catch (err) {
-    console.error(`[WHATSAPP ERROR] ${err.message}`);
+    console.error(`[WHATSAPP ERROR] +${fullPhone}: ${err.message}`);
   }
 }
 
