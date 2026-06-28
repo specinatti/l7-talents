@@ -13,6 +13,11 @@
     .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .vagas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
     .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 32px; }
+    .match-badge { display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px; }
+    .match-top  { background:#dcfce7;color:#15803d; }
+    .match-high { background:#dbeafe;color:#1d4ed8; }
+    .match-good { background:#fef9c3;color:#a16207; }
+    .match-low  { background:#f3f4f6;color:#6b7280; }
   </style>
 </head>
 <body>
@@ -108,6 +113,13 @@
 
     let currentPage = 1;
 
+    function matchBadge(label, score) {
+      if (!label) return '';
+      const icons = { top: '🔥', high: '⚡', good: '👍', low: '📋' };
+      const labels = { top: 'Top Match', high: 'High Match', good: 'Bom Match', low: 'Low Match' };
+      return `<span class="match-badge match-${label}">${icons[label]} ${labels[label]} ${score}%</span>`;
+    }
+
     async function search(page = 1) {
       currentPage = page;
       const params = new URLSearchParams({
@@ -119,7 +131,6 @@
         page,
         limit: 12,
       });
-      // Remove params vazios
       [...params.keys()].forEach(k => { if (!params.get(k)) params.delete(k); });
 
       const grid = document.getElementById('vagas-grid');
@@ -135,9 +146,21 @@
           return;
         }
 
-        grid.innerHTML = data.vagas.map(v => `
+        // Busca match para todas as vagas em paralelo (só pra candidato)
+        let matchMap = {};
+        if (user?.role === 'candidato') {
+          const matches = await Promise.allSettled(data.vagas.map(v => get(`/vagas/${v.id}/match`)));
+          data.vagas.forEach((v, i) => {
+            if (matches[i].status === 'fulfilled') matchMap[v.id] = matches[i].value;
+          });
+        }
+
+        grid.innerHTML = data.vagas.map(v => {
+          const m = matchMap[v.id];
+          return `
           <a href="/pages/vaga.html?id=${v.id}" style="text-decoration:none;">
             <div class="vaga-card ${v.destaque ? 'destaque' : ''}">
+              ${m ? `<div style="margin-bottom:10px;">${matchBadge(m.label, m.score)}</div>` : ''}
               <div class="vaga-empresa">
                 <div class="vaga-logo">${v.empresa?.charAt(0) || 'E'}</div>
                 <div>
@@ -157,10 +180,9 @@
                 <div class="text-muted text-sm">${formatDate(v.created_at)}</div>
               </div>
             </div>
-          </a>
-        `).join('');
+          </a>`;
+        }).join('');
 
-        // Paginação
         const totalPages = Math.ceil(data.total / 12);
         const pag = document.getElementById('pagination');
         if (totalPages <= 1) { pag.innerHTML = ''; return; }

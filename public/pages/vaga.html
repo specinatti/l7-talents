@@ -6,6 +6,18 @@
   <title>Vaga - L7 Talents</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .match-badge { display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px; }
+    .match-top  { background:#dcfce7;color:#15803d; }
+    .match-high { background:#dbeafe;color:#1d4ed8; }
+    .match-good { background:#fef9c3;color:#a16207; }
+    .match-low  { background:#f3f4f6;color:#6b7280; }
+    .match-bar  { height:6px;border-radius:3px;background:#e5e7eb;margin:6px 0 4px; }
+    .match-fill { height:100%;border-radius:3px;transition:width .4s; }
+    .match-item { display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600);margin:3px 0; }
+    .profile-bar { height:8px;border-radius:4px;background:#e5e7eb;margin:6px 0; }
+    .profile-fill { height:100%;border-radius:4px;background:var(--primary);transition:width .4s; }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -59,8 +71,61 @@
     async function load() {
       if (!vagaId) { document.getElementById('content').innerHTML = '<p class="text-center text-muted">Vaga não encontrada.</p>'; return; }
       try {
-        const v = await get(`/vagas/${vagaId}`);
+        // Busca vaga e (se candidato) match + perfil em paralelo
+        const reqs = [get(`/vagas/${vagaId}`)];
+        if (user?.role === 'candidato') {
+          reqs.push(get(`/vagas/${vagaId}/match`).catch(() => null));
+          reqs.push(get('/candidatos/perfil').catch(() => null));
+        }
+        const [v, match, perfil] = await Promise.all(reqs);
+
         document.title = `${v.titulo} - L7 Talents`;
+
+        // Calcula completude do perfil
+        function calcCompletude(p) {
+          if (!p) return null;
+          const campos = ['nome','telefone','cidade','estado','cargo_desejado','area_atuacao',
+            'nivel_experiencia','pretensao_salarial','modalidade','resumo_profissional'];
+          const preenchidos = campos.filter(c => p[c]).length;
+          let extra = 0;
+          if (p.habilidades?.length) extra++;
+          if (p.linkedin) extra++;
+          if (p.foto_url) extra++;
+          if (p.curriculo_url) extra++;
+          if (p.experiencias?.filter(e => e?.id).length) extra++;
+          if (p.formacoes?.filter(f => f?.id).length) extra++;
+          const total = campos.length + 6;
+          return Math.round(((preenchidos + extra) / total) * 100);
+        }
+
+        function matchBadge(m) {
+          if (!m) return '';
+          const icons = { top: '🔥', high: '⚡', good: '👍', low: '📋' };
+          const labels = { top: 'Top Match', high: 'High Match', good: 'Bom Match', low: 'Low Match' };
+          const colors = { top: '#16a34a', high: '#2563eb', good: '#d97706', low: '#9ca3af' };
+          const detalheHtml = m.detalhes.map(d =>
+            `<div class="match-item">${d.ok ? '✅' : '❌'} ${d.item}</div>`
+          ).join('');
+          return `
+            <div style="margin-bottom:16px;padding:12px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <span class="match-badge match-${m.label}">${icons[m.label]} ${labels[m.label]}</span>
+                <span style="font-size:18px;font-weight:700;color:${colors[m.label]};">${m.score}%</span>
+              </div>
+              <div class="match-bar"><div class="match-fill" style="width:${m.score}%;background:${colors[m.label]};"></div></div>
+              <div style="margin-top:8px;">${detalheHtml}</div>
+            </div>`;
+        }
+
+        const completude = calcCompletude(perfil);
+        const completudeHtml = completude !== null ? `
+          <div style="margin-bottom:16px;padding:12px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;">
+              <span>Completude do perfil</span><span>${completude}%</span>
+            </div>
+            <div class="profile-bar"><div class="profile-fill" style="width:${completude}%;"></div></div>
+            ${completude < 80 ? `<a href="/pages/candidato/perfil.html" style="font-size:12px;color:var(--primary);">Completar perfil →</a>` : '<span style="font-size:12px;color:#16a34a;">✅ Perfil bem preenchido</span>'}
+          </div>` : '';
 
         document.getElementById('content').innerHTML = `
           <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
@@ -96,6 +161,8 @@
 
             <div>
               <div class="card" style="position:sticky;top:80px;">
+                ${match ? matchBadge(match) : ''}
+                ${completudeHtml}
                 <div id="action-area">
                   ${!user ? `
                     <p class="text-muted text-sm mb-16">Faça login para se candidatar a esta vaga.</p>

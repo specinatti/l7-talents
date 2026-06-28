@@ -90,6 +90,50 @@ async function candidatar(req, res) {
   }
 }
 
+// Algoritmo de match reutilizável
+function calcMatch(c, v) {
+  let score = 0, detalhes = [];
+
+  if (c.area_atuacao && v.area && c.area_atuacao.toLowerCase() === v.area.toLowerCase()) { score += 40; detalhes.push({ item: 'Área de atuação', ok: true }); }
+  else { detalhes.push({ item: 'Área de atuação', ok: false }); }
+
+  if (c.nivel_experiencia && v.nivel && c.nivel_experiencia.toLowerCase() === v.nivel.toLowerCase()) { score += 20; detalhes.push({ item: 'Nível de experiência', ok: true }); }
+  else { detalhes.push({ item: 'Nível de experiência', ok: false }); }
+
+  if (c.modalidade && v.modalidade && c.modalidade.toLowerCase() === v.modalidade.toLowerCase()) { score += 15; detalhes.push({ item: 'Modalidade', ok: true }); }
+  else { detalhes.push({ item: 'Modalidade', ok: false }); }
+
+  if (c.estado && v.estado && c.estado === v.estado) { score += 10; detalhes.push({ item: 'Estado', ok: true }); }
+  else { detalhes.push({ item: 'Estado', ok: false }); }
+
+  if (c.pretensao_salarial && v.salario_max && Number(c.pretensao_salarial) <= Number(v.salario_max)) { score += 5; detalhes.push({ item: 'Pretensão salarial', ok: true }); }
+  else if (c.pretensao_salarial && v.salario_max) { detalhes.push({ item: 'Pretensão salarial', ok: false }); }
+
+  let habilMatch = [];
+  if (c.habilidades?.length && v.habilidades?.length) {
+    habilMatch = c.habilidades.filter(h => v.habilidades.some(vh => vh.toLowerCase().includes(h.toLowerCase())));
+    score += Math.min(habilMatch.length * 5, 25);
+  }
+  detalhes.push({ item: `Habilidades (${habilMatch.length}/${v.habilidades?.length || 0})`, ok: habilMatch.length > 0 });
+
+  const label = score >= 80 ? 'top' : score >= 50 ? 'high' : score >= 25 ? 'good' : 'low';
+  return { score, label, detalhes };
+}
+
+// Endpoint: GET /api/vagas/:id/match
+async function getMatch(req, res) {
+  try {
+    const [{ rows: perfil }, { rows: vaga }] = await Promise.all([
+      pool.query('SELECT area_atuacao, nivel_experiencia, modalidade, estado, pretensao_salarial, habilidades FROM candidatos WHERE user_id = $1', [req.user.id]),
+      pool.query('SELECT area, nivel, modalidade, estado, salario_max, habilidades FROM vagas WHERE id = $1', [req.params.id])
+    ]);
+    if (!perfil[0] || !vaga[0]) return res.status(404).json({ error: 'Não encontrado' });
+    res.json(calcMatch(perfil[0], vaga[0]));
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao calcular match' });
+  }
+}
+
 async function vagasRecomendadas(req, res) {
   try {
     const { rows: perfil } = await pool.query(
@@ -106,18 +150,8 @@ async function vagasRecomendadas(req, res) {
     );
 
     const scored = vagas.map(v => {
-      let score = 0;
-      if (c.area_atuacao && v.area && c.area_atuacao.toLowerCase() === v.area.toLowerCase()) score += 40;
-      if (c.nivel_experiencia && v.nivel && c.nivel_experiencia.toLowerCase() === v.nivel.toLowerCase()) score += 20;
-      if (c.modalidade && v.modalidade && c.modalidade.toLowerCase() === v.modalidade.toLowerCase()) score += 15;
-      if (c.estado && v.estado && c.estado === v.estado) score += 10;
-      if (c.cidade && v.cidade && c.cidade.toLowerCase() === v.cidade.toLowerCase()) score += 5;
-      if (c.pretensao_salarial && v.salario_max && Number(c.pretensao_salarial) <= Number(v.salario_max)) score += 5;
-      if (c.habilidades?.length && v.habilidades?.length) {
-        const match = c.habilidades.filter(h => v.habilidades.some(vh => vh.toLowerCase().includes(h.toLowerCase())));
-        score += Math.min(match.length * 5, 25);
-      }
-      return { ...v, match_score: score };
+      const { score, label } = calcMatch(c, v);
+      return { ...v, match_score: score, match_label: label };
     })
     .filter(v => v.match_score > 0)
     .sort((a, b) => b.match_score - a.match_score)
@@ -130,4 +164,4 @@ async function vagasRecomendadas(req, res) {
   }
 }
 
-module.exports = { listarVagas, getVaga, candidatar, vagasRecomendadas };
+module.exports = { listarVagas, getVaga, candidatar, vagasRecomendadas, getMatch };
