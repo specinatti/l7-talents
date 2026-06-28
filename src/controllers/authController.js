@@ -201,7 +201,7 @@ async function register(req, res) {
 async function me(req, res) {
   try {
     const { rows } = await pool.query(
-      'SELECT id, email, email_alternativo, whatsapp, role, created_at FROM users WHERE id = $1',
+      'SELECT id, email, email_alternativo, whatsapp, role, plano_ativo, plano_expira_em, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Usuário não encontrado' });

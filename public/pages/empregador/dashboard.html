@@ -56,6 +56,15 @@
         </div>
       </div>
 
+      <!-- Plano ativo -->
+      <div class="card mb-24" id="card-plano" style="display:none;">
+        <div class="card-header">
+          <h2 class="card-title">📦 Meu Plano</h2>
+          <a href="/pages/planos.html" class="btn btn-secondary btn-sm">Renovar / Upgrade</a>
+        </div>
+        <div id="plano-info"></div>
+      </div>
+
       <!-- Vagas recentes -->
       <div class="card mb-24">
         <div class="card-header">
@@ -87,17 +96,49 @@
 
     async function loadDashboard() {
       try {
-        const [stats, vagas, candidatos, perfil] = await Promise.all([
+        const [stats, vagas, candidatos, perfil, me] = await Promise.all([
           get('/empregadores/dashboard'),
           get('/empregadores/vagas'),
           get('/empregadores/candidatos'),
           get('/empregadores/perfil'),
+          get('/auth/me'),
         ]);
 
         document.getElementById('greeting').textContent = `Olá, ${perfil.nome_contato?.split(' ')[0] || 'Empresa'}! 👋`;
         document.getElementById('stat-vagas').textContent = stats.vagas_ativas;
         document.getElementById('stat-candidaturas').textContent = stats.total_candidaturas;
         document.getElementById('stat-views').textContent = stats.total_visualizacoes;
+
+        // Card plano ativo
+        if (me.plano_ativo) {
+          const planos = { teste:'Teste (7 dias)', starter:'Starter', business:'Business', premium:'Premium', rh_avulso:'RH Avulso', avaliacao:'Avaliação' };
+          const expira = me.plano_expira_em ? new Date(me.plano_expira_em) : null;
+          const diasRestantes = expira ? Math.max(0, Math.ceil((expira - Date.now()) / 86400000)) : null;
+          const cor = diasRestantes !== null && diasRestantes <= 7 ? '#dc2626' : '#16a34a';
+          document.getElementById('card-plano').style.display = '';
+          document.getElementById('plano-info').innerHTML = `
+            <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;padding:8px 0;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:48px;height:48px;background:#F2EDE8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>
+                <div>
+                  <div style="font-size:18px;font-weight:700;color:#1B2A4A;">${planos[me.plano_ativo] || me.plano_ativo}</div>
+                  <div style="font-size:13px;color:#6b7280;">Plano ativo</div>
+                </div>
+              </div>
+              ${expira ? `
+                <div style="text-align:center;">
+                  <div style="font-size:28px;font-weight:800;color:${cor};">${diasRestantes}</div>
+                  <div style="font-size:12px;color:#6b7280;">dias restantes</div>
+                </div>
+                <div style="font-size:13px;color:#6b7280;">Válido até ${expira.toLocaleDateString('pt-BR')}</div>
+              ` : ''}
+              ${diasRestantes !== null && diasRestantes <= 7 ? `
+                <div style="background:#fff1f2;border:1px solid #f87171;border-radius:8px;padding:10px 16px;font-size:13px;color:#dc2626;">
+                  ⚠️ Plano expirando em breve. <a href="/pages/planos.html" style="color:#dc2626;font-weight:600;">Renovar agora</a>
+                </div>
+              ` : ''}
+            </div>`;
+        }
 
         // Vagas
         const vl = document.getElementById('vagas-list');
