@@ -13,7 +13,7 @@ async function sendWhatsApp(phone, message) {
       `https://api.z-api.io/instances/${process.env.ZAPI_INSTANCE}/token/${process.env.ZAPI_TOKEN}/send-text`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Client-Token': process.env.ZAPI_CLIENT_TOKEN },
         body: JSON.stringify({ phone: fullPhone, message })
       }
     );

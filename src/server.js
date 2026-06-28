@@ -108,4 +108,8 @@ const PORT = process.env.PORT || 3000;
 
 initDB()
   .then(() => app.listen(PORT, () => console.log(`🚀 L7 Talents rodando na porta ${PORT}`)))
-  .catch(err => { console.error('Erro ao iniciar:', err); process.exit(1); });
+  .catch(err => {
+    console.warn('⚠️  Banco indisponível:', err.message);
+    console.warn('⚠️  Servidor iniciando sem banco — funcionalidades que dependem do DB estarão indisponíveis.');
+    app.listen(PORT, () => console.log(`🚀 L7 Talents rodando na porta ${PORT} (sem banco)`));
+  });

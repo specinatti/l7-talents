@@ -9,16 +9,18 @@ async function auth(req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Validar fingerprint: IP e User-Agent devem bater
-    const currentIp = req.ip || '';
-    const currentUa = (req.headers['user-agent'] || '').substring(0, 100);
-    if (decoded._ip && decoded._ip !== currentIp) {
-      res.clearCookie('auth_token');
-      return res.status(401).json({ error: 'Sessão inválida' });
-    }
-    if (decoded._ua && decoded._ua !== currentUa) {
-      res.clearCookie('auth_token');
-      return res.status(401).json({ error: 'Sessão inválida' });
+    // Validar fingerprint: IP e User-Agent devem bater (só em produção)
+    if (process.env.NODE_ENV === 'production') {
+      const currentIp = req.ip || '';
+      const currentUa = (req.headers['user-agent'] || '').substring(0, 100);
+      if (decoded._ip && decoded._ip !== currentIp) {
+        res.clearCookie('auth_token');
+        return res.status(401).json({ error: 'Sessão inválida' });
+      }
+      if (decoded._ua && decoded._ua !== currentUa) {
+        res.clearCookie('auth_token');
+        return res.status(401).json({ error: 'Sessão inválida' });
+      }
     }
 
     // Invalidar token se senha foi alterada após emissão
