@@ -165,8 +165,8 @@ async function register(req, res) {
   const { email, password, role, nome, razao_social } = req.body;
   if (!email || !password || !role || !nome)
     return res.status(400).json({ error: 'Campos obrigatórios: email, password, role, nome' });
-  if (!['candidato', 'empregador', 'financeiro', 'rh'].includes(role))
-    return res.status(400).json({ error: 'Role inválido' });
+  if (!['candidato', 'financeiro', 'rh'].includes(role))
+    return res.status(400).json({ error: 'Empresas devem adquirir um plano em /pages/planos.html', redirect: '/pages/planos.html' });
   if (password.length < 8)
     return res.status(400).json({ error: 'Senha deve ter no mínimo 8 caracteres' });
 

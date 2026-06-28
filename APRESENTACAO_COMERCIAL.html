@@ -7,22 +7,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Inter',sans-serif; background:#FDFAF7; color:#1B2A4A; }
+  body { font-family:'Inter',sans-serif; background:#FAF7F4; color:#1B2A4A; }
 
   /* HERO */
-  .hero { background:linear-gradient(135deg,#1B2A4A 0%,#2d4a7a 50%,#B85C6E 100%); color:white; padding:80px 40px; text-align:center; }
-  .hero-logo { font-family:'Playfair Display',serif; font-size:52px; font-weight:900; margin-bottom:8px; }
-  .hero-logo span { color:#f9c74f; }
+  .hero { background:linear-gradient(135deg,#1B2A4A 0%,#2d3f6b 60%,#B85C6E 100%); color:white; padding:80px 40px; text-align:center; }
+  .hero-logo { font-family:'Playfair Display',serif; font-size:52px; font-weight:900; margin-bottom:8px; letter-spacing:-1px; }
+  .hero-logo span { color:#B85C6E; background:white; padding:0 6px; border-radius:4px; }
   .hero-sub { font-size:20px; opacity:.85; margin-bottom:32px; }
   .hero-desc { font-size:16px; max-width:600px; margin:0 auto 40px; opacity:.8; line-height:1.8; }
   .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
   .btn-hero { padding:14px 32px; border-radius:50px; font-size:15px; font-weight:700; text-decoration:none; transition:.2s; }
-  .btn-gold { background:#f9c74f; color:#1B2A4A; }
+  .btn-gold { background:#FAF7F4; color:#1B2A4A; }
+  .btn-gold:hover { background:#F2EDE8; }
   .btn-outline-w { background:transparent; color:white; border:2px solid white; }
+  .btn-outline-w:hover { background:rgba(255,255,255,.1); }
 
   /* NUMBERS */
-  .numbers { background:white; padding:48px 40px; display:flex; justify-content:center; gap:0; flex-wrap:wrap; border-bottom:3px solid #f3f4f6; }
-  .num-item { text-align:center; padding:20px 40px; border-right:1px solid #e5e7eb; }
+  .numbers { background:white; padding:48px 40px; display:flex; justify-content:center; gap:0; flex-wrap:wrap; border-bottom:3px solid #F2EDE8; }
+  .num-item { text-align:center; padding:20px 40px; border-right:1px solid #F2EDE8; }
   .num-item:last-child { border-right:none; }
   .num-val { font-size:42px; font-weight:800; color:#B85C6E; font-family:'Playfair Display',serif; }
   .num-label { font-size:13px; color:#6b7280; margin-top:4px; }
@@ -30,13 +32,13 @@
   /* SECTIONS */
   section { padding:72px 40px; }
   .section-inner { max-width:1100px; margin:0 auto; }
-  .section-tag { display:inline-block; background:#fce7ec; color:#B85C6E; font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:16px; letter-spacing:.05em; text-transform:uppercase; }
+  .section-tag { display:inline-block; background:#F2EDE8; color:#B85C6E; font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:16px; letter-spacing:.05em; text-transform:uppercase; }
   .section-title { font-family:'Playfair Display',serif; font-size:36px; color:#1B2A4A; margin-bottom:12px; line-height:1.3; }
   .section-desc { font-size:16px; color:#6b7280; max-width:580px; line-height:1.8; margin-bottom:40px; }
 
   /* CARDS */
   .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
-  .card { background:white; border-radius:16px; padding:28px; border:1px solid #e5e7eb; transition:.25s; }
+  .card { background:white; border-radius:16px; padding:28px; border:1px solid #F2EDE8; transition:.25s; }
   .card:hover { box-shadow:0 12px 32px rgba(184,92,110,.12); transform:translateY(-4px); border-color:#B85C6E; }
   .card-icon { font-size:36px; margin-bottom:16px; }
   .card-title { font-size:17px; font-weight:700; color:#1B2A4A; margin-bottom:8px; }
@@ -44,8 +46,8 @@
 
   /* PLANOS */
   .planos-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
-  .plano { background:white; border-radius:16px; padding:28px; border:2px solid #e5e7eb; position:relative; }
-  .plano.destaque { border-color:#B85C6E; }
+  .plano { background:white; border-radius:16px; padding:28px; border:2px solid #F2EDE8; position:relative; }
+  .plano.destaque { border-color:#B85C6E; background:#FAF7F4; }
   .plano-badge { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:#B85C6E; color:white; font-size:11px; font-weight:700; padding:4px 14px; border-radius:20px; white-space:nowrap; }
   .plano-nome { font-family:'Playfair Display',serif; font-size:22px; color:#1B2A4A; margin-bottom:4px; }
   .plano-desc { font-size:12px; color:#B85C6E; font-weight:600; margin-bottom:16px; }
@@ -53,32 +55,34 @@
   .plano-preco sup { font-size:16px; }
   .plano-periodo { font-size:12px; color:#9ca3af; margin-bottom:20px; }
   .plano-items { list-style:none; }
-  .plano-items li { font-size:13px; color:#374151; padding:7px 0; border-bottom:1px solid #f3f4f6; display:flex; gap:8px; }
+  .plano-items li { font-size:13px; color:#374151; padding:7px 0; border-bottom:1px solid #F2EDE8; display:flex; gap:8px; }
   .plano-items li:last-child { border-bottom:none; }
 
   /* CANDIDATOS */
-  .cand-bg { background:linear-gradient(135deg,#1B2A4A,#2d4a7a); }
+  .cand-bg { background:linear-gradient(135deg,#1B2A4A,#2d3f6b); }
   .cand-bg .section-title, .cand-bg .section-desc { color:white; }
   .cand-bg .section-desc { opacity:.8; }
-  .cand-bg .section-tag { background:rgba(249,199,79,.2); color:#f9c74f; }
-  .cand-bg .card { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
+  .cand-bg .section-tag { background:rgba(250,247,244,.15); color:#FAF7F4; }
+  .cand-bg .card { background:rgba(250,247,244,.08); border-color:rgba(250,247,244,.15); }
   .cand-bg .card-title { color:white; }
   .cand-bg .card-desc { color:rgba(255,255,255,.7); }
 
   /* FREE VS PAGO */
   .compare { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-  .compare-col { background:white; border-radius:16px; padding:28px; border:2px solid #e5e7eb; }
-  .compare-col.pago { border-color:#f9c74f; background:#fffdf0; }
-  .compare-title { font-size:18px; font-weight:700; margin-bottom:16px; }
+  .compare-col { background:white; border-radius:16px; padding:28px; border:2px solid #F2EDE8; }
+  .compare-col.pago { border-color:#B85C6E; background:#FAF7F4; }
+  .compare-title { font-size:18px; font-weight:700; margin-bottom:16px; color:#1B2A4A; }
   .compare-items { list-style:none; }
-  .compare-items li { font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6; display:flex; gap:10px; align-items:center; color:#374151; }
+  .compare-items li { font-size:14px; padding:8px 0; border-bottom:1px solid #F2EDE8; display:flex; gap:10px; align-items:center; color:#374151; }
 </style>
 </head>
 <body>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-logo">L7 <span>Talents</span></div>
+  <div style="margin-bottom:24px;">
+    <img src="/images/l7-logo.svg" alt="L7 Talents" style="height:80px;background:white;padding:8px 16px;border-radius:12px;">
+  </div>
   <div class="hero-sub">A plataforma de RH que conecta empresas aos melhores talentos</div>
   <div class="hero-desc">Recrutamento inteligente, gestão de candidatos e processos seletivos modernos — tudo em um só lugar, com tecnologia de ponta e atendimento humano.</div>
   <div class="hero-btns">
@@ -182,7 +186,7 @@
         <div style="font-family:'Playfair Display',serif;font-size:24px;color:white;margin-bottom:8px;">Enterprise — Sob Consulta</div>
         <div style="color:rgba(255,255,255,.7);font-size:14px;max-width:480px;line-height:1.7;">Vagas ilimitadas, RH estruturado, gestão contínua de talentos e relatórios mensais. Para empresas que precisam de uma solução completa.</div>
       </div>
-      <a href="mailto:comercial@l7talents.online" style="background:#f9c74f;color:#1B2A4A;padding:14px 28px;border-radius:50px;font-weight:700;text-decoration:none;white-space:nowrap;">Falar com consultor →</a>
+      <a href="mailto:comercial@l7talents.online" style="background:#B85C6E;color:white;padding:14px 28px;border-radius:50px;font-weight:700;text-decoration:none;white-space:nowrap;">Falar com consultor →</a>
     </div>
   </div>
 </section>
@@ -285,18 +289,19 @@
 </section>
 
 <!-- CONTATO -->
-<section style="background:linear-gradient(135deg,#1B2A4A,#B85C6E);text-align:center;">
+<section style="background:linear-gradient(135deg,#1B2A4A,#2d3f6b);text-align:center;">
   <div class="section-inner">
+    <div style="margin-bottom:24px;"><img src="/images/l7-logo.svg" alt="L7 Talents" style="height:60px;background:white;padding:6px 14px;border-radius:10px;"></div>
     <div style="font-family:'Playfair Display',serif;font-size:40px;color:white;margin-bottom:16px;">Pronto para começar?</div>
     <div style="color:rgba(255,255,255,.8);font-size:16px;max-width:500px;margin:0 auto 40px;line-height:1.8;">
-      Teste a plataforma por apenas <strong style="color:#f9c74f;">R$ 5</strong> durante 7 dias.<br>
-      Candidatos se cadastram <strong style="color:#f9c74f;">gratuitamente</strong>.
+      Teste a plataforma por apenas <strong style="color:#FAF7F4;">R$ 5</strong> durante 7 dias.<br>
+      Candidatos se cadastram <strong style="color:#FAF7F4;">gratuitamente</strong>.
     </div>
     <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;">
-      <a href="https://l7talents.online/pages/planos.html" style="background:#f9c74f;color:#1B2A4A;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Contratar plano →</a>
-      <a href="https://l7talents.online/pages/cadastro.html?role=candidato" style="background:transparent;color:white;border:2px solid white;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Cadastro gratuito →</a>
+      <a href="https://l7talents.online/pages/planos.html" style="background:#B85C6E;color:white;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Contratar plano →</a>
+      <a href="https://l7talents.online/pages/cadastro.html?role=candidato" style="background:#FAF7F4;color:#1B2A4A;padding:16px 36px;border-radius:50px;font-weight:700;font-size:16px;text-decoration:none;">Cadastro gratuito →</a>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,.2);padding-top:32px;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;">
+    <div style="border-top:1px solid rgba(250,247,244,.2);padding-top:32px;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;">
       <div style="color:rgba(255,255,255,.7);font-size:14px;">📧 comercial@l7talents.online</div>
       <div style="color:rgba(255,255,255,.7);font-size:14px;">🌐 l7talents.online</div>
       <div style="color:rgba(255,255,255,.7);font-size:14px;">📱 WhatsApp disponível na plataforma</div>
