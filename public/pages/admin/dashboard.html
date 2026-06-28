@@ -52,6 +52,7 @@
     <div class="tab-bar">
       <button class="tab active" onclick="switchTab('monitor')">📊 Monitor</button>
       <button class="tab" onclick="switchTab('usuarios')">👥 Usuários</button>
+      <button class="tab" onclick="switchTab('compras')">💰 Compras</button>
       <button class="tab" onclick="switchTab('design')">🎨 Design</button>
       <button class="tab" onclick="switchTab('logs')">📋 Logs</button>
     </div>
@@ -156,6 +157,18 @@
     </div>
 
     <!-- ── LOGS ── -->
+    <div id="tab-compras" class="section">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Compras realizadas</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadCompras()">↻ Atualizar</button>
+        </div>
+        <div id="compras-container">
+          <div style="text-align:center;padding:32px;color:var(--gray-400);">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
     <div id="tab-logs" class="section">
       <div class="card">
         <div class="card-header">
@@ -198,11 +211,13 @@
   initNavbar('admin');
 
   function switchTab(name) {
-    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['monitor','usuarios','design','logs'][i] === name));
+    const tabs = ['monitor','usuarios','compras','design','logs'];
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     if (name === 'monitor') loadMonitor();
     if (name === 'usuarios') loadUsuarios();
+    if (name === 'compras') loadCompras();
     if (name === 'logs') loadLogs();
   }
 
@@ -289,6 +304,47 @@
       setLoading(btn, false);
     }
   });
+
+  // ── Compras ───────────────────────────────────────────────────────────
+  const STATUS_COR = { aprovado:'badge-green', pendente:'badge-warn', recusado:'badge-red', cancelado:'badge-red' };
+  const PACOTE_NOME = { teste:'Teste (7d)', starter:'Starter (30d)', business:'Business (60d)', premium:'Premium (90d)', rh_avulso:'RH Avulso', avaliacao:'Avaliação' };
+
+  async function loadCompras() {
+    try {
+      const res = await fetch('/api/pagamentos/pedidos', { headers: { Authorization: `Bearer ${auth.getToken()}` } });
+      const pedidos = await res.json();
+      const c = document.getElementById('compras-container');
+      if (!pedidos.length) { c.innerHTML = '<p style="text-align:center;padding:32px;color:var(--gray-400);">Nenhuma compra registrada.</p>'; return; }
+
+      // Totais rápidos
+      const aprovados = pedidos.filter(p => p.status === 'aprovado');
+      const receita = aprovados.reduce((s, p) => s + parseFloat(p.valor), 0);
+      c.innerHTML = `
+        <div style="display:flex;gap:16px;flex-wrap:wrap;padding:16px;border-bottom:1px solid var(--cream2);">
+          <div class="stat-card" style="flex:1;min-width:120px;"><div class="stat-val">${pedidos.length}</div><div class="stat-lbl">Total pedidos</div></div>
+          <div class="stat-card" style="flex:1;min-width:120px;"><div class="stat-val">${aprovados.length}</div><div class="stat-lbl">Aprovados</div></div>
+          <div class="stat-card" style="flex:1;min-width:120px;"><div class="stat-val">R$ ${receita.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="stat-lbl">Receita total</div></div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Data</th><th>Comprador</th><th>Empresa</th><th>Pacote</th><th>Valor</th><th>Status</th><th>MP ID</th></tr></thead>
+            <tbody>${pedidos.map(p => `
+              <tr>
+                <td class="text-muted" style="white-space:nowrap;">${new Date(p.created_at).toLocaleDateString('pt-BR')}</td>
+                <td><div class="fw-600">${p.nome_comprador || '—'}</div><div style="font-size:11px;color:var(--gray-400);">${p.email_comprador}</div></td>
+                <td>${p.empresa || '—'}</td>
+                <td><span class="badge badge-blue">${PACOTE_NOME[p.pacote] || p.pacote}</span></td>
+                <td class="fw-600">R$ ${parseFloat(p.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                <td><span class="badge ${STATUS_COR[p.status] || 'badge-warn'}">${p.status}</span></td>
+                <td style="font-size:11px;color:var(--gray-400);">${p.mp_payment_id || '—'}</td>
+              </tr>
+            `).join('')}</tbody>
+          </table>
+        </div>`;
+    } catch (err) {
+      document.getElementById('compras-container').innerHTML = `<p class="text-muted" style="padding:16px;">${err.message}</p>`;
+    }
+  }
 
   // ── Logs ─────────────────────────────────────────────────────────────
   async function loadLogs() {
