@@ -20,6 +20,8 @@ async function getPerfil(req, res) {
   }
 }
 
+const { sendWhatsApp } = require('../utils/whatsapp');
+
 async function updatePerfil(req, res) {
   const campos = ['nome','telefone','whatsapp','cidade','estado','linkedin','github','portfolio',
     'cargo_desejado','area_atuacao','nivel_experiencia','pretensao_salarial',
@@ -38,10 +40,23 @@ async function updatePerfil(req, res) {
   vals.push(req.user.id);
 
   try {
+    // Buscar whatsapp anterior para detectar primeiro cadastro
+    const before = await pool.query('SELECT whatsapp, nome FROM candidatos WHERE user_id = $1', [req.user.id]);
+    const whatsappAntes = before.rows[0]?.whatsapp;
+
     const { rows } = await pool.query(
       `UPDATE candidatos SET ${sets.join(', ')} WHERE user_id = $${vals.length} RETURNING *`,
       vals
     );
+
+    // Boas-vindas na primeira vez que cadastra WhatsApp
+    const novoWhatsapp = rows[0]?.whatsapp;
+    if (novoWhatsapp && !whatsappAntes) {
+      sendWhatsApp(novoWhatsapp,
+        `Olá ${rows[0].nome}! 👋\n\nSeu WhatsApp foi vinculado ao *L7 Talents*.\n\nVocê receberá notificações de vagas compatíveis e atualizações das suas candidaturas por aqui. 🚀`
+      );
+    }
+
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar perfil' });

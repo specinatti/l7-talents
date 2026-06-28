@@ -22,9 +22,20 @@ async function updatePerfil(req, res) {
   if (!sets.length) return res.status(400).json({ error: 'Nenhum campo para atualizar' });
   vals.push(req.user.id);
   try {
+    const before = await pool.query('SELECT whatsapp, nome_contato FROM empregadores WHERE user_id = $1', [req.user.id]);
+    const whatsappAntes = before.rows[0]?.whatsapp;
+
     const { rows } = await pool.query(
       `UPDATE empregadores SET ${sets.join(', ')} WHERE user_id = $${vals.length} RETURNING *`, vals
     );
+
+    const novoWhatsapp = rows[0]?.whatsapp;
+    if (novoWhatsapp && !whatsappAntes) {
+      sendWhatsApp(novoWhatsapp,
+        `Olá ${rows[0].nome_contato}! 👋\n\nSeu WhatsApp foi vinculado ao *L7 Talents*.\n\nVocê receberá notificações de novas candidaturas nas suas vagas por aqui. 🚀`
+      );
+    }
+
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar perfil' });

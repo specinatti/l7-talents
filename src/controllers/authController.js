@@ -76,24 +76,12 @@ async function sendEmailOTP(user) {
     console.log(`[EMAIL OTP] ${destinations.join(', ')}: ${code}`);
   }
 
-  // Enviar por WhatsApp via Z-API se número cadastrado
-  if (process.env.ZAPI_INSTANCE && process.env.ZAPI_TOKEN && user.whatsapp) {
-    const phone = user.whatsapp.replace(/\D/g, '');
-    const fullPhone = phone.startsWith('55') ? phone : `55${phone}`;
-    try {
-      const fetch = require('node-fetch');
-      await fetch(`https://api.z-api.io/instances/${process.env.ZAPI_INSTANCE}/token/${process.env.ZAPI_TOKEN}/send-text`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: fullPhone,
-          message: `🔐 *L7 Talents* — Seu código de acesso:\n\n*${code}*\n\nVálido por 10 minutos. Não compartilhe.`
-        })
-      });
-      console.log(`[WHATSAPP OTP] Enviado para ${fullPhone}`);
-    } catch (waErr) {
-      console.error(`[WHATSAPP OTP ERROR] ${waErr.message}`);
-    }
+  // Enviar por WhatsApp via Twilio se número cadastrado
+  if (user.whatsapp) {
+    const { sendWhatsApp } = require('../utils/whatsapp');
+    await sendWhatsApp(user.whatsapp,
+      `🔐 *L7 Talents* — Seu código de acesso:\n\n*${code}*\n\nVálido por 10 minutos. Não compartilhe.`
+    );
   }
 }
 
